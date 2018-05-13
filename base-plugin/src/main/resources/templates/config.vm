@@ -1,0 +1,59 @@
+#requireResourcesForContext("com.cloudflare.access.atlassian")
+<html>
+<head>
+    <title>Cloudflare Access Plugin Configuration</title>
+    <meta name="decorator" content="atl.admin">
+    $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+</head>
+<body class="page-type-admin">
+	#if( $showTitle )
+	<h2>Cloudflare Access Plugin Configuration</h2>
+	#end
+	
+	#if( $filteringDisabled )
+		<div class="aui-message aui-message-warning">
+		    <p class="title">
+		        <strong>$i18n.getText('cfaccess.warning.filteringDisabled.title')</strong>
+		    </p>
+		    <p>$i18n.getText('cfaccess.warning.filteringDisabled.message')</p>
+		</div>	
+	#end
+	
+	#if( $result )
+		<div class="aui-message $result.msgCssClass">
+		    <p class="title">
+		        <strong>$result.msgTitle</strong>
+		    </p>
+		    <p>$result.msg</p>
+		    <p>
+			#if( $result.violations.size() > 0 )
+			<ul>
+		  	#foreach( $violation in $result.violations )
+				<li>$i18n.getText($violation)</li>
+			#end
+			</ul>
+			#end
+		    </p>
+		</div>
+	#end
+	
+    <form id="config" class="aui top-label" method="POST" action="">
+    
+      <div class="field-group">
+        <label for="tokenAudience">$i18n.getText("cfaccess.config.tokenAudience") <span class="aui-icon icon-required"> required</span></label>
+        <input type="text" class="text long-field" id="tokenAudience" name="tokenAudience" value="$!{config.tokenAudience}">
+        <div class="description">$i18n.getText("cfaccess.config.tokenAudience.description")</div>
+      </div>
+      
+      <div class="field-group">
+        <label for="authDomain">$i18n.getText("cfaccess.config.authDomain") <span class="aui-icon icon-required"> required</span></label>
+        <input type="text" class="text long-field" id="authDomain" name="authDomain" value="$!{config.authDomain}">
+        <div class="description">$i18n.getText("cfaccess.config.authDomain.description")</div>
+      </div>
+      
+      <div class="field-group">
+        <input type="submit" class="button" value="Save">
+      </div>
+    </form>
+</body>
+</html>

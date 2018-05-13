@@ -1,0 +1,97 @@
+CLOUDFLARE ACCESS PLUGIN FOR ATLASSIAN LICENSE
+
+Your installation of this software constitutes a symbol of your signature
+indicating that you accept the terms of this Cloudflare Access Plugin for
+Atlassian License (this “Agreement”).  This Agreement is a binding legal
+agreement between you and Cloudflare, Inc. (“Cloudflare”) for the Cloudflare
+Access Plugin for Atlassian software code made available to you by Cloudflare or
+its authorized representative (the “Software”).  If you are not accepting this
+Agreement as an individual, then “you” means your company, its officers,
+members, employees, agents, representatives, successors and assigns.
+
+BY USING THE SOFTWARE, YOU ARE INDICATING THAT YOU HAVE READ, AND AGREE TO BE
+BOUND BY, THIS AGREEMENT IN ITS ENTIRETY, WITHOUT LIMITATION OR QUALIFICATION,
+AS WELL AS BY ALL APPLICABLE LAWS AND REGULATIONS, AS IF YOU HAD HANDWRITTEN
+YOUR NAME ON AND SIGNED THIS AGREEMENT.  IF YOU DO NOT AGREE TO THE TERMS AND
+CONDITIONS CONTAINED IN THIS AGREEMENT, YOU MAY NOT USE THE SOFTWARE.
+
+1.    GRANT OF RIGHTS
+
+1.1     Grant of License.    Subject to the terms and conditions of this
+Agreement, Cloudflare hereby grants you a limited, revocable, non-exclusive,
+non-sublicensable, and non-transferable copyright license to install and use the
+Software in connection with Cloudflare’s cloud-based solutions (the “License”).
+For any elements of the Software provided to you in source code, you may modify
+such source code solely to the extent necessary to support your permitted use of
+the Software (collectively, “Modifications”); provided, that in no event may you
+create Modifications for use with products or services other than those provided
+to you by or on behalf of Cloudflare, and you agree to indemnify, defend and
+hold Cloudflare harmless from and against any and all claims, costs, damages,
+notices affixed to, distributed with or associated with the Software. Except for
+the rights and licenses explicitly granted herein, as between you and
+Cloudflare, Cloudflare and/or its licensors own and shall retain all right,
+title, and interest in and to the Software, including any and all technology
+embodied therein, including all copyrights, patents, trade secrets, trade dress
+and other proprietary rights associated therewith, and any derivative works
+created therefrom.
+
+2.      DISCLAIMER; NO WARRANTIES
+
+THE SOFTWARE IS MADE AVAILABLE TO YOU ON AN "AS IS" AND "AS AVAILABLE" BASIS,
+WITH THE EXPRESS UNDERSTANDING THAT CLOUDFLARE HAS NO OBLIGATION TO MONITOR,
+CONTROL, OR VET THE SOFTWARE. AS SUCH, YOUR USE OF THE SOFTWARE IS AT YOUR OWN
+DISCRETION AND RISK. CLOUDFLARE MAKES NO CLAIMS OR PROMISES ABOUT THE QUALITY,
+ACCURACY, OR RELIABILITY OF THE SOFTWARE, ITS SAFETY OR SECURITY. ACCORDINGLY,
+CLOUDFLARE IS NOT LIABLE TO YOU FOR ANY LOSS OR DAMAGE THAT MIGHT ARISE, FOR
+EXAMPLE, FROM THE SOFTWARE'S INOPERABILITY, UNAVAILABILITY OR SECURITY
+VULNERABILITIES. ACCORDINGLY, TO THE EXTENT PERMISSIBLE UNDER APPLCIABLE LAW,
+CLOUDFLARE EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS OR IMPLIED,
+INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, AND NON-INFRINGEMENT. FOR THE AVOIDANCE OF DOUBT, YOU ACKNOWLEDGE AND
+AGREE THAT CLOUDFLARE IS NOT OBLIGATED TO PROVIDE YOU WITH SUPPORT FOR THE
+SOFTWARE OR CORRECT ANY BUGS, DEFECTS, OR ERRORS IN THE SOFTWARE.
+
+3.      LIMITATION OF LIABILITY
+
+IN NO EVENT WILL CLOUDFLARE BE LIABLE TO YOU OR ANY THIRD PARTY FOR ANY
+INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES ARISING OUT OF
+OR RELATING TO YOUR ACCESS TO OR USE OF, OR YOUR INABILITY TO ACCESS OR USE, THE
+SOFTWARE, WHETHER BASED ON WARRANTY, CONTRACT, TORT (INCLUDING NEGLIGENCE),
+STATUTE OR ANY OTHER LEGAL THEORY, WHETHER OR NOT CLOUDFLARE HAS BEEN INFORMED
+OF THE POSSIBILITY OF SUCH DAMAGE.
+
+4.      TERM AND TERMINATION
+
+This Agreement shall be effective upon download or installation of the Software
+by you, and shall continue until terminated in accordance with this Section 4.
+This Agreement may be terminated by Cloudflare if you are in material breach of
+this Agreement or any other agreement between you and Cloudflare or its
+authorized representative (a “Related Agreement”), including, without
+limitation, if you fail to pay any amounts due to Cloudflare under a Related
+Agreement, or if all Related Agreements are terminated or expired. Upon the
+termination of this Agreement for any reason all license rights granted
+hereunder shall terminate immediately.
+
+5.      MISCELLANEOUS
+
+Cloudflare may modify this Agreement upon written notice to you.  No failure or
+delay by either party in exercising any right, power, or remedy under this
+Agreement, except as specifically provided herein, shall operate as a waiver of
+any such right, power or remedy. This Agreement shall be governed by the laws of
+the State of California, without giving effect to any conflicts of laws
+principles that require the application of the law of a different jurisdiction,
+and excluding the United Nations Convention on Contracts for the International
+Sale of Goods.  The parties to this Agreement are independent contractors.
+Neither party shall be deemed to be an employee, agent, partner or legal
+representative of the other for any purpose and neither shall have any right,
+power or authority to create any obligation or responsibility on behalf of the
+other. If any provision of this Agreement is held by a court of competent
+jurisdiction to be contrary to law, such provision shall be changed and
+interpreted so as to best accomplish the objectives of the original provision to
+the fullest extent allowed by law, and the remaining provisions of this
+Agreement shall remain in full force and effect. This Agreement constitutes the
+final, complete and exclusive agreement between you and Cloudflare with respect
+to the License and the Software, and supersedes all previous written and oral
+agreements and communications related thereto.
+
+Last Updated: October 1, 2018
