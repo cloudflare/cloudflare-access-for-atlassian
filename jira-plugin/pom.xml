@@ -27,11 +27,24 @@
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
+        
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-sal-plugin</artifactId>
 			<version>${jira.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-core</artifactId>
+            <version>${jira.version}</version>
+            <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.crowd</groupId>
+			<artifactId>crowd-api</artifactId>
+			<version>${crowd.version}</version>
+			<scope>provided</scope>			
 		</dependency>        
         <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
         <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
@@ -83,7 +96,6 @@
             <artifactId>gson</artifactId>
             <version>2.2.2-atlassian-1</version>
         </dependency>
-        
         <dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -142,7 +154,11 @@
                         <Import-Package>
                         	org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
-                             *;resolution:=optional
+                            com.atlassian.crowd.*;resolution:="optional",
+                            com.atlassian.crowd.embedded.api.*;resolution:="optional",
+                            com.sun.*;resolution:="optional",
+                            net.sf.cglib.*;resolution:="optional",
+                             *;resolution:="optional"
                         </Import-Package>
 
                         <!-- Ensure plugin is spring powered -->
@@ -178,6 +194,7 @@
 
     <properties>
         <jira.version>7.7.1</jira.version>
+        <crowd.version>3.1.1</crowd.version>
         <amps.version>6.3.15</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>

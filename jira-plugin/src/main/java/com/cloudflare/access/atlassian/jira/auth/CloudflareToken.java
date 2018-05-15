@@ -17,38 +17,41 @@ public class CloudflareToken {
 
 	private static final String CF_ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
 	private static final String CF_ACCESS_JWT_COOKIE = "CF_Authorization";
-
-	private final HttpServletRequest request;
+	private JwtToken jwt;
 
 	public CloudflareToken(HttpServletRequest request) {
-		this.request = request;
+		String token = getJWT(request);
+		TokenVerifier tokenVerifier = new TokenVerifier(new EnvironmentVerificationContext());
+		this.jwt = tokenVerifier.validate(token);
 	}
 
 	public String getUserEmail() {
-		String token = getJWT();
-		TokenVerifier tokenVerifier = new TokenVerifier(new EnvironmentVerificationContext());
-		JwtToken jwt = tokenVerifier.validate(token);
 		return (String) jwt.getClaim("email");
 	}
 
-	private String getJWT() {
-		String jwt = getFromHeader();
+	private String getJWT(HttpServletRequest request) {
+		String jwt = getFromHeader(request);
 		if(isBlank(jwt)) {
-			jwt = getFromCookie();
+			jwt = getFromCookie(request);
 		}
 
 		if(isBlank(jwt)) {
-			//TODO throw exception
+			//TODO use custom exception
+			throw new IllegalStateException("No Cloudflare Access token available in the request");
 		}
 		return jwt;
 	}
 
-	private String getFromHeader(){
-		return this.request.getHeader(CF_ACCESS_JWT_HEADER);
+	private String getFromHeader(HttpServletRequest request){
+		return request.getHeader(CF_ACCESS_JWT_HEADER);
 	}
 
-	private String getFromCookie(){
-		return Arrays.stream(this.request.getCookies())
+	private String getFromCookie(HttpServletRequest request){
+		if(request.getCookies() == null) {
+			return null;
+		}
+
+		return Arrays.stream(request.getCookies())
 				.filter(cookie -> CF_ACCESS_JWT_COOKIE.equals(cookie.getName()))
 				.findFirst()
 				.map(Cookie::getValue)
