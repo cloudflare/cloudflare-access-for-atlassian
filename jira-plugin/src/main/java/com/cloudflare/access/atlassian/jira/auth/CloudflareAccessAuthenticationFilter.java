@@ -1,6 +1,7 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -16,7 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.atlassian.crowd.embedded.api.CrowdService;
+import com.atlassian.crowd.embedded.api.SearchRestriction;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.crowd.search.builder.Combine;
 import com.atlassian.crowd.search.query.entity.UserQuery;
 import com.atlassian.crowd.search.query.entity.restriction.MatchMode;
 import com.atlassian.crowd.search.query.entity.restriction.TermRestriction;
@@ -29,7 +32,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.seraph.auth.DefaultAuthenticator;
 import com.atlassian.seraph.service.rememberme.RememberMeService;
 import com.cloudflare.access.atlassian.jira.util.RequestInspector;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 
 @Named("CloudflareAccessAuthenticationFilter")
 public class CloudflareAccessAuthenticationFilter implements Filter{
@@ -77,23 +80,32 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 	}
 
 	private CloudflareAuthenticationResult authenticate(HttpServletRequest httpRequest) {
-		User user = null;
 		try {
 			CloudflareToken cloudflareToken = new CloudflareToken(httpRequest);
-			//TODO how to handle more than one user with same email address?
+
 			String userEmail = cloudflareToken.getUserEmail();
-			user  = Iterables.getFirst(crowdService.search(new UserQuery<>(User.class, new TermRestriction<>(UserTermKeys.EMAIL, MatchMode.EXACTLY_MATCHES, userEmail), 0, 1)), null);
+			SearchRestriction userCriteria = Combine.allOf(
+					new TermRestriction<>(UserTermKeys.EMAIL, MatchMode.EXACTLY_MATCHES, userEmail),
+					new TermRestriction<>(UserTermKeys.ACTIVE, true)
+			);
+			UserQuery<User> query = new UserQuery<>(User.class, userCriteria, 0, Integer.MAX_VALUE);
+
+			Iterator<User> users = crowdService.search(query).iterator();
+			User user  = Iterators.getNext(users, null);
 
 			if(user == null) {
 				throw new IllegalArgumentException(String.format("No user matching '%s'", userEmail));
 			}
 
+			if(users.hasNext()) {
+				throw new IllegalArgumentException(String.format("More than one user matching '%s'", userEmail));
+			}
+
+			return new CloudflareAuthenticationResult(user);
 		}catch (Throwable e) {
 			log.error("Error processing token:" + e.getMessage(), e);
 			return new CloudflareAuthenticationResult(e);
 		}
-		return new CloudflareAuthenticationResult(user);
 	}
-
 
 }
