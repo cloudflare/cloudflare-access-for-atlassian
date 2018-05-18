@@ -17,7 +17,7 @@ To be able to authorize users initially authenticated on Access you need to prov
 
 ### CSRF configuration for REST calls
 
-REST calls are protected agains Cross Site Request Forgery (CSRF) and due to proxying requests through Cloudflare, the REST calls will fail with similar messages on Atlassian services:
+REST calls are protected against Cross Site Request Forgery (CSRF) and as requests are proxied through Cloudflare, the REST calls will fail with similar messages on Atlassian services:
 
 ```
 2015-09-01 17:25:46.530585500 2015-09-01 07:25:46,530 ajp-nio-127.0.0.104-8009-exec-23 WARN anonymous 1045x1465x1 sibktb 127.0.0.1 /rest/auth/latest/session [c.a.p.r.c.security.jersey.XsrfResourceFilter] Additional XSRF checks failed for request: https://example.domain/rest/auth/latest/session , origin: https://another-origin.domain , referrer: null , credentials in request: true , allowed via CORS: false}}
@@ -31,6 +31,6 @@ Please refer to the following links for more details and how to fix this problem
 
 #### Development - CSRF configuration when using SSL and Atlassian SDK
 
-The `atlas-run` command currently is not copying the scheme we define on the base Tomcat when starting the application.
+The `atlas-run` command currently is not copying the scheme defined on the base Tomcat when starting the application.
 
 The solution is to configure the local proxy (Nginx/Apache) to set the `Origin` header with a URL like `http://<Your testing domain>` 
