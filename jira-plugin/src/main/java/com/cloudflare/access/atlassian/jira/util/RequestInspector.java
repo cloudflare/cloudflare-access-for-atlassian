@@ -12,6 +12,14 @@ import javax.servlet.http.HttpSession;
 public class RequestInspector {
 	private static final String divider = "---------------------------------------------------------------------------------------\n";
 
+	public static String getRequestedResourceInfo(HttpServletRequest request) {
+		StringBuilder sb =  new StringBuilder();
+		sb.append(divider);
+		sb.append("ServerName:" + request.getServerName());
+		sb.append("ServletPath:" + request.getServletPath());
+		return sb.toString();
+	}
+
 	public static String getHeadersAndCookies(HttpServletRequest request) {
 		StringBuilder sb =  new StringBuilder();
 		sb.append(divider);
@@ -39,7 +47,7 @@ public class RequestInspector {
 	public static String getSessionContents(HttpServletRequest request) {
 		StringBuilder sb =  new StringBuilder();
 		sb.append(divider);
-		final HttpSession httpSession = request.getSession();
+		final HttpSession httpSession = request.getSession(false);
 		Enumeration<String> sessionKeys = httpSession.getAttributeNames();
 		while (sessionKeys.hasMoreElements()) {
 			String key = sessionKeys.nextElement();

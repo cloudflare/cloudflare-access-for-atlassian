@@ -60,8 +60,10 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		log.info(RequestInspector.getHeadersAndCookies(httpRequest));
-		log.info(RequestInspector.getSessionContents(httpRequest));
+		if(JiraWhitelistRules.matchesWhitelist(httpRequest)) {
+			chain.doFilter(request, response);
+			return;
+		}
 
 		final CloudflareAuthenticationResult authResult = authenticate(httpRequest);
 
@@ -74,6 +76,9 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
             ComponentAccessor.getComponentOfType(RememberMeService.class).addRememberMeCookie(httpRequest, httpResponse, user.getName());
             chain.doFilter(request, response);
 		}else {
+			log.debug(RequestInspector.getHeadersAndCookies(httpRequest));
+			log.debug(RequestInspector.getSessionContents(httpRequest));
+			log.debug(RequestInspector.getRequestedResourceInfo(httpRequest));
 			httpResponse.sendError(401, authResult.getError().getMessage());
 			httpResponse.addHeader("WWW-Authenticate", "bearer realm=" + httpRequest.getServerName());
 		}
