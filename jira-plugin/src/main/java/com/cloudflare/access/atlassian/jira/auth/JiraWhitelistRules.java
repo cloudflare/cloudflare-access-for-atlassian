@@ -12,14 +12,18 @@ import com.cloudflare.access.atlassian.jira.util.WhitelistRule;
 public class JiraWhitelistRules {
 
 	/**
-	 * Matches requests to gadgets XML specs
+	 * Matches requests to gadgets specs and bundles
+	 *
+	 * Example: /jira/rest/gadgets/1.0/g/feed
+	 *
 	 */
-	private static final WhitelistRule GADGET_SPEC_RULE = (request) -> {
+	private static final WhitelistRule GADGETS = (request) -> {
 		String uri = request.getRequestURI();
-		return uri.matches("^/rest/gadgets/.*xml$");
+		System.out.println("Matching uri: "+uri);
+		return uri.matches("^.*/rest/gadgets/.*$");
 	};
 
-	private static final List<WhitelistRule> rules = Collections.singletonList(GADGET_SPEC_RULE);
+	private static final List<WhitelistRule> rules = Collections.singletonList(GADGETS);
 
 
 	public static final boolean matchesWhitelist(HttpServletRequest request) {

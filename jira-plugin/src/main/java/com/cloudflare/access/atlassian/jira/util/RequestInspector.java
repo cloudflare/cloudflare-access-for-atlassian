@@ -48,6 +48,7 @@ public class RequestInspector {
 		StringBuilder sb =  new StringBuilder();
 		sb.append(divider);
 		final HttpSession httpSession = request.getSession(false);
+		if(httpSession == null) return "NO SESSION";
 		Enumeration<String> sessionKeys = httpSession.getAttributeNames();
 		while (sessionKeys.hasMoreElements()) {
 			String key = sessionKeys.nextElement();
