@@ -6,10 +6,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.BooleanUtils;
 
+import com.atlassian.extras.common.log.Logger;
+import com.atlassian.extras.common.log.Logger.Log;
 import com.cloudflare.access.atlassian.jira.util.WhitelistRule;
 import com.google.common.collect.Lists;
 
 public class JiraWhitelistRules {
+
+	private static final Log log = Logger.getInstance(JiraWhitelistRules.class);
 
 	/**
 	 * Matches requests to gadgets specs and bundles
@@ -19,7 +23,9 @@ public class JiraWhitelistRules {
 	 */
 	private static final WhitelistRule GADGETS = (request) -> {
 		String uri = request.getRequestURI();
-		return uri.matches("^.*/rest/gadgets/.*$");
+		boolean matches = uri.matches("^.*/rest/gadgets/.*$");
+		log.debug(String.format("Whitelist '%s'? %s", uri, matches));
+		return matches;
 	};
 
 	/**
@@ -28,7 +34,9 @@ public class JiraWhitelistRules {
 	 */
 	private static final WhitelistRule CSS = (request) -> {
 		String uri = request.getRequestURI();
-		return uri.matches("^.*css$");
+		boolean matches = uri.matches("^.*css$");
+		log.debug(String.format("Whitelist '%s'? %s", uri, matches));
+		return matches;
 	};
 
 	private static final List<WhitelistRule> rules = Lists.newArrayList(GADGETS, CSS);

@@ -15,8 +15,8 @@ public class RequestInspector {
 	public static String getRequestedResourceInfo(HttpServletRequest request) {
 		StringBuilder sb =  new StringBuilder();
 		sb.append(divider);
-		sb.append("ServerName:" + request.getServerName());
-		sb.append("ServletPath:" + request.getServletPath());
+		sb.append("ServerName:" + request.getServerName() + "\n");
+		sb.append("ServletPath:" + request.getServletPath() + "\n");
 		return sb.toString();
 	}
 

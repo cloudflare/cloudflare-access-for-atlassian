@@ -61,12 +61,16 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+		log.debug("Initializing internal proxy...");
 		AtlassianInternalHttpProxy.INSTANCE.init(new EnvironmentPluginConfiguration().getInternalProxyConfig());
+		log.debug("Filter initialized");
 	}
 
 	@Override
 	public void destroy() {
+		log.debug("Shutting down internal proxy...");
 		AtlassianInternalHttpProxy.INSTANCE.shutdown();
+		log.debug("Filter destroyed");
 	}
 
 	@Override
@@ -92,6 +96,7 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 
 		if(authResult.isAuthenticated()) {
 			User user = authResult.getUser();
+			log.debug("Request authenticated for user: " + user.getName());
 			final HttpSession httpSession = httpRequest.getSession();
             httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, user);
             httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, null);
@@ -99,6 +104,7 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
             ComponentAccessor.getComponentOfType(RememberMeService.class).addRememberMeCookie(httpRequest, httpResponse, user.getName());
             chain.doFilter(request, response);
 		}else {
+			log.debug("Request not authenticated: " + authResult.getError().getMessage());
 			log.debug(RequestInspector.getHeadersAndCookies(httpRequest));
 			log.debug(RequestInspector.getSessionContents(httpRequest));
 			log.debug(RequestInspector.getRequestedResourceInfo(httpRequest));

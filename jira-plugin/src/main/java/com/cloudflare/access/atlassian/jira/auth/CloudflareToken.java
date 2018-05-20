@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
+import com.atlassian.extras.common.log.Logger;
+import com.atlassian.extras.common.log.Logger.Log;
 import com.cloudflare.access.atlassian.common.TokenVerifier;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
@@ -16,6 +18,9 @@ public class CloudflareToken {
 
 	private static final String CF_ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
 	private static final String CF_ACCESS_JWT_COOKIE = "CF_Authorization";
+
+	private static final Log log = Logger.getInstance(CloudflareToken.class);
+
 	private JwtToken jwt;
 
 	public CloudflareToken(HttpServletRequest request, AuthenticationContext authContext) {
@@ -31,11 +36,12 @@ public class CloudflareToken {
 	private String getJWT(HttpServletRequest request) {
 		String jwt = getFromHeader(request);
 		if(isBlank(jwt)) {
+			log.debug("JWT not available in header");
 			jwt = getFromCookie(request);
 		}
 
 		if(isBlank(jwt)) {
-			//TODO use custom exception
+			log.debug("JWT not available in cookie");
 			throw new IllegalStateException("No Cloudflare Access token available in the request");
 		}
 		return jwt;

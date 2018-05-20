@@ -11,12 +11,15 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.atlassian.extras.common.log.Logger;
 import com.atlassian.extras.common.log.Logger.Log;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.seraph.auth.DefaultAuthenticator;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.context.EnvironmentAuthenticationContext;
 import com.cloudflare.access.atlassian.jira.util.PluginUtils;
@@ -52,8 +55,13 @@ public class CloudflareAccessLogoutFilter implements Filter{
 			return;
 		}
 
-		log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());
-		final HttpServletResponse httpResponse = (HttpServletResponse) response;
+		final HttpServletRequest httpRequest = (HttpServletRequest) request;
+		final HttpSession httpSession = httpRequest.getSession();
+        httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, null);
+        httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, true);
+
+        log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());
+        final HttpServletResponse httpResponse = (HttpServletResponse) response;
 		httpResponse.sendRedirect(authContext.getLogoutUrl());
 	}
 
