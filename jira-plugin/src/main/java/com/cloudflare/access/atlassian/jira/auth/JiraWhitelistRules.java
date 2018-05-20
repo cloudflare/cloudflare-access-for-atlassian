@@ -1,6 +1,5 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.BooleanUtils;
 
 import com.cloudflare.access.atlassian.jira.util.WhitelistRule;
+import com.google.common.collect.Lists;
 
 public class JiraWhitelistRules {
 
@@ -19,11 +19,19 @@ public class JiraWhitelistRules {
 	 */
 	private static final WhitelistRule GADGETS = (request) -> {
 		String uri = request.getRequestURI();
-		System.out.println("Matching uri: "+uri);
 		return uri.matches("^.*/rest/gadgets/.*$");
 	};
 
-	private static final List<WhitelistRule> rules = Collections.singletonList(GADGETS);
+	/**
+	 * Matches requests to CSS files
+	 *
+	 */
+	private static final WhitelistRule CSS = (request) -> {
+		String uri = request.getRequestURI();
+		return uri.matches("^.*css$");
+	};
+
+	private static final List<WhitelistRule> rules = Lists.newArrayList(GADGETS, CSS);
 
 
 	public static final boolean matchesWhitelist(HttpServletRequest request) {

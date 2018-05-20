@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-import com.cloudflare.access.atlassian.common.context.VerificationContext;
+import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.exception.InvalidJWTException;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -100,7 +100,7 @@ public class TokenVerifierTest {
 	}
 
 
-	private static class TestVerificationContext implements VerificationContext{
+	private static class TestVerificationContext implements AuthenticationContext{
 
 		private String audience;
 		private String issuer;
@@ -156,6 +156,11 @@ public class TokenVerifierTest {
 		@Override
 		public String getSigningKeyAsJson() {
 			return this.jwkJson;
+		}
+
+		@Override
+		public String getLogoutUrl() {
+			return "unusedhere";
 		}
 
 		@Override

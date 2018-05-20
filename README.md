@@ -13,7 +13,7 @@ To be able to authorize users initially authenticated on Access you need to prov
 - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from you Access configuration
 - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
 - `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
-
+- `CF_ACCESS_ATLASSIAN_LOGOUT_URL`: Logout URL to redirect users. Something like `https://<Your Authentication Domain>/cdn-cgi/access/logout`
 
 ### CSRF configuration for REST calls
 

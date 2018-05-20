@@ -28,9 +28,12 @@ import com.atlassian.extras.common.log.Logger;
 import com.atlassian.extras.common.log.Logger.Log;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.login.LoginManager;
+import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.seraph.auth.DefaultAuthenticator;
 import com.atlassian.seraph.service.rememberme.RememberMeService;
+import com.cloudflare.access.atlassian.common.http.AtlassianInternalHttpProxy;
+import com.cloudflare.access.atlassian.jira.util.PluginUtils;
 import com.cloudflare.access.atlassian.jira.util.RequestInspector;
 import com.google.common.collect.Iterators;
 
@@ -42,13 +45,21 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 	@ComponentImport
 	private CrowdService crowdService;
 
+	@ComponentImport
+	private PluginAccessor pluginAcessor;
+
 	@Inject
-	public CloudflareAccessAuthenticationFilter(CrowdService crowdService) {
+	public CloudflareAccessAuthenticationFilter(CrowdService crowdService, PluginAccessor pluginAcessor) {
 		this.crowdService = Objects.requireNonNull(crowdService, "CrowdService instance not injected by DI container");
+		this.pluginAcessor = Objects.requireNonNull(pluginAcessor, "PluginAccessor instance not injected by DI container");
 	}
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {}
+	public void init(FilterConfig filterConfig) throws ServletException {
+		//TODO we may need to find host and port
+		//TODO add a config to set the url and port, this way if our approach fail we are always able to forward to the right place
+		AtlassianInternalHttpProxy.INSTANCE.init("localhost", 2990);
+	}
 
 	@Override
 	public void destroy() {}
@@ -59,6 +70,11 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+		if(pluginAcessor.isPluginEnabled(PluginUtils.getPluginKey()) == false) {
+			chain.doFilter(request, response);
+			return;
+		}
 
 		if(JiraWhitelistRules.matchesWhitelist(httpRequest)) {
 			chain.doFilter(request, response);

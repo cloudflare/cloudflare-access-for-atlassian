@@ -16,8 +16,8 @@
         <url>https://www.cloudflare.com/</url>
     </organization>
 
-    <name>jira-plugin</name>
-    <description>This is the com.cloudflare.access.atlassian:jira-plugin plugin for Atlassian JIRA.</description>
+    <name>Cloudflare Access for JIRA</name>
+    <description>This is the Cloudflare Access authentication plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -77,7 +77,21 @@
             <version>1</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!-- 
+        	This prevents the error below when creating the OSGI manifest:
 
+        	The default package '.' is not permitted by the Import-Package syntax.
+
+        	More at: https://developer.atlassian.com/server/framework/atlassian-sdk/using-jdom-in-osgi/ 
+        -->
+		<dependency>
+		    <groupId>jdom</groupId>
+		    <artifactId>jdom</artifactId>
+		    <version>1.0</version>
+		    <scope>provided</scope>
+		</dependency>
+		
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
@@ -148,17 +162,19 @@
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
 
                         <!-- Add package to export here -->
-                        <Export-Package>com.cloudflare.access.atlassian.jira.api,</Export-Package>
+                        <Export-Package>
+                        	com.cloudflare.access.atlassian.jira.auth
+                        </Export-Package>
 
                         <!-- Add package import here -->
                         <Import-Package>
                         	org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             com.atlassian.crowd.*;resolution:="optional",
-                            com.atlassian.crowd.embedded.api.*;resolution:="optional",
                             com.sun.*;resolution:="optional",
                             net.sf.cglib.*;resolution:="optional",
-                             *;resolution:="optional"
+                            
+                            *;resolution:="optional"
                         </Import-Package>
 
                         <!-- Ensure plugin is spring powered -->
@@ -196,6 +212,7 @@
         <jira.version>7.7.1</jira.version>
         <crowd.version>3.1.1</crowd.version>
         <amps.version>6.3.15</amps.version>
+        <netty.version>4.0.44.Final</netty.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->

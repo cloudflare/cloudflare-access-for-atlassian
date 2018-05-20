@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
 import com.cloudflare.access.atlassian.common.TokenVerifier;
-import com.cloudflare.access.atlassian.common.context.EnvironmentVerificationContext;
+import com.cloudflare.access.atlassian.common.context.EnvironmentAuthenticationContext;
 
 //TODO implement test
 public class CloudflareToken {
@@ -21,7 +21,7 @@ public class CloudflareToken {
 
 	public CloudflareToken(HttpServletRequest request) {
 		String token = getJWT(request);
-		TokenVerifier tokenVerifier = new TokenVerifier(new EnvironmentVerificationContext());
+		TokenVerifier tokenVerifier = new TokenVerifier(new EnvironmentAuthenticationContext());
 		this.jwt = tokenVerifier.validate(token);
 	}
 

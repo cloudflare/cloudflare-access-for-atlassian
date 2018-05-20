@@ -12,14 +12,14 @@ import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
-import com.cloudflare.access.atlassian.common.context.VerificationContext;
+import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.exception.InvalidJWTException;
 
 public class TokenVerifier {
 
-	private VerificationContext context;
+	private AuthenticationContext context;
 
-	public TokenVerifier(VerificationContext context) {
+	public TokenVerifier(AuthenticationContext context) {
 		this.context = context;
 	}
 
