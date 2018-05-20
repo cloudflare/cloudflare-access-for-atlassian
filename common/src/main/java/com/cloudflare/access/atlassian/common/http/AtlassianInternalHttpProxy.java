@@ -30,13 +30,13 @@ public class AtlassianInternalHttpProxy {
 
 	private AtlassianInternalHttpProxy() {}
 
-	public void init(final String hostToForward, final int portToForward) {
+	public void init(AtlassianInternalHttpProxyConfig config) {
 		this.shutdown();
 
 		this.server =
 			    DefaultHttpProxyServer.bootstrap()
 			        .withPort(0)
-			        .withFiltersSource(new LocalServerForwardAdapter(hostToForward, portToForward))
+			        .withFiltersSource(new LocalServerForwardAdapter(config.getAddress(), config.getPort()))
 			        .start();
 
 		System.setProperty("http.proxyHost", "127.0.0.1");
@@ -44,8 +44,11 @@ public class AtlassianInternalHttpProxy {
 	}
 
 	public void shutdown() {
-		if(this.server != null)
+		if(this.server != null) {
 			this.server.stop();
+			System.setProperty("http.proxyHost", "");
+			System.setProperty("http.proxyPort", "");
+		}
 	}
 
 	private final class LocalServerForwardAdapter extends HttpFiltersSourceAdapter {

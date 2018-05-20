@@ -11,7 +11,7 @@
     <resource type="i18n" name="i18n" location="jira-plugin"/>
 
 	<!-- TODO check this resources before release -->
-    <!-- add our web resources -->
+    <!-- add our web resources 
     <web-resource key="jira-plugin-resources" name="jira-plugin Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <resource type="download" name="jira-plugin.css" location="/css/jira-plugin.css"/>
@@ -20,6 +20,7 @@
 
         <context>jira-plugin</context>
     </web-resource>
+    -->
     
     <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" 
     				class="com.cloudflare.access.atlassian.jira.auth.CloudflareAccessAuthenticationFilter" 

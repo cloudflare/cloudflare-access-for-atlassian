@@ -10,18 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
 import com.cloudflare.access.atlassian.common.TokenVerifier;
-import com.cloudflare.access.atlassian.common.context.EnvironmentAuthenticationContext;
+import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
-//TODO implement test
 public class CloudflareToken {
 
 	private static final String CF_ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
 	private static final String CF_ACCESS_JWT_COOKIE = "CF_Authorization";
 	private JwtToken jwt;
 
-	public CloudflareToken(HttpServletRequest request) {
+	public CloudflareToken(HttpServletRequest request, AuthenticationContext authContext) {
 		String token = getJWT(request);
-		TokenVerifier tokenVerifier = new TokenVerifier(new EnvironmentAuthenticationContext());
+		TokenVerifier tokenVerifier = new TokenVerifier(authContext);
 		this.jwt = tokenVerifier.validate(token);
 	}
 

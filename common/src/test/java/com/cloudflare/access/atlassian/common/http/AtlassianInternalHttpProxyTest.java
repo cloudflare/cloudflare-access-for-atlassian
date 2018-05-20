@@ -14,7 +14,8 @@ public class AtlassianInternalHttpProxyTest {
 
 	@Test
 	public void testLocalForward() throws MalformedURLException, IOException {
-		AtlassianInternalHttpProxy.INSTANCE.init("httpbin.org", 80);
+		AtlassianInternalHttpProxyConfig config = new AtlassianInternalHttpProxyConfig("httpbin.org", 80);
+		AtlassianInternalHttpProxy.INSTANCE.init(config);
 		sendGet("http://example.com", 200, null);
 		sendGet("http://example.com/jira/rest/gadgets/1.0/g/feed", 302, "http://httpbin.org:80/jira/rest/gadgets/1.0/g/feed");
 		AtlassianInternalHttpProxy.INSTANCE.shutdown();

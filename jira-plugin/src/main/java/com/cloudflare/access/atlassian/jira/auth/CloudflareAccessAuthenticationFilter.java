@@ -32,6 +32,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.seraph.auth.DefaultAuthenticator;
 import com.atlassian.seraph.service.rememberme.RememberMeService;
+import com.cloudflare.access.atlassian.common.config.EnvironmentPluginConfiguration;
 import com.cloudflare.access.atlassian.common.http.AtlassianInternalHttpProxy;
 import com.cloudflare.access.atlassian.jira.util.PluginUtils;
 import com.cloudflare.access.atlassian.jira.util.RequestInspector;
@@ -49,20 +50,24 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 	private PluginAccessor pluginAcessor;
 
 	@Inject
-	public CloudflareAccessAuthenticationFilter(CrowdService crowdService, PluginAccessor pluginAcessor) {
+	private CloudflareAccessService cloudflareAccess;
+
+	@Inject
+	public CloudflareAccessAuthenticationFilter(CrowdService crowdService, PluginAccessor pluginAcessor, CloudflareAccessService cloudflareAccess) {
 		this.crowdService = Objects.requireNonNull(crowdService, "CrowdService instance not injected by DI container");
 		this.pluginAcessor = Objects.requireNonNull(pluginAcessor, "PluginAccessor instance not injected by DI container");
+		this.cloudflareAccess = Objects.requireNonNull(cloudflareAccess, "CloudflareAccessService instance not injected by DI container");
 	}
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		//TODO we may need to find host and port
-		//TODO add a config to set the url and port, this way if our approach fail we are always able to forward to the right place
-		AtlassianInternalHttpProxy.INSTANCE.init("localhost", 2990);
+		AtlassianInternalHttpProxy.INSTANCE.init(new EnvironmentPluginConfiguration().getInternalProxyConfig());
 	}
 
 	@Override
-	public void destroy() {}
+	public void destroy() {
+		AtlassianInternalHttpProxy.INSTANCE.shutdown();
+	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -72,11 +77,13 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 		if(pluginAcessor.isPluginEnabled(PluginUtils.getPluginKey()) == false) {
+			log.debug("Plugin is disabled, bypassing filter");
 			chain.doFilter(request, response);
 			return;
 		}
 
 		if(JiraWhitelistRules.matchesWhitelist(httpRequest)) {
+			log.debug("Request is whitelisted, bypassing filter");
 			chain.doFilter(request, response);
 			return;
 		}
@@ -102,7 +109,7 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 
 	private CloudflareAuthenticationResult authenticate(HttpServletRequest httpRequest) {
 		try {
-			CloudflareToken cloudflareToken = new CloudflareToken(httpRequest);
+			CloudflareToken cloudflareToken = this.cloudflareAccess.getValidTokenFromRequest(httpRequest);
 
 			String userEmail = cloudflareToken.getUserEmail();
 			SearchRestriction userCriteria = Combine.allOf(
@@ -125,6 +132,7 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 			return new CloudflareAuthenticationResult(user);
 		}catch (Throwable e) {
 			log.error("Error processing token:" + e.getMessage(), e);
+			e.printStackTrace();
 			return new CloudflareAuthenticationResult(e);
 		}
 	}

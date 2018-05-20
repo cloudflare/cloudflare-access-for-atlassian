@@ -21,6 +21,7 @@ public class RequestInspector {
 	}
 
 	public static String getHeadersAndCookies(HttpServletRequest request) {
+		if(request.getHeaderNames() == null) return "";
 		StringBuilder sb =  new StringBuilder();
 		sb.append(divider);
 		Enumeration<String> headers = request.getHeaderNames();
@@ -45,10 +46,11 @@ public class RequestInspector {
 	}
 
 	public static String getSessionContents(HttpServletRequest request) {
-		StringBuilder sb =  new StringBuilder();
-		sb.append(divider);
 		final HttpSession httpSession = request.getSession(false);
 		if(httpSession == null) return "NO SESSION";
+
+		StringBuilder sb =  new StringBuilder();
+		sb.append(divider);
 		Enumeration<String> sessionKeys = httpSession.getAttributeNames();
 		while (sessionKeys.hasMoreElements()) {
 			String key = sessionKeys.nextElement();
