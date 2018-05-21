@@ -28,7 +28,7 @@ Remember to restart the application after setting up the environment.
 
 Follow these steps to install the add-on manually:
 
-- Download `cloudflare-access-jira-plugin.jar` 
+- Download `releases/cloudflare-access-jira-plugin-*.jar` 
 - Login on JIRA as administrator
 - Go to *JIRA Administration* > *Add-ons* > *Manage add-ons*
 - Click on *Upload add-on*
