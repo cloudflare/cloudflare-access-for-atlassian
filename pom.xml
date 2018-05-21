@@ -4,7 +4,7 @@
 
 	<groupId>com.cloudflare.access.atlassian</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<name>Cloudflare Access for Atlassian</name>
