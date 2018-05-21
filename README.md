@@ -9,7 +9,7 @@ Currently supported products are:
 
 ## Server Setup
 
-To be able to authorize users authenticated on Access you need to provide the following environment variables:
+To authorize authenticated users  from Access you need to provide the following environment variables:
 - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from you Access configuration
 - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
 - `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
