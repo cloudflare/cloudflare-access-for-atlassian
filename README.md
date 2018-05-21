@@ -87,3 +87,20 @@ The `atlas-run` command currently is not copying the scheme defined on the base 
 The solution is to configure the local proxy (Nginx/Apache) to set the `Origin` header with a URL like `http://<Your testing domain>` 
 
 Also this leads to other CSRF checks where content is not returned, in that case is best to install and manage the Atlassian product manually.
+
+# Building
+
+Install the Atlassian SDK following instructions on [Set up the Atlassian Plugin SDK and build a project](https://developer.atlassian.com/server/framework/atlassian-sdk/set-up-the-atlassian-plugin-sdk-and-build-a-project/).
+
+To build the module `common`:
+
+```
+./mvnw clean package -PcommonOnly
+```
+
+To build all modules:
+
+```
+atlas-mvn clean package
+```
+
