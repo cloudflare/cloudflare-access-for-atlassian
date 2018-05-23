@@ -1,6 +1,7 @@
 package com.cloudflare.access.atlassian.confluence.auth;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -109,8 +110,7 @@ public class AuthenticationFilter implements Filter{
 			log.debug(RequestInspector.getSessionContents(httpRequest));
 			log.debug(RequestInspector.getRequestedResourceInfo(httpRequest));*/
 			if(acceptsHtml(httpRequest)) {
-				httpResponse.addHeader(AuthenticationErrorServlet.ERROR_MSG_HEADER, authResult.getError().getMessage());
-				httpResponse.sendRedirect(httpRequest.getContextPath() + AuthenticationErrorServlet.PATH);
+				httpResponse.sendRedirect(httpRequest.getContextPath() + AuthenticationErrorServlet.PATH + String.format("?%s=%s", AuthenticationErrorServlet.ERROR_MSG_PARAM, URLEncoder.encode(authResult.getError().getMessage(), "UTF-8")));
 			}else {
 				httpResponse.sendError(401, authResult.getError().getMessage());
 				httpResponse.addHeader("WWW-Authenticate", "bearer realm=" + httpRequest.getServerName());

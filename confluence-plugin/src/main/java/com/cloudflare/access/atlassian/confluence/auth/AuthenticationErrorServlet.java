@@ -18,7 +18,7 @@ import com.google.common.collect.Maps;
 public class AuthenticationErrorServlet extends HttpServlet {
 	private static final long serialVersionUID = -5289553688902542990L;
 
-	public static final String ERROR_MSG_HEADER = "CF_ATL_AUTH_ERROR_MSG";
+	public static final String ERROR_MSG_PARAM = "reason";
 	public static final String PATH = "/plugins/servlet/cloudflareaccess/auth/error.vm";
 	private static final String ERROR_TEMPLATE = "/templates/error.vm";
 
@@ -34,7 +34,7 @@ public class AuthenticationErrorServlet extends HttpServlet {
 		resp.setContentType("text/html;charset=utf-8");
 
         Map<String, Object> context = Maps.newHashMap();
-        context.put("errorMessage", req.getHeader(ERROR_MSG_HEADER));
+        context.put("errorMessage", req.getParameter(ERROR_MSG_PARAM));
 
         templateRenderer.render(ERROR_TEMPLATE, context, resp.getWriter());
 	}
