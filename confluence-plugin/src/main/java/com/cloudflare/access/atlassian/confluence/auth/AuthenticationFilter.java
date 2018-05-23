@@ -109,8 +109,8 @@ public class AuthenticationFilter implements Filter{
 			log.debug(RequestInspector.getSessionContents(httpRequest));
 			log.debug(RequestInspector.getRequestedResourceInfo(httpRequest));*/
 			if(acceptsHtml(httpRequest)) {
-				httpRequest.setAttribute(AuthenticationErrorServlet.ERROR_MSG_ATTRIBUTE, authResult.getError().getMessage());
-				httpRequest.getRequestDispatcher(AuthenticationErrorServlet.PATH).forward(httpRequest, httpResponse);
+				httpResponse.addHeader(AuthenticationErrorServlet.ERROR_MSG_HEADER, authResult.getError().getMessage());
+				httpResponse.sendRedirect(httpRequest.getContextPath() + AuthenticationErrorServlet.PATH);
 			}else {
 				httpResponse.sendError(401, authResult.getError().getMessage());
 				httpResponse.addHeader("WWW-Authenticate", "bearer realm=" + httpRequest.getServerName());
