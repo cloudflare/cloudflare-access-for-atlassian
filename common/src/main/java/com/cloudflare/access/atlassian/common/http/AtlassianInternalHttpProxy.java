@@ -9,6 +9,8 @@ import org.littleshoot.proxy.HttpFiltersAdapter;
 import org.littleshoot.proxy.HttpFiltersSourceAdapter;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -25,6 +27,7 @@ import io.netty.handler.codec.http.HttpVersion;
 //TODO handle chained proxy
 public class AtlassianInternalHttpProxy {
 
+	public static final Logger log = LoggerFactory.getLogger(AtlassianInternalHttpProxy.class);
 	public static final AtlassianInternalHttpProxy INSTANCE = new AtlassianInternalHttpProxy();
 	private HttpProxyServer server;
 
@@ -65,8 +68,11 @@ public class AtlassianInternalHttpProxy {
 		    return new HttpFiltersAdapter(originalRequest) {
 		        @Override
 		        public HttpResponse clientToProxyRequest(HttpObject httpObject) {
+		        	log.debug("Intercepting outgoing request...");
 		        	if (shouldRewrite(httpObject)) {
-	        			URI localUrl = rewriteUri((HttpRequest) httpObject);
+		        		HttpRequest httpRequest = (HttpRequest) httpObject;
+						URI localUrl = rewriteUri(httpRequest);
+						log.debug("Sending redirect: \n\tFrom: {}\n\tTo: {}", httpRequest.getUri(), localUrl);
 	        			DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND);
 	        			HttpHeaders.setHeader(response, Names.CONNECTION, Values.CLOSE);
 	        			HttpHeaders.setHeader(response, Names.LOCATION, localUrl.toString());

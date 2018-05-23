@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/cf-icon.png</param>
+    <param name="plugin-logo">images/cf-logo.png</param>
+  </plugin-info>
+  <!-- add our i18n resource -->
+  <resource type="i18n" name="i18n" location="confluence-plugin"/>
+  <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" class="com.cloudflare.access.atlassian.confluence.auth.AuthenticationFilter" location="before-login" weight="200">
+    <description>Check authentication headers</description>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </servlet-filter>
+  <servlet-filter name="Cloudflare Access Logout Filter" key="cloudflareAccessLogoutFilter" class="com.cloudflare.access.atlassian.confluence.auth.LogoutFilter" location="before-login" weight="100">
+    <description>Intercepts logout calls and logout user from Cloudflare Access</description>
+    <url-pattern>/logout.action</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </servlet-filter>
+  
+  <servlet name="Authentication Error Servlet" i18n-name-key="authentication-error-servlet.name" key="authenticationErrorServlet" class="com.cloudflare.access.atlassian.confluence.auth.AuthenticationErrorServlet">
+    <description key="authentication-error-servlet.description">Custom error page to display authentication errors</description>
+    <url-pattern>/cloudflareaccess/auth/error.vm</url-pattern>
+  </servlet>
+</atlassian-plugin>
