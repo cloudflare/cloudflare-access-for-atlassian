@@ -25,7 +25,7 @@ public class CloudflareAccessService {
 
 	private static final Logger log = LoggerFactory.getLogger(CloudflareAccessService.class);
 
-	private final AuthenticationContext authContext = new EnvironmentAuthenticationContext();
+	private AuthenticationContext authContext = new EnvironmentAuthenticationContext();
 
 	private PluginAccessor pluginAcessor;
 	private CloudflarePluginDetails pluginDetails;
@@ -49,6 +49,10 @@ public class CloudflareAccessService {
 		this.failureHandler = failureHandler;
 	}
 
+	void setAuthContext(AuthenticationContext authContext){
+		this.authContext = authContext;
+	}
+
 	public void processAuthRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 		try {
 			if(isPluginDisabled()) {
@@ -66,8 +70,8 @@ public class CloudflareAccessService {
 			CloudflareToken token = getValidTokenFromRequest(request);
 			User user = userService.getUser(token.getUserEmail());
 			successHandler.handle(request, response, chain, user);
-			chain.doFilter(request, response);
 		}catch (Throwable e) {
+			log.error("Error processing authentication: " + e.getMessage(), e);
 			failureHandler.handle(request, response, e);
 		}
 	}

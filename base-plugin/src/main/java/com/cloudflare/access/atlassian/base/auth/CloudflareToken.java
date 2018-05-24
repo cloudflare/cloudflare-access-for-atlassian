@@ -16,8 +16,8 @@ import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
 public class CloudflareToken {
 
-	private static final String CF_ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
-	private static final String CF_ACCESS_JWT_COOKIE = "CF_Authorization";
+	public static final String CF_ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
+	public static final String CF_ACCESS_JWT_COOKIE = "CF_Authorization";
 
 	private static final Logger log = LoggerFactory.getLogger(CloudflareToken.class);
 
