@@ -1,6 +1,7 @@
-package com.cloudflare.access.atlassian.jira.auth;
+package com.cloudflare.access.atlassian.confluence.auth;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,15 +22,14 @@ import com.cloudflare.access.atlassian.common.config.EnvironmentPluginConfigurat
 import com.cloudflare.access.atlassian.common.http.AtlassianInternalHttpProxy;
 
 @Named("CloudflareAccessAuthenticationFilter")
-public class CloudflareAccessAuthenticationFilter implements Filter{
+public class AuthenticationFilter implements Filter{
 
-	private static final Logger log = LoggerFactory.getLogger(CloudflareAccessAuthenticationFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
-	@Inject
 	private CloudflareAccessService cloudflareAccess;
 
 	@Inject
-	public CloudflareAccessAuthenticationFilter(CloudflareAccessService cloudflareAccess) {
+	public AuthenticationFilter(CloudflareAccessService cloudflareAccess) {
 		this.cloudflareAccess = cloudflareAccess;
 	}
 
@@ -50,10 +50,10 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+		Objects.requireNonNull(cloudflareAccess, "CloudflareAccessService instance not injected by DI container");
 		cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
 	}
 

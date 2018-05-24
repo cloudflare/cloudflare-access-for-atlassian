@@ -1,6 +1,7 @@
-package com.cloudflare.access.atlassian.jira.auth;
+package com.cloudflare.access.atlassian.confluence.auth;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -16,13 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
 
 @Named("CloudflareAccessLogoutFilter")
-public class CloudflareAccessLogoutFilter implements Filter{
+public class LogoutFilter implements Filter{
 
 	private CloudflareAccessService cloudflareAccess;
 
 	@Inject
-	public CloudflareAccessLogoutFilter(CloudflareAccessService cloudflareAccess) {
-		this.cloudflareAccess = cloudflareAccess;
+	public LogoutFilter(CloudflareAccessService cloudflareAccess) {
+		this.cloudflareAccess = Objects.requireNonNull(cloudflareAccess, "CloudflareAccessService instance not injected by DI container");
 	}
 
 	@Override
