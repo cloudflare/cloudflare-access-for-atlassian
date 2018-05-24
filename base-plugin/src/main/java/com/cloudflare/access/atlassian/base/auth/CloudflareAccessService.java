@@ -17,6 +17,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.seraph.auth.DefaultAuthenticator;
+import com.cloudflare.access.atlassian.base.utils.RequestInspector;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.context.EnvironmentAuthenticationContext;
 
@@ -72,6 +73,8 @@ public class CloudflareAccessService {
 			successHandler.handle(request, response, chain, user);
 		}catch (Throwable e) {
 			log.error("Error processing authentication: " + e.getMessage(), e);
+			log.debug(RequestInspector.getRequestedResourceInfo(request));
+			log.debug(RequestInspector.getHeadersAndCookies(request));
 			failureHandler.handle(request, response, e);
 		}
 	}

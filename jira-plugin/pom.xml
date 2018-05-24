@@ -142,7 +142,7 @@
         
         <dependency>
         	<groupId>com.cloudflare.access.atlassian</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>base-plugin</artifactId>
 			<version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -209,13 +209,20 @@
                     </execution>
                 </executions>
                 <configuration>
+                	<!-- Add any service from the base plugin that was overriden, should be a regex -->
+                	<includeExclude>
+                	</includeExclude>
                     <scannedDependencies>
                         <dependency>
                             <groupId>com.atlassian.plugin</groupId>
                             <artifactId>atlassian-spring-scanner-external-jar</artifactId>
                         </dependency>
+                        <dependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>base-plugin</artifactId>
+                        </dependency>
                     </scannedDependencies>
-                    <verbose>false</verbose>
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
         </plugins>
