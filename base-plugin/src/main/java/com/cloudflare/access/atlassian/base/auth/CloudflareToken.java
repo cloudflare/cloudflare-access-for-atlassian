@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.confluence.auth;
+package com.cloudflare.access.atlassian.base.auth;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -8,9 +8,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.atlassian.extras.common.log.Logger;
-import com.atlassian.extras.common.log.Logger.Log;
 import com.cloudflare.access.atlassian.common.TokenVerifier;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
@@ -19,7 +19,7 @@ public class CloudflareToken {
 	private static final String CF_ACCESS_JWT_HEADER = "cf-access-jwt-assertion";
 	private static final String CF_ACCESS_JWT_COOKIE = "CF_Authorization";
 
-	private static final Log log = Logger.getInstance(CloudflareToken.class);
+	private static final Logger log = LoggerFactory.getLogger(CloudflareToken.class);
 
 	private JwtToken jwt;
 
