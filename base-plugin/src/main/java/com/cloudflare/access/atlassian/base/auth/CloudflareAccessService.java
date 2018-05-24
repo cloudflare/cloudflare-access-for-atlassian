@@ -87,6 +87,11 @@ public class CloudflareAccessService {
 		if(httpSession != null) {
 			httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, null);
 			httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, true);
+			try {
+				httpSession.invalidate();
+			}catch (IllegalStateException e) {
+				log.debug("Session was already invalid");
+			}
 		}
 
 		log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());

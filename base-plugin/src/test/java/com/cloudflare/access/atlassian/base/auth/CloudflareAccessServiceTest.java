@@ -3,7 +3,10 @@ package com.cloudflare.access.atlassian.base.auth;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
+
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -79,5 +82,43 @@ public class CloudflareAccessServiceTest {
 		verifyZeroInteractions(successHandler);
 		verifyZeroInteractions(httpResponse);
 		verifyZeroInteractions(chain);
+	}
+
+	@Test
+	public void testNoTokenValidationIfPluginDisabled() throws IOException, ServletException {
+		when(pluginAcessor.isPluginEnabled(anyString())).thenReturn(false);
+
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
+		cloudflareAccessService.setAuthContext(authContext);
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
+		verifyZeroInteractions(successHandler);
+		verifyZeroInteractions(userService);
+		verifyZeroInteractions(httpRequest);
+		verifyZeroInteractions(httpResponse);
+	}
+
+	@Test
+	public void testNoTokenValidationIfRequestIsWhitelisted() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		when(whitelistRules.isRequestWhitelisted(httpRequest)).thenReturn(true);
+
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
+		cloudflareAccessService.setAuthContext(authContext);
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		verify(whitelistRules,times(1)).isRequestWhitelisted(httpRequest);
+		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
+		verifyZeroInteractions(successHandler);
+		verifyZeroInteractions(userService);
+		verifyZeroInteractions(httpResponse);
 	}
 }
