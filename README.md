@@ -92,10 +92,10 @@ Also this leads to other CSRF checks where content is not returned, in that case
 
 Install the Atlassian SDK following instructions on [Set up the Atlassian Plugin SDK and build a project](https://developer.atlassian.com/server/framework/atlassian-sdk/set-up-the-atlassian-plugin-sdk-and-build-a-project/).
 
-To build the module `common`:
+To build the modules `common` and `base-plugin`:
 
 ```
-./mvnw clean package -PcommonOnly
+atlas-mvn clean package -PnoProduct
 ```
 
 To build all modules:
