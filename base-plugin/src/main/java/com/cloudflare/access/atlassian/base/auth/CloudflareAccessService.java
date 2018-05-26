@@ -78,6 +78,7 @@ public class CloudflareAccessService {
 			log.error("Error processing authentication: " + e.getMessage(), e);
 			log.debug(RequestInspector.getRequestedResourceInfo(request));
 			log.debug(RequestInspector.getHeadersAndCookies(request));
+			clearCookies(request, response);
 			failureHandler.handle(request, response, e);
 		}
 	}
