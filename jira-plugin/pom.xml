@@ -211,6 +211,7 @@
                 <configuration>
                 	<!-- Add any service from the base plugin that was overriden, should be a regex -->
                 	<includeExclude>
+                		-.*DefaultFailedAuthHandler.*
                 	</includeExclude>
                     <scannedDependencies>
                         <dependency>
