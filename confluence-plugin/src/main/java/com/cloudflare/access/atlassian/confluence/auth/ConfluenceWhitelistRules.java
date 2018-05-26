@@ -22,7 +22,8 @@ public class ConfluenceWhitelistRules implements AtlassianProductWhitelistRules{
 		String uri = httpRequest.getRequestURI();
 		List<String> rules = Lists.newArrayList(
 				"^.*"+AuthenticationErrorServlet.PATH+"$",
-				"^.*(css|woff|ttf|svg|png|gif|jpg|jpeg)$"
+				"^.*(css|woff|ttf|svg|png|gif|jpg|jpeg)$",
+				"^.*/rest/analytics/1.0/publish/bulk$"
 		);
 		return rules
 				.stream()

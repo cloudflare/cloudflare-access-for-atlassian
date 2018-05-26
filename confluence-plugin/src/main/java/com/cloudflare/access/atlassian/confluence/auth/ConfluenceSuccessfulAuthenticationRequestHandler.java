@@ -1,5 +1,7 @@
 package com.cloudflare.access.atlassian.confluence.auth;
 
+import java.io.IOException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,17 +38,35 @@ public class ConfluenceSuccessfulAuthenticationRequestHandler implements Success
 	@Override
 	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain, User user) {
 		try {
-			ConfluenceUser confluenceUser = userAcessor.getUserByName(user.getName());
+
 			final HttpSession httpSession = httpRequest.getSession();
-	        httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, new ConfluenceUserPrincipal(confluenceUser));
-	        httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, null);
-	        ComponentLocator.getComponent(LoginManager.class).onSuccessfulLoginAttempt(user.getName(), httpRequest);
-	        ComponentLocator.getComponent(RememberMeService.class).addRememberMeCookie(httpRequest, httpResponse, user.getName());
+
+			if(httpSession.getAttribute(DefaultAuthenticator.LOGGED_IN_KEY) == null) {
+				ConfluenceUser confluenceUser = userAcessor.getUserByName(user.getName());
+				httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, new ConfluenceUserPrincipal(confluenceUser));
+				httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, null);
+				ComponentLocator.getComponent(LoginManager.class).onSuccessfulLoginAttempt(user.getName(), httpRequest);
+				ComponentLocator.getComponent(RememberMeService.class).addRememberMeCookie(httpRequest, httpResponse, user.getName());
+			}
+
 	        chain.doFilter(httpRequest, httpResponse);
+
+		}catch (IllegalStateException e) {
+
+			try {
+				httpResponse.sendError(401, "Session is invalid");
+			} catch (IOException io) {
+				io.printStackTrace();
+				log.error("Unable to send error for invalid session: " + e.getMessage(), e);
+			}
+
 		}catch (Throwable e) {
+
 			log.error("Unable to handle successful authentication: " + e.getMessage(), e);
 			throw new RuntimeException(e);
+
 		}
 	}
+
 
 }

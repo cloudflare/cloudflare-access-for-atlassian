@@ -1,5 +1,6 @@
 package com.cloudflare.access.atlassian.base.auth;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -7,12 +8,15 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -120,5 +124,42 @@ public class CloudflareAccessServiceTest {
 		verifyZeroInteractions(successHandler);
 		verifyZeroInteractions(userService);
 		verifyZeroInteractions(httpResponse);
+	}
+
+	@Test
+	public void testLogout() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+		HttpSession httpSession = mock(HttpSession.class);
+
+		when(httpRequest.getCookies()).thenReturn(new Cookie[] {
+				newCookie("seraph.whatever", "test", 999999),
+				newCookie("JSESSIONID", "test", 999999),
+		});
+		when(httpRequest.getSession()).thenReturn(httpSession);
+		when(httpRequest.getSession(false)).thenReturn(httpSession);
+
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
+		cloudflareAccessService.setAuthContext(authContext);
+		cloudflareAccessService.processLogoutRequest(httpRequest, httpResponse, chain);
+
+		verify(httpResponse, times(1)).sendRedirect(authContext.getLogoutUrl());
+		verify(httpSession, times(1)).invalidate();
+
+		ArgumentCaptor<Cookie> cookiesCaptor = ArgumentCaptor.forClass(Cookie.class);
+		verify(httpResponse, times(2)).addCookie(cookiesCaptor.capture());
+
+		assertEquals(cookiesCaptor.getAllValues().size(), 2);
+		assertEquals(cookiesCaptor.getAllValues().get(0).getMaxAge(), 0);
+		assertEquals(cookiesCaptor.getAllValues().get(1).getMaxAge(), 0);
+	}
+
+
+
+	private Cookie newCookie(String name, String value, int maxAge) {
+		Cookie cookie = new Cookie(name, value);
+		cookie.setMaxAge(maxAge);
+		return cookie;
 	}
 }

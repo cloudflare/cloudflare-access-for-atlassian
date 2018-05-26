@@ -10,15 +10,24 @@
   </plugin-info>
   <!-- add our i18n resource -->
   <resource type="i18n" name="i18n" location="confluence-plugin"/>
+  
   <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" class="com.cloudflare.access.atlassian.confluence.auth.AuthenticationFilter" location="before-login" weight="200">
     <description>Check authentication headers</description>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </servlet-filter>
+  
+  <web-resource key="webResources">
+    <resource type="download" name="override.css" location="/css/override.css"/>
+    <context>com.cloudflare.access.atlassian</context>
+    <context>atl.general</context>
+  </web-resource>
+  
+  
   <servlet-filter name="Cloudflare Access Logout Filter" key="cloudflareAccessLogoutFilter" class="com.cloudflare.access.atlassian.confluence.auth.LogoutFilter" location="before-login" weight="100">
     <description>Intercepts logout calls and logout user from Cloudflare Access</description>
-    <url-pattern>/logout.action</url-pattern>
+    <url-pattern>/logout*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </servlet-filter>

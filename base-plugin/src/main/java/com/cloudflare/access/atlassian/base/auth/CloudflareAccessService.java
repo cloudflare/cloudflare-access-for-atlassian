@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -25,6 +26,8 @@ import com.cloudflare.access.atlassian.common.context.EnvironmentAuthenticationC
 public class CloudflareAccessService {
 
 	private static final Logger log = LoggerFactory.getLogger(CloudflareAccessService.class);
+
+
 
 	private AuthenticationContext authContext = new EnvironmentAuthenticationContext();
 
@@ -97,8 +100,30 @@ public class CloudflareAccessService {
 			}
 		}
 
+		clearCookies(request, response);
+
 		log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());
 		response.sendRedirect(authContext.getLogoutUrl());
+	}
+
+	private void clearCookies(HttpServletRequest request, HttpServletResponse response) {
+		Cookie[] cookies = request.getCookies();
+		if(cookies == null) {
+			return;
+		}
+		for (Cookie cookie : cookies) {
+			if(shouldDeleteCookie(cookie)) {
+				cookie.setMaxAge(0);
+				log.debug("Deleting cookie '{}'", cookie.getName());
+				response.addCookie(cookie);
+			}
+		}
+	}
+
+	private boolean shouldDeleteCookie(Cookie c) {
+		String name = c.getName().toLowerCase();
+		return name.equalsIgnoreCase("JSESSIONID") ||
+				name.startsWith("seraph");
 	}
 
 	private boolean isPluginDisabled() {
