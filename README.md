@@ -9,6 +9,8 @@ Currently supported products are:
 
 ## Server Setup
 
+This setup applies to all supported Atlassian products.
+
 To authorize authenticated users  from Access you need to provide the following environment variables:
 - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from you Access configuration
 - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
@@ -28,11 +30,22 @@ Remember to restart the application after setting up the environment.
 
 Follow these steps to install the add-on manually:
 
-- Download `releases/cloudflare-access-jira-plugin-*.jar` 
+- Download `cloudflare-access-jira-plugin-*.jar` from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases/) 
 - Login on JIRA as administrator
 - Go to *JIRA Administration* > *Add-ons* > *Manage add-ons*
 - Click on *Upload add-on*
 - Upload the jar
+
+## Confluence Setup
+
+Follow these steps to install the add-on manually:
+
+- Download `cloudflare-access-confluence-plugin-*.jar` from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases/) 
+- Login on Confluence as administrator
+- Go to *Confluence Administration* > *Add-ons* > *Manage add-ons*
+- Click on *Upload add-on*
+- Upload the jar
+
 
 # Troubleshooting
 
