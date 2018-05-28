@@ -151,6 +151,7 @@ Install the Bintray repository for custom dependency by including the snippet be
 </p>
 </details>
 
+
 To build the modules `common` and `base-plugin`:
 
 ```
