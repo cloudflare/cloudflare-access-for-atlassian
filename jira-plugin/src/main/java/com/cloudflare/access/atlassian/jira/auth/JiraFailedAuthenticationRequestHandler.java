@@ -74,6 +74,8 @@ public class JiraFailedAuthenticationRequestHandler implements FailedAuthenticat
 	}
 
 	private String getRequestIdentifier(HttpServletRequest request) {
+		if(request.getCookies() == null) return null;
+
 		Optional<Cookie> jsessionid = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equalsIgnoreCase("JSESSIONID")).findFirst();
 		String requestIdentifier = jsessionid.map(Cookie::getValue).orElseGet(() -> request.getParameter(CF_PLUGIN_REQUEST_IDENTIFIER_PARAM));
 		return requestIdentifier;

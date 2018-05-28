@@ -15,6 +15,22 @@ import org.mockito.ArgumentCaptor;
 public class JiraFailedAuthenticationRequestHandlerTest {
 
 	@Test
+	public void testThatSends401WhenNoCookieIsAvailable() throws IOException {
+		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler();
+
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+
+		when(httpRequest.getRequestURI()).thenReturn("/secure/website");
+
+		handler.handle(httpRequest, httpResponse, new Exception("testing exception"));
+
+		verify(httpResponse, never()).sendRedirect(anyString());
+		verify(httpResponse, times(1)).sendError(401, "testing exception");
+		verify(httpResponse, times(1)).addHeader(eq("WWW-Authenticate"), anyString());
+	}
+
+	@Test
 	public void testThatSendsRedirectOnTheFirstFailure() throws IOException {
 		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler();
 

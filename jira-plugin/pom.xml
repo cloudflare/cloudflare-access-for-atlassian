@@ -39,6 +39,14 @@
             <artifactId>jira-core</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
+            <!-- Excluded as would conflict with common
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.bouncycastle</groupId>
+            		<artifactId>bcprov-jdk15on</artifactId>
+            	</exclusion>
+            </exclusions>
+            -->
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.crowd</groupId>
@@ -46,16 +54,6 @@
 			<version>${crowd.version}</version>
 			<scope>provided</scope>			
 		</dependency>        
-        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
-        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
-        <!--
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-core</artifactId>
-            <version>${jira.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
 
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
@@ -144,6 +142,12 @@
         	<groupId>com.cloudflare.access.atlassian</groupId>
 			<artifactId>base-plugin</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+            		<groupId>org.bouncycastle</groupId>
+            		<artifactId>bcprov-jdk15on</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
     </dependencies>
 
@@ -186,7 +190,6 @@
                             com.atlassian.crowd.*;resolution:="optional",
                             com.sun.*;resolution:="optional",
                             net.sf.cglib.*;resolution:="optional",
-                            
                             *;resolution:="optional"
                         </Import-Package>
 

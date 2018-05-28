@@ -10,12 +10,14 @@ public class EnvironmentPluginConfiguration implements PluginConfiguration{
 
 	private static final String CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS = "CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS";
 	private static final String CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT = "CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT";
+	private static final String CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_HTTPS = "CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_HTTPS";
 
 	@Override
 	public AtlassianInternalHttpProxyConfig getInternalProxyConfig() {
 		String host = getEnvValueOrDefault(CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS, "localhost");
 		int port = Integer.valueOf(EnvUtils.getEnvValueOrThrow(CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT));
-		return new AtlassianInternalHttpProxyConfig(host, port);
+		boolean useHttps = Boolean.parseBoolean(getEnvValueOrDefault(CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_HTTPS, "false"));
+		return new AtlassianInternalHttpProxyConfig(host, port, useHttps);
 	}
 
 	@Override
