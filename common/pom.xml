@@ -132,9 +132,9 @@
 		    <version>${netty.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.ganskef</groupId>
-		    <artifactId>littleproxy-mitm</artifactId>
-		    <version>1.1.1-BC150</version>
+		  <groupId>com.github.felipebn</groupId>
+		  <artifactId>littleproxy-mitm-bc150</artifactId>
+		  <version>1.1.1</version>
 		</dependency>
 		<!-- Little Proxy deps - END -->
 				

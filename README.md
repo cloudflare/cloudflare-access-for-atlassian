@@ -103,7 +103,54 @@ Also this leads to other CSRF checks where content is not returned, in that case
 
 # Building
 
+
 Install the Atlassian SDK following instructions on [Set up the Atlassian Plugin SDK and build a project](https://developer.atlassian.com/server/framework/atlassian-sdk/set-up-the-atlassian-plugin-sdk-and-build-a-project/).
+ 
+Install the Bintray repository for custom dependency by including the snippet below in your Maven `settings.xml`.
+
+<details><summary>Click to expand snippet</summary>
+<p>
+
+```
+<?xml version="1.0" encoding="UTF-8" ?>
+<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'
+          xmlns='http://maven.apache.org/SETTINGS/1.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+    <!-- ... -->
+    <profiles>
+        <profile>
+            <repositories>
+                <repository>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <id>bintray-felipebn-maven</id>
+                    <name>bintray</name>
+                    <url>https://dl.bintray.com/felipebn/maven</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <id>bintray-felipebn-maven</id>
+                    <name>bintray-plugins</name>
+                    <url>https://dl.bintray.com/felipebn/maven</url>
+                </pluginRepository>
+            </pluginRepositories>
+            <id>bintray</id>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>bintray</activeProfile>
+    </activeProfiles>
+    <!-- ... -->
+</settings>
+```
+
+</p>
+</details>
+
 
 To build the modules `common` and `base-plugin`:
 
