@@ -38,32 +38,34 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
         HttpServletRequest httpRequest = httpAuthenticationContext.getRequest();
 
         String userName = (String) httpRequest.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
-        log.info("Attempting authentication, username: {}........", userName);
+        log.debug("Attempting authentication, username: {}", userName);
         if(userName == null) {
+        	log.debug("No username in the request, opt-out auth");
         	return null;
         }
-
+        log.debug("Loading user from user sevice...");
 		return userService.getUserByName(userName);
 	}
 
 	@Override
 	public void validateAuthentication(HttpAuthenticationContext httpAuthenticationContext) {
-        HttpSession session = httpAuthenticationContext.getRequest().getSession(false);
+		log.debug("Passing auth validation");
+		HttpSession session = httpAuthenticationContext.getRequest().getSession(false);
         if (session == null) {
             // nothing to validate - the user wasn't authenticated by this authentication handler
             return;
         }
-        log.info("Passing a chance of checking the auth............");
 	}
 
 	@Override
 	public boolean onAuthenticationSuccess(HttpAuthenticationSuccessContext context) throws ServletException, IOException {
         String authenticatedUserName = (String) context.getRequest().getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
         if (authenticatedUserName != null) {
+        	log.debug("Found value for attribute '{}', successful auth!", AUTHENTICATED_USER_NAME_ATTRIBUTE);
             context.getRequest().getSession().setAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE, authenticatedUserName);
             return true;
         }
-
+        log.debug("No '{}' attribute in the request, unsucessful auth!", AUTHENTICATED_USER_NAME_ATTRIBUTE);
         return false;
 	}
 
