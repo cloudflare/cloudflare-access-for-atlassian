@@ -1,8 +1,11 @@
 package com.cloudflare.access.atlassian.bitbucket.auth;
 
-import static com.cloudflare.access.atlassian.bitbucket.auth.BitbucketPluginDetails.KEY_CONTAINER_AUTH_NAME;
+import static com.cloudflare.access.atlassian.bitbucket.auth.BitbucketPluginDetails.AUTHENTICATED_USER_NAME_ATTRIBUTE;
+
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,7 +24,14 @@ public class BitbucketSuccessfulAuthenticationRequestHandler implements Successf
 	@Override
 	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain, User user) {
 		log.info("Handling successful authentication for user {}", user.getName());
-		httpRequest.setAttribute(KEY_CONTAINER_AUTH_NAME, user.getName());
+		httpRequest.setAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE, user.getName());
+		try {
+			chain.doFilter(httpRequest, httpResponse);
+		} catch (IOException | ServletException e) {
+			System.out.println("Error executing chain: " + e.getMessage());
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 }

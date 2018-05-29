@@ -10,6 +10,24 @@
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="bitbucket-plugin"/>
     
+        <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" 
+    				class="com.cloudflare.access.atlassian.bitbucket.auth.CloudflareAccessAuthenticationFilter" 
+    				location="before-login" weight="200">
+        <description>Check authentication headers</description>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </servlet-filter>
+
+    <servlet-filter name="Cloudflare Access Logout Filter" key="cloudflareAccessLogoutFilter" 
+    				class="com.cloudflare.access.atlassian.bitbucket.auth.CloudflareAccessLogoutFilter" 
+    				location="before-login" weight="100">
+        <description>Intercepts logout calls and logout user from Cloudflare Access</description>
+        <url-pattern>/logout</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </servlet-filter>
+    
     <http-auth-handler key="containerAuthenticationHandler"
                        class="bean:cloudflareAccessAuthenticationHandler"
                        weight="100"/>

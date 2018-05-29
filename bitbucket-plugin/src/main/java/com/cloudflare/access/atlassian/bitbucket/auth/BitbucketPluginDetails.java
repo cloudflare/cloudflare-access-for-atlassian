@@ -7,7 +7,7 @@ import com.cloudflare.access.atlassian.base.auth.CloudflarePluginDetails;
 @Component
 public class BitbucketPluginDetails implements CloudflarePluginDetails{
 
-	public static final String KEY_CONTAINER_AUTH_NAME = "auth.container.cloudflare-access-user";
+	public static final String AUTHENTICATED_USER_NAME_ATTRIBUTE = "auth.cloudflare-access-user";
 
 	@Override
 	public String getPluginKey() {
