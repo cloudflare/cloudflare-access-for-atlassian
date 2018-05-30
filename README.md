@@ -13,7 +13,7 @@ This instructions applies to all supported Atlassian products.
 
 1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
 1. Add the environment variables below to your server with the value from Cloudflare Access settings:
-    - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from you Access configuration
+    - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from your Access configuration
     - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
     - `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
     - `CF_ACCESS_ATLASSIAN_LOGOUT_URL`: Logout URL to redirect users. Something like `https://<Your Authentication Domain>/cdn-cgi/access/logout`
@@ -187,3 +187,21 @@ To build all modules:
 atlas-mvn clean package
 ```
 
+# Local development/testing with Docker and NGINX
+
+The images below are available on Docker hub for development and testing.
+
+These images are configured to:
+
+- Setup the context path on Tomcat
+- Create a secondary connector to enable application links
+
+**These images do not have the plugin installed, it should be installed/updated after starting them.**
+
+I recommend having a reverse proxy in front of the Atlassian containers, with distinct paths forwarding to JIRA, Confluence and Bitbucket.
+
+
+## Images
+
+- [JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/)
+- [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/) 
