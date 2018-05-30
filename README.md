@@ -211,8 +211,8 @@ I recommend having a reverse proxy in front of the Atlassian containers, with di
 After installing the plugin, you need to add the proxy certificate to your product in order to enable internal HTTPS calls:
 
 1. Attach to the running container with `docker exec -it <container_id_or_name> /bin/bash`
-1. Go to `/var/atlassian/<product name>/cloudflare-access-atlassian-plugin`
-1. Install the certificate `cfaccess-plugin.pem` into your keystore:
+1. Go to `/var/atlassian/<product name in lower case>/cloudflare-access-atlassian-plugin`
+1. Install the certificate `cfaccess-plugin.pem` into container JVM keystore:
 
     ```
     keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/cacerts -storepass changeit
