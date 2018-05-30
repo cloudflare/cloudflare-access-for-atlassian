@@ -36,6 +36,14 @@ After installing the plugin, you need to add the proxy certificate to your produ
 
 1. Restart the Atlassian application
 
+
+### Setting up Application Links
+
+If you are using Application Links like JIRA + Bitbucket or JIRA + Confluence, you need to setup the [Bypassing Reverse Proxy](https://confluence.atlassian.com/kb/common-application-link-layouts-718835602.html) applications link layout.
+
+1. Setup one additional unproxied connector in both applications [explained here](https://confluence.atlassian.com/kb/how-to-bypass-a-reverse-proxy-or-ssl-in-application-links-719095724.html). **Note that this connector should not be secured by Cloudflare Access**.
+1. Setup the application link following [this KB](https://confluence.atlassian.com/kb/how-to-create-an-unproxied-application-link-719095740.html)  
+
 ### Helpful links
 
 - Home Directory: [JIRA](https://confluence.atlassian.com/adminjiraserver073/jira-application-home-directory-861253888.html) [Confluence](https://confluence.atlassian.com/doc/confluence-home-and-other-important-directories-590259707.html) [Bitbucket](https://confluence.atlassian.com/bitbucketserver/bitbucket-server-home-directory-776640890.html)
