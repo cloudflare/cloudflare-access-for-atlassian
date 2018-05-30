@@ -7,7 +7,7 @@ Currently supported products are:
 - Confluence
 - Bitbucket
 
-##Installation
+## Installation
 
 This instructions applies to all supported Atlassian products.
 
@@ -29,10 +29,11 @@ After installing the plugin, you need to add the proxy certificate to your produ
 1. Go to your Atlassian application home directory
 1. Go to `cloudflare-access-atlassian-plugin`
 1. Install the certificate `cfaccess-plugin.pem` into your keystore, example:  
-    
-    ```keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore <JAVA_HOME>/lib/security/cacerts -storepass changeit        
+
     ```
-    
+    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore <JAVA_HOME>/lib/security/cacerts -storepass changeit        
+    ```
+
 1. Restart the Atlassian application
 
 ### Helpful links
@@ -43,6 +44,25 @@ After installing the plugin, you need to add the proxy certificate to your produ
 
 
 # Troubleshooting
+
+## Plugin upload/installation never complete
+
+**Symptoms:**
+
+- Plugin installation progress stuck
+
+**Cause:**
+
+Most likely you have a reverser proxy in front of the applicatio with a small limit for 
+uploading files.
+
+**Solution:**
+
+Check the network panel while uploading the plugin looking for `4xx` HTTP errors. 
+
+If you see a `HTTP 413`, you need to increase the upload file size limit on your reverse proxy.
+
+For NGINX see [this](https://www.cyberciti.biz/faq/linux-unix-bsd-nginx-413-request-entity-too-large/). 
 
 ## JIRA Gadgets not working after installing the plugin
 
