@@ -200,6 +200,11 @@ These images are configured to:
 
 I recommend having a reverse proxy in front of the Atlassian containers, with distinct paths forwarding to JIRA, Confluence and Bitbucket.
 
+## Images
+
+- [JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/)
+- [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/)
+
 ## Plugin testing
  
 1. Start the desired Atlassian application container 
@@ -217,8 +222,3 @@ After installing the plugin, you need to add the proxy certificate to your produ
     ```
     keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/cacerts -storepass changeit
     ``` 
-
-## Images
-
-- [JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/)
-- [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/) 
