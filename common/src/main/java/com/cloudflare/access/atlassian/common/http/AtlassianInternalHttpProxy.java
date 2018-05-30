@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -52,14 +51,7 @@ public class AtlassianInternalHttpProxy {
 		try {
 			this.shutdown();
 
-			installCA();
-			Authority authority = new Authority(new File("."),
-												"cfaccess-plugin",
-												"changeit".toCharArray(),
-												"Internal proxy to keep internal atlassian product requests in the local network",
-												"LittleProxy-mitm on Cloudflare Access Plugin",
-												"Certificate Authority", "LittleProxy-mitm on Cloudflare Access Plugin",
-												"Internal proxy to keep internal atlassian product requests in the local network");
+			Authority authority = createCertificateAuthority();
 			this.server =
 				    DefaultHttpProxyServer.bootstrap()
 				        .withPort(0)
@@ -74,15 +66,18 @@ public class AtlassianInternalHttpProxy {
 		}
 	}
 
-	private void installCA() {
-		try {
-			FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/cfaccess-plugin.p12"), new File("cfaccess-plugin.p12"));
-			FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/cfaccess-plugin.pem"), new File("cfaccess-plugin.pem"));
-			//TODO we could check if the keystore contains them and tell the user to install!
-		}catch (Throwable e) {
-			throw new RuntimeException("Unable to install proxy certificates!", e);
-		}
+	private Authority createCertificateAuthority() {
+		File keyStoreDir = new File("cloudflare-access-atlassian-plugin");
+		keyStoreDir.mkdir();
 
+		Authority authority = new Authority(keyStoreDir,
+											"cfaccess-plugin",
+											"changeit".toCharArray(),
+											"Internal proxy to keep internal atlassian product requests in the local network",
+											"LittleProxy-mitm on Cloudflare Access Plugin",
+											"Certificate Authority", "LittleProxy-mitm on Cloudflare Access Plugin",
+											"Internal proxy to keep internal atlassian product requests in the local network");
+		return authority;
 	}
 
 	public void shutdown() {

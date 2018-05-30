@@ -7,44 +7,39 @@ Currently supported products are:
 - Confluence
 - Bitbucket
 
-## Server Setup
+##Installation
 
-This setup applies to all supported Atlassian products.
+This instructions applies to all supported Atlassian products.
 
-To authorize authenticated users  from Access you need to provide the following environment variables:
-- `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from you Access configuration
-- `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
-- `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
-- `CF_ACCESS_ATLASSIAN_LOGOUT_URL`: Logout URL to redirect users. Something like `https://<Your Authentication Domain>/cdn-cgi/access/logout`
+1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
+1. Add the environment variables below to your server with the value from Cloudflare Access settings:
+    - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from you Access configuration
+    - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
+    - `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
+    - `CF_ACCESS_ATLASSIAN_LOGOUT_URL`: Logout URL to redirect users. Something like `https://<Your Authentication Domain>/cdn-cgi/access/logout`
+    - `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS`: (optional) Local IP or hostname where the service is listening to. Default value is `localhost`.
+    - `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT`: Local Port where the service is listening to.
+1. Restart the application
+1. Login in the Atlassian application as administrator
+1. Go to *Manage add-ons* on the administration page or menu
+1. Select *Upload add-on* and upload the JAR you downloaded
 
-For **JIRA** you also need to provide the following configuration in order to have Gadgets working properly:
+After installing the plugin, you need to add the proxy certificate to your product in order to enable internal HTTPS calls:
 
-- `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS`: (optional) Local IP or hostname where the service is listening to. Default value is `localhost`.
-- `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT`: Local Port where the service is listening to.
+1. Go to your Atlassian application home directory
+1. Go to `cloudflare-access-atlassian-plugin`
+1. Install the certificate `cfaccess-plugin.pem` into your keystore, example:  
+    
+    ```keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore <JAVA_HOME>/lib/security/cacerts -storepass changeit        
+    ```
+    
+1. Restart the Atlassian application
 
-This environment variables may be set on your application `setenv.sh` (Tomcat) or system wide.
+### Helpful links
 
-Remember to restart the application after setting up the environment.
-
-## JIRA Setup
-
-Follow these steps to install the add-on manually:
-
-- Download `cloudflare-access-jira-plugin-*.jar` from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases/) 
-- Login on JIRA as administrator
-- Go to *JIRA Administration* > *Add-ons* > *Manage add-ons*
-- Click on *Upload add-on*
-- Upload the jar
-
-## Confluence Setup
-
-Follow these steps to install the add-on manually:
-
-- Download `cloudflare-access-confluence-plugin-*.jar` from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases/) 
-- Login on Confluence as administrator
-- Go to *Confluence Administration* > *Add-ons* > *Manage add-ons*
-- Click on *Upload add-on*
-- Upload the jar
+- Home Directory: [JIRA](https://confluence.atlassian.com/adminjiraserver073/jira-application-home-directory-861253888.html) [Confluence](https://confluence.atlassian.com/doc/confluence-home-and-other-important-directories-590259707.html) [Bitbucket](https://confluence.atlassian.com/bitbucketserver/bitbucket-server-home-directory-776640890.html)
+- [Keytool](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html)
+- Internal Proxy Motivation: [How to fix gadget titles showing as __MSG_gadget](https://confluence.atlassian.com/jirakb/how-to-fix-gadget-titles-showing-as-__msg_gadget-813697086.html)
 
 
 # Troubleshooting
@@ -66,11 +61,11 @@ The plugin includes a HTTP proxy that should be able to forward this requests to
 
 - Check your environment settings, ensure that you provided the right local address and port for the server
 - Try to access the URL presented in the logs from the application server (e.g. using `curl -L <URL>`)
+- Check that you installed the certificate on the JVM keystore
 
 **Important:**
 
 - Currently the internal proxy replaces any JVM proxy configuration for HTTP, soon it will chain the proxies together
-- The proxy is HTTP only, so if your application is sending HTTPS requests they won't be proxied to the local address
 
 ## CSRF configuration for REST calls
 
