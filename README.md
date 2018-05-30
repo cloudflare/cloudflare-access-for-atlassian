@@ -9,10 +9,10 @@ Currently supported products are:
 
 ## Installation
 
-This instructions applies to all supported Atlassian products.
-
+This instructions applies to all supported Atlassian products, installed locally.
+ 
 1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
-1. Add the environment variables below to your server with the value from Cloudflare Access settings:
+1. Add the environment variables below to your server with the value from Cloudflare Access settings :
     - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from your Access configuration
     - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
     - `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
@@ -200,6 +200,23 @@ These images are configured to:
 
 I recommend having a reverse proxy in front of the Atlassian containers, with distinct paths forwarding to JIRA, Confluence and Bitbucket.
 
+## Plugin testing
+ 
+1. Start the desired Atlassian application container 
+1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
+1. Login in the Atlassian application as administrator
+1. Go to *Manage add-ons* on the administration page or menu
+1. Select *Upload add-on* and upload the JAR you downloaded
+
+After installing the plugin, you need to add the proxy certificate to your product in order to enable internal HTTPS calls:
+
+1. Attach to the running container with `docker exec -it <container_id_or_name> /bin/bash`
+1. Go to `/var/atlassian/<product name>/cloudflare-access-atlassian-plugin`
+1. Install the certificate `cfaccess-plugin.pem` into your keystore:
+
+    ```
+    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/cacerts -storepass changeit
+    ``` 
 
 ## Images
 
