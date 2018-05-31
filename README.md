@@ -225,4 +225,6 @@ After installing the plugin, you need to add the proxy certificate to your produ
     
     # Bitbucket image
     keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file cfaccess-plugin.pem -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit
-    ``` 
+    ```
+1. Stop the container with `docker stop <container id or name>`
+1. Start the container with `docker start <container id or name>`
