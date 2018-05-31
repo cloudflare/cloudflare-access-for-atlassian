@@ -7,47 +7,70 @@ Currently supported products are:
 - Confluence
 - Bitbucket
 
-## Server Setup
+## Installation
 
-This setup applies to all supported Atlassian products.
+This instructions applies to all supported Atlassian products, installed locally.
+ 
+1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
+1. Add the environment variables below to your server with the value from Cloudflare Access settings :
+    - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from your Access configuration
+    - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
+    - `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
+    - `CF_ACCESS_ATLASSIAN_LOGOUT_URL`: Logout URL to redirect users. Something like `https://<Your Authentication Domain>/cdn-cgi/access/logout`
+    - `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS`: (optional) Local IP or hostname where the service is listening to. Default value is `localhost`.
+    - `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT`: Local Port where the service is listening to.
+1. Restart the application
+1. Login in the Atlassian application as administrator
+1. Go to *Manage add-ons* on the administration page or menu
+1. Select *Upload add-on* and upload the JAR you downloaded
 
-To authorize authenticated users  from Access you need to provide the following environment variables:
-- `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from you Access configuration
-- `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
-- `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
-- `CF_ACCESS_ATLASSIAN_LOGOUT_URL`: Logout URL to redirect users. Something like `https://<Your Authentication Domain>/cdn-cgi/access/logout`
+After installing the plugin, you need to add the proxy certificate to your product in order to enable internal HTTPS calls:
 
-For **JIRA** you also need to provide the following configuration in order to have Gadgets working properly:
+1. Go to your Atlassian application home directory
+1. Go to `cloudflare-access-atlassian-plugin`
+1. Install the certificate `cfaccess-plugin.pem` into your keystore, example:  
 
-- `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS`: (optional) Local IP or hostname where the service is listening to. Default value is `localhost`.
-- `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT`: Local Port where the service is listening to.
+    ```
+    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore <JAVA_HOME>/lib/security/cacerts -storepass changeit        
+    ```
 
-This environment variables may be set on your application `setenv.sh` (Tomcat) or system wide.
+1. Restart the Atlassian application
 
-Remember to restart the application after setting up the environment.
 
-## JIRA Setup
+### Setting up Application Links
 
-Follow these steps to install the add-on manually:
+If you are using Application Links like JIRA + Bitbucket or JIRA + Confluence, you need to setup the [Bypassing Reverse Proxy](https://confluence.atlassian.com/kb/common-application-link-layouts-718835602.html) applications link layout.
 
-- Download `cloudflare-access-jira-plugin-*.jar` from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases/) 
-- Login on JIRA as administrator
-- Go to *JIRA Administration* > *Add-ons* > *Manage add-ons*
-- Click on *Upload add-on*
-- Upload the jar
+1. Setup one additional unproxied connector in both applications [explained here](https://confluence.atlassian.com/kb/how-to-bypass-a-reverse-proxy-or-ssl-in-application-links-719095724.html). **Note that this connector should not be secured by Cloudflare Access**.
+1. Setup the application link following [this KB](https://confluence.atlassian.com/kb/how-to-create-an-unproxied-application-link-719095740.html)  
 
-## Confluence Setup
+### Helpful links
 
-Follow these steps to install the add-on manually:
-
-- Download `cloudflare-access-confluence-plugin-*.jar` from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases/) 
-- Login on Confluence as administrator
-- Go to *Confluence Administration* > *Add-ons* > *Manage add-ons*
-- Click on *Upload add-on*
-- Upload the jar
+- Home Directory: [JIRA](https://confluence.atlassian.com/adminjiraserver073/jira-application-home-directory-861253888.html) [Confluence](https://confluence.atlassian.com/doc/confluence-home-and-other-important-directories-590259707.html) [Bitbucket](https://confluence.atlassian.com/bitbucketserver/bitbucket-server-home-directory-776640890.html)
+- [Keytool](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html)
+- Internal Proxy Motivation: [How to fix gadget titles showing as __MSG_gadget](https://confluence.atlassian.com/jirakb/how-to-fix-gadget-titles-showing-as-__msg_gadget-813697086.html)
 
 
 # Troubleshooting
+
+## Plugin upload/installation never complete
+
+**Symptoms:**
+
+- Plugin installation progress stuck
+
+**Cause:**
+
+Most likely you have a reverser proxy in front of the applicatio with a small limit for 
+uploading files.
+
+**Solution:**
+
+Check the network panel while uploading the plugin looking for `4xx` HTTP errors. 
+
+If you see a `HTTP 413`, you need to increase the upload file size limit on your reverse proxy.
+
+For NGINX see [this](https://www.cyberciti.biz/faq/linux-unix-bsd-nginx-413-request-entity-too-large/). 
 
 ## JIRA Gadgets not working after installing the plugin
 
@@ -66,11 +89,11 @@ The plugin includes a HTTP proxy that should be able to forward this requests to
 
 - Check your environment settings, ensure that you provided the right local address and port for the server
 - Try to access the URL presented in the logs from the application server (e.g. using `curl -L <URL>`)
+- Check that you installed the certificate on the JVM keystore
 
 **Important:**
 
 - Currently the internal proxy replaces any JVM proxy configuration for HTTP, soon it will chain the proxies together
-- The proxy is HTTP only, so if your application is sending HTTPS requests they won't be proxied to the local address
 
 ## CSRF configuration for REST calls
 
@@ -164,3 +187,38 @@ To build all modules:
 atlas-mvn clean package
 ```
 
+# Local development/testing with Docker and NGINX
+
+The images below are available on Docker hub for development and testing.
+
+These images are configured to:
+
+- Setup the context path on Tomcat
+- Create a secondary connector to enable application links
+
+**These images do not have the plugin installed, it should be installed/updated after starting them.**
+
+I recommend having a reverse proxy in front of the Atlassian containers, with distinct paths forwarding to JIRA, Confluence and Bitbucket.
+
+## Images
+
+- [JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/)
+- [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/)
+
+## Plugin testing
+ 
+1. Start the desired Atlassian application container 
+1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
+1. Login in the Atlassian application as administrator
+1. Go to *Manage add-ons* on the administration page or menu
+1. Select *Upload add-on* and upload the JAR you downloaded
+
+After installing the plugin, you need to add the proxy certificate to your product in order to enable internal HTTPS calls:
+
+1. Attach to the running container with `docker exec -it <container_id_or_name> /bin/bash`
+1. Go to `/var/atlassian/<product name in lower case>/cloudflare-access-atlassian-plugin`
+1. Install the certificate `cfaccess-plugin.pem` into container JVM keystore:
+
+    ```
+    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file /tmp/cfaccess-plugin.pem -keystore /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/cacerts -storepass changeit
+    ``` 

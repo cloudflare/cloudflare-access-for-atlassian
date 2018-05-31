@@ -1,5 +1,7 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,11 +23,14 @@ public class JiraWhitelistRules implements AtlassianProductWhitelistRules{
 		String uri = httpRequest.getRequestURI();
 		List<String> rules = Lists.newArrayList(
 				"^.*/rest/gadgets/.*$",
-				"^.*(css|woff|ttf)$"
+				"^.*(css|woff|ttf)$",
+				"^.*/rest/applinks/.*$",
+				"^.*/rest/capabilities/.*$"
 		);
-		return rules
-				.stream()
-				.anyMatch(rule -> this.checkRule(uri, rule));
+
+		return isRestWithOauth(httpRequest) ||
+				rules.stream()
+					.anyMatch(rule -> this.checkRule(uri, rule));
 	}
 
 	private boolean checkRule(String uri, String regex) {
@@ -34,5 +39,10 @@ public class JiraWhitelistRules implements AtlassianProductWhitelistRules{
 		return m;
 	}
 
+	private boolean isRestWithOauth(HttpServletRequest httpRequest) {
+		String uri = httpRequest.getRequestURI();
+		String authHeader = httpRequest.getHeader("authorization");
 
+		return uri.matches("^.*/rest/.*$") && contains(lowerCase(authHeader), "oauth");
+	}
 }
