@@ -220,5 +220,9 @@ After installing the plugin, you need to add the proxy certificate to your produ
 1. Install the certificate `cfaccess-plugin.pem` into container JVM keystore:
 
     ```
+    # JIRA and Confluence images
     keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file cfaccess-plugin.pem -keystore /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/cacerts -storepass changeit
+    
+    # Bitbucket image
+    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file cfaccess-plugin.pem -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit
     ``` 
