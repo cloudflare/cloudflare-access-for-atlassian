@@ -10,7 +10,12 @@
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="bitbucket-plugin"/>
     
-        <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" 
+	<web-resource key="webResources">
+		<resource type="download" name="override.css" location="/css/override.css"/>
+		<context>bitbucket.page.errors</context>
+	</web-resource>
+    
+    <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" 
     				class="com.cloudflare.access.atlassian.bitbucket.auth.CloudflareAccessAuthenticationFilter" 
     				location="before-login" weight="200">
         <description>Check authentication headers</description>

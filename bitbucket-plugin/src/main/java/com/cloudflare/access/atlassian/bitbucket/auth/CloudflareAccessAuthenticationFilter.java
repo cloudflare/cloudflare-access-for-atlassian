@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
+import com.cloudflare.access.atlassian.base.utils.RequestInspector;
 import com.cloudflare.access.atlassian.common.config.EnvironmentPluginConfiguration;
 import com.cloudflare.access.atlassian.common.http.AtlassianInternalHttpProxy;
 
@@ -56,11 +57,13 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 
 		try {
 			System.out.println("Handling authentication the filter");
+			System.out.println(RequestInspector.getRequestedResourceInfo(httpRequest));
+			System.out.println(RequestInspector.getHeadersAndCookies(httpRequest));
 			cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
 		}catch (Throwable e) {
 			System.out.println("Error handling auth request!!!!!!!");
 			e.printStackTrace();
-			chain.doFilter(httpRequest, httpResponse);
+			//chain.doFilter(httpRequest, httpResponse);
 		}
 	}
 
