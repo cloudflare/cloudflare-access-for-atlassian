@@ -3,6 +3,7 @@ package com.cloudflare.access.atlassian.bitbucket.auth;
 import static com.cloudflare.access.atlassian.bitbucket.auth.BitbucketPluginDetails.AUTHENTICATED_USER_NAME_ATTRIBUTE;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,7 +45,9 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
         	return null;
         }
         log.debug("Loading user from user sevice...");
-		return userService.getUserByName(userName);
+		ApplicationUser user = userService.getUserByName(userName);
+		log.debug("User: " + user);
+		return user;
 	}
 
 	@Override
@@ -55,15 +58,24 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
             // nothing to validate - the user wasn't authenticated by this authentication handler
             return;
         }
+
+        HttpServletRequest httpRequest = httpAuthenticationContext.getRequest();
+        String sessionUsername = (String) session.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
+        String requestUsername = (String) httpRequest.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
+        if(sessionUsername != null && !Objects.equals(sessionUsername, requestUsername)) {
+        	throw new ExpiredAuthException(sessionUsername, requestUsername);
+        }
 	}
 
+	/**
+	 * @return False as we do not complete the request handling.
+	 */
 	@Override
 	public boolean onAuthenticationSuccess(HttpAuthenticationSuccessContext context) throws ServletException, IOException {
         String authenticatedUserName = (String) context.getRequest().getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
         if (authenticatedUserName != null) {
-        	log.debug("Found value for attribute '{}', successful auth!", AUTHENTICATED_USER_NAME_ATTRIBUTE);
+        	log.debug("Found value for attribute '{}', successful auth, lets store it in the session!", AUTHENTICATED_USER_NAME_ATTRIBUTE);
             context.getRequest().getSession().setAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE, authenticatedUserName);
-            return true;
         }
         log.debug("No '{}' attribute in the request, unsucessful auth!", AUTHENTICATED_USER_NAME_ATTRIBUTE);
         return false;
@@ -71,5 +83,12 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
 
 
 
+	public static class ExpiredAuthException extends RuntimeException{
 
+		private static final long serialVersionUID = -3844887726771335053L;
+		public ExpiredAuthException(String sessionUsername, String requestUsername) {
+			super(String.format("Session username '%s' does not match request username '%s'!", sessionUsername, requestUsername));
+		}
+
+	}
 }
