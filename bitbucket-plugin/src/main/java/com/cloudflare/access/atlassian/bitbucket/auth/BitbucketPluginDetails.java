@@ -8,6 +8,7 @@ import com.cloudflare.access.atlassian.base.auth.CloudflarePluginDetails;
 public class BitbucketPluginDetails implements CloudflarePluginDetails{
 
 	public static final String AUTHENTICATED_USER_NAME_ATTRIBUTE = "auth.cloudflare-access-user";
+	public static final String WHITELISTED_REQUEST_FLAG_ATTRIBUTE = "auth.whitelisted";
 
 	@Override
 	public String getPluginKey() {

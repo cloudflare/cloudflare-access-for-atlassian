@@ -1,6 +1,6 @@
 package com.cloudflare.access.atlassian.bitbucket.auth;
 
-import static com.cloudflare.access.atlassian.bitbucket.auth.BitbucketPluginDetails.AUTHENTICATED_USER_NAME_ATTRIBUTE;
+import static com.cloudflare.access.atlassian.bitbucket.auth.BitbucketPluginDetails.*;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -52,19 +52,29 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
 
 	@Override
 	public void validateAuthentication(HttpAuthenticationContext httpAuthenticationContext) {
-		log.debug("Passing auth validation");
-		HttpSession session = httpAuthenticationContext.getRequest().getSession(false);
+		log.debug("Passing auth validation...");
+		HttpServletRequest httpRequest = httpAuthenticationContext.getRequest();
+		HttpSession session = httpRequest.getSession(false);
         if (session == null) {
-            // nothing to validate - the user wasn't authenticated by this authentication handler
+        	log.debug("No session to validate, all fine...");
             return;
         }
 
-        HttpServletRequest httpRequest = httpAuthenticationContext.getRequest();
-        String sessionUsername = (String) session.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
-        String requestUsername = (String) httpRequest.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
-        if(sessionUsername != null && !Objects.equals(sessionUsername, requestUsername)) {
-        	throw new ExpiredAuthException(sessionUsername, requestUsername);
+
+        Boolean isWhitelisted = (Boolean) httpRequest.getAttribute(WHITELISTED_REQUEST_FLAG_ATTRIBUTE);
+        if(isWhitelisted != null && isWhitelisted) {
+        	log.debug("Request is whitelisted, all fine...");
+            return;
         }
+
+        String requestUserName = (String) httpRequest.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
+        String sessionUserName = (String) session.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
+        if(sessionUserName != null && !Objects.equals(sessionUserName, requestUserName)) {
+        	log.debug("Request user does not match session user...");
+        	throw new ExpiredAuthException(sessionUserName, requestUserName);
+        }
+
+        log.debug("Auth is valid");
 	}
 
 	/**
