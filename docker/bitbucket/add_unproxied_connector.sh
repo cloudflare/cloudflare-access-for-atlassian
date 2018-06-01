@@ -11,13 +11,18 @@
 #               acceptCount="10"
 #               URIEncoding="UTF-8" />
 
+port="17990"
+existingPort=`xmlstarlet sel -t -v "//Connector[@port='$port']/@port" ${SERVER_XML_PATH}`
+
+if [ -z "$existingPort" ]; then
+
 xmlstarlet ed \
 -P -S -L \
 --subnode /Server/Service \
 --type elem \
 -n ProxyConnector \
 -v "" \
--i /Server/Service/ProxyConnector -t attr -n "port" -v "17990" \
+-i /Server/Service/ProxyConnector -t attr -n "port" -v "$port" \
 -i /Server/Service/ProxyConnector -t attr -n "connectionTimeout" -v "20000" \
 -i /Server/Service/ProxyConnector -t attr -n "maxThreads" -v "200" \
 -i /Server/Service/ProxyConnector -t attr -n "minSpareThreads" -v "10" \
@@ -26,3 +31,5 @@ xmlstarlet ed \
 -i /Server/Service/ProxyConnector -t attr -n "URIEncoding" -v "UTF-8" \
 -r /Server/Service/ProxyConnector -v Connector \
 ${SERVER_XML_PATH}
+
+fi
