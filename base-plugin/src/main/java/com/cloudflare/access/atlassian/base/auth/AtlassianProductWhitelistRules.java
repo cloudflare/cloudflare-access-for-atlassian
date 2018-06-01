@@ -19,9 +19,13 @@ public interface AtlassianProductWhitelistRules {
 
 	default boolean isRestWithOauth(HttpServletRequest httpRequest) {
 		String uri = httpRequest.getRequestURI();
-		String authHeader = httpRequest.getHeader("authorization");
 
-		return uri.matches("^.*/rest/.*$") && contains(lowerCase(authHeader), "oauth");
+		return uri.matches("^.*/rest/.*$") && isOauthAuthorizationHeaderPresent(httpRequest);
+	}
+
+	default boolean isOauthAuthorizationHeaderPresent(HttpServletRequest httpRequest) {
+		String authHeader = httpRequest.getHeader("authorization");
+		return contains(lowerCase(authHeader), "oauth");
 	}
 
 	default boolean isApplicationLinkRelated(HttpServletRequest httpRequest) {

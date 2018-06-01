@@ -43,6 +43,10 @@ If you are using Application Links like JIRA + Bitbucket or JIRA + Confluence, y
 
 1. Setup one additional unproxied connector in both applications [explained here](https://confluence.atlassian.com/kb/how-to-bypass-a-reverse-proxy-or-ssl-in-application-links-719095724.html). **Note that this connector should not be secured by Cloudflare Access**.
 1. Setup the application link following [this KB](https://confluence.atlassian.com/kb/how-to-create-an-unproxied-application-link-719095740.html)  
+1. When creating the link with applications already behind Access you will receive a warning asking to replace the URL as id redirected once. When this happens just replace the URL in the field with the unsecured URL.
+
+
+
 
 ### Helpful links
 
@@ -94,6 +98,22 @@ The plugin includes a HTTP proxy that should be able to forward this requests to
 **Important:**
 
 - Currently the internal proxy replaces any JVM proxy configuration for HTTP, soon it will chain the proxies together
+
+## Application Links - Network error
+
+**Symptoms:**
+
+- Application link shows Network Error label
+- You are seeing "Connection Refused" exceptions on the log when trying to setup the link
+
+**Cause:**
+
+This usually would happen after a plugin update as Application Links logic caches the proxy configuration and the proxy port will change after updating the plugin.
+
+**Solution:**
+
+Restart the application after the update will clean the proxy cache and the application link should be back to normal.
+
 
 ## CSRF configuration for REST calls
 
