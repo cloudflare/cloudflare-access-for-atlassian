@@ -28,7 +28,6 @@ public class BitbucketSuccessfulAuthenticationRequestHandler implements Successf
 		try {
 			chain.doFilter(httpRequest, httpResponse);
 		} catch (IOException | ServletException e) {
-			System.out.println("Error executing chain: " + e.getMessage());
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}

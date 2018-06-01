@@ -40,7 +40,6 @@ public interface AtlassianProductWhitelistRules {
 	default boolean checkRule(String uri, String regex) {
 		boolean m = uri.matches(regex);
 		log.debug("URI '{}' Matches whitelist '{}' ? {}", new Object[] {uri, regex, m});
-		System.out.println(String.format("URI '%s' Matches whitelist '%s' ? %s", uri, regex, m));
 		return m;
 	}
 }
