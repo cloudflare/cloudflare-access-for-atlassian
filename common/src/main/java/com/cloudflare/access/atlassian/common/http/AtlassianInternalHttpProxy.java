@@ -88,6 +88,8 @@ public class AtlassianInternalHttpProxy {
 	}
 
 	private void setupJvmProxyProperties(String host, String port) {
+		log.debug("Enabling proxy on {}:{}", host, port);
+
 		System.setProperty("http.proxyHost", host);
 		System.setProperty("http.proxyPort", port);
 

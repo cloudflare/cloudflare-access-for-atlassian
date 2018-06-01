@@ -23,19 +23,12 @@ public class ConfluenceWhitelistRules implements AtlassianProductWhitelistRules{
 		List<String> rules = Lists.newArrayList(
 				"^.*"+AuthenticationErrorServlet.PATH+"$",
 				"^.*(css|woff|ttf|svg|png|gif|jpg|jpeg)$",
-				"^.*/rest/analytics/1.0/publish/bulk$",
+				"^.*/rest/analytics/1.0/publish/bulk$", /*Prevent leaking cookies as this is a usage tracking and should not attempt auth*/
 				"^.*/rest/gadgets/.*$"
 		);
 		return rules
 				.stream()
 				.anyMatch(rule -> this.checkRule(uri, rule));
 	}
-
-	private boolean checkRule(String uri, String regex) {
-		boolean m = uri.matches(regex);
-		log.debug("URI '{}' Matches whitelist '{}' ? {}", new Object[] {uri, regex, m});
-		return m;
-	}
-
 
 }
