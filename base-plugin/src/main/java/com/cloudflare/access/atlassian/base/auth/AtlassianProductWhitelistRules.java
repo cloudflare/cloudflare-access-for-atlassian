@@ -17,15 +17,14 @@ public interface AtlassianProductWhitelistRules {
 
 	boolean isRequestWhitelisted(HttpServletRequest request);
 
-	default boolean isRestWithOauth(HttpServletRequest httpRequest) {
-		String uri = httpRequest.getRequestURI();
-
-		return uri.matches("^.*/rest/.*$") && isOauthAuthorizationHeaderPresent(httpRequest);
-	}
-
 	default boolean isOauthAuthorizationHeaderPresent(HttpServletRequest httpRequest) {
 		String authHeader = httpRequest.getHeader("authorization");
-		return contains(lowerCase(authHeader), "oauth");
+		boolean containsOauth = contains(lowerCase(authHeader), "oauth");
+		log.debug("Request contains oauth ? {}", containsOauth);
+		if(containsOauth) {
+			log.debug("Oauth header: {}", authHeader);
+		}
+		return containsOauth;
 	}
 
 	default boolean isApplicationLinkRelated(HttpServletRequest httpRequest) {
@@ -33,8 +32,10 @@ public interface AtlassianProductWhitelistRules {
 		List<String> rules = Lists.newArrayList(
 				"^.*/rest/applinks.*$",
 				"^.*/rest/capabilities.*$",
-				"^.*/servlet/capabilities$",  			/*'rest/capabilities' redirects to here*/
-				"^.*/servlet/oauth/.*$"
+				"^.*/servlet/capabilities.*$",  			/*'rest/capabilities' redirects to here*/
+				"^.*/servlet/oauth/.*$",
+				"^.*/rest/remote-link-aggregation.*$",
+				"^.*/servlet/remote-link-aggregation.*$"
 		);
 
 		return rules.stream()

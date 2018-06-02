@@ -20,7 +20,7 @@ public class JiraWhitelistRules implements AtlassianProductWhitelistRules{
 				"^.*(css|woff|ttf)$"
 		);
 
-		return isRestWithOauth(httpRequest) ||
+		return isOauthAuthorizationHeaderPresent(httpRequest) ||
 				isApplicationLinkRelated(httpRequest) ||
 				rules.stream()
 					.anyMatch(rule -> this.checkRule(uri, rule));

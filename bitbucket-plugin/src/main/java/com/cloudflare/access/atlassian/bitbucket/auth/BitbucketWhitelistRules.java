@@ -22,7 +22,7 @@ public class BitbucketWhitelistRules implements AtlassianProductWhitelistRules{
 				"^.*/rest/api/latest/logs/.*$",
 				"^.*/scm/.*$"
 		);
-		boolean whitelisted = isRestWithOauth(httpRequest) ||
+		boolean whitelisted = isOauthAuthorizationHeaderPresent(httpRequest) ||
 				isApplicationLinkRelated(httpRequest) ||
 				rules.stream()
 					.anyMatch(rule -> this.checkRule(uri, rule));
