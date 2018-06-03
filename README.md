@@ -99,6 +99,22 @@ The plugin includes a HTTP proxy that should be able to forward this requests to
 
 - Currently the internal proxy replaces any JVM proxy configuration for HTTP, soon it will chain the proxies together
 
+## Confluence macros showing *__MSG_xxxx* title or description
+
+**Symptoms:**
+
+- Some macros are displaying title or description with a text starting with *__MSG_xxxx*
+
+**Cause:**
+
+Very likelly the macros plugin was unable to load the proper message bundles and cached the texts with placeholders.
+
+**Solution:**
+
+- Go to Confluence Administration page
+- Go to Cache Management
+- Clear all caches which name contanins "Macro" or "Gadget"
+
 ## Application Links - Network error
 
 **Symptoms:**
@@ -227,7 +243,7 @@ I recommend having a reverse proxy in front of the Atlassian containers, with di
 
 ## Plugin testing
  
-1. Start the desired Atlassian application container 
+1. Start the desired Atlassian application container ([JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/), [Confluence](https://hub.docker.com/r/felipebn/confluence-cf-access-plugin-dev/), [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/))
 1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
 1. Login in the Atlassian application as administrator
 1. Go to *Manage add-ons* on the administration page or menu
