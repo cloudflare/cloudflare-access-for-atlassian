@@ -112,7 +112,7 @@ public class AtlassianInternalHttpProxyTest {
 		String contents = assertCodeAndReturnContent("http://nonexistingdomain.foo/request/jira/rest/gadgets/1.0/g/feed", 200, true);
 		assertThat(unescapeHtml4(contents), containsString("\"url\": \"http://mockbin.com/request/jira/rest/gadgets/1.0/g/feed\""));
 
-		//Assert that only the final requests are sent to the jvm proxy
+		//Assert that only the external request reaches the JVM proxy
 		assertThat(jvmProxyInterceptedURLs, hasSize(1));
 		assertThat(jvmProxyInterceptedURLs, contains(exampleDotCom));
 
