@@ -1,8 +1,12 @@
 package com.cloudflare.access.atlassian.common.http;
 
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
+
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Queue;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -13,10 +17,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.littleshoot.proxy.ChainedProxy;
+import org.littleshoot.proxy.ChainedProxyAdapter;
+import org.littleshoot.proxy.ChainedProxyManager;
 import org.littleshoot.proxy.HttpFilters;
 import org.littleshoot.proxy.HttpFiltersAdapter;
 import org.littleshoot.proxy.HttpFiltersSourceAdapter;
 import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.HttpProxyServerBootstrap;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.littleshoot.proxy.impl.ProxyUtils;
 import org.littleshoot.proxy.mitm.Authority;
@@ -38,26 +46,28 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.AttributeKey;
 
 
-//TODO handle chained proxy
 public class AtlassianInternalHttpProxy {
 
 	public static final Logger log = LoggerFactory.getLogger(AtlassianInternalHttpProxy.class);
 	public static final AtlassianInternalHttpProxy INSTANCE = new AtlassianInternalHttpProxy();
 	private HttpProxyServer server;
+	private JvmInitialProxyConfig jvmProxyConfig;
 
-	private AtlassianInternalHttpProxy() {}
+	AtlassianInternalHttpProxy() {
+		this.jvmProxyConfig = new JvmInitialProxyConfig();
+	}
 
 	public void init(AtlassianInternalHttpProxyConfig config) {
 		try {
 			this.shutdown();
 
 			Authority authority = createCertificateAuthority();
-			this.server =
-				    DefaultHttpProxyServer.bootstrap()
-				        .withPort(0)
-				        .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
-				        .withFiltersSource(new LocalServerForwardAdapter(config))
-				        .start();
+			HttpProxyServerBootstrap proxyBootstrapper = DefaultHttpProxyServer.bootstrap()
+			    .withPort(0)
+			    .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
+			    .withFiltersSource(new LocalServerForwardAdapter(config, jvmProxyConfig));
+
+			this.server = chainToExistingJVMProxy(proxyBootstrapper, config).start();
 
 			setupJvmProxyProperties("127.0.0.1", String.valueOf(server.getListenAddress().getPort()));
 			setupJvmSSLContext();
@@ -65,6 +75,7 @@ public class AtlassianInternalHttpProxy {
 			throw new RuntimeException("Unable to create an internal proxy!", e);
 		}
 	}
+
 
 	private Authority createCertificateAuthority() {
 		File keyStoreDir = new File("cloudflare-access-atlassian-plugin");
@@ -80,10 +91,61 @@ public class AtlassianInternalHttpProxy {
 		return authority;
 	}
 
+	/*
+	 * Chains to the JVM initial HTTP proxy, HTTPS is handled by Apache HttpClient.
+	 */
+	private HttpProxyServerBootstrap chainToExistingJVMProxy(HttpProxyServerBootstrap proxyBootstrapper, AtlassianInternalHttpProxyConfig config) {
+		if(jvmProxyConfig.hasHttp()) {
+			proxyBootstrapper
+			.withChainProxyManager(new ChainedProxyManager() {
+
+				@Override
+				public void lookupChainedProxies(HttpRequest httpRequest, Queue<ChainedProxy> chainedProxies) {
+					if(isRequestToLocalForward(httpRequest)) {
+						chainedProxies.add(ChainedProxyAdapter.FALLBACK_TO_DIRECT_CONNECTION);
+					}else {
+						chainedProxies.add(new ChainedProxyAdapter() {
+							@Override
+							public InetSocketAddress getChainedProxyAddress() {
+								return jvmProxyConfig.getHttpProxyAddress();
+							}
+						});
+					}
+				}
+
+				private boolean isRequestToLocalForward(HttpRequest httpRequest) {
+					try {
+						String scheme = ProxyUtils.isCONNECT(httpRequest) ? "https://":"";
+						URI uri = new URI(scheme + httpRequest.getUri());
+						if(uri.getHost().equals(config.getAddress()) && uri.getPort() == config.getPort()) {
+							return true;
+						}
+					}catch (Exception e) {
+						e.printStackTrace();
+						throw new RuntimeException("Unable to check local forward to URL: " + httpRequest, e);
+					}
+					return false;
+				}
+			});
+		}
+		return proxyBootstrapper;
+	}
+
 	public void shutdown() {
 		if(this.server != null) {
 			this.server.stop();
-			setupJvmProxyProperties("", "");
+			resetJvmProxyProperties();
+		}
+	}
+
+	private void resetJvmProxyProperties() {
+		if(jvmProxyConfig.hasHttp()) {
+			System.setProperty("http.proxyHost", jvmProxyConfig.getHttpProxyAddress().getHostString());
+			System.setProperty("http.proxyPort", String.valueOf(jvmProxyConfig.getHttpProxyAddress().getPort()));
+		}
+		if(jvmProxyConfig.hasHttps()) {
+			System.setProperty("https.proxyHost", jvmProxyConfig.getHttpsProxyAddress().getHostString());
+			System.setProperty("https.proxyPort", String.valueOf(jvmProxyConfig.getHttpsProxyAddress().getPort()));
 		}
 	}
 
@@ -115,9 +177,11 @@ public class AtlassianInternalHttpProxy {
 	private static final class LocalServerForwardAdapter extends HttpFiltersSourceAdapter {
 		private final AttributeKey<String> CONNECTED_URL = AttributeKey.valueOf("connected_url");
 		private AtlassianInternalHttpProxyConfig config;
+		private JvmInitialProxyConfig jvmProxyConfig;
 
-		public LocalServerForwardAdapter(AtlassianInternalHttpProxyConfig config) {
+		public LocalServerForwardAdapter(AtlassianInternalHttpProxyConfig config, JvmInitialProxyConfig jvmProxyConfig) {
 			this.config = config;
+			this.jvmProxyConfig = jvmProxyConfig;
 		}
 
 		@Override
@@ -131,7 +195,7 @@ public class AtlassianInternalHttpProxy {
 			String connectedUrl = getConnectedUrlFromChannel(clientCtx);
 			if(connectedUrl != null) {
 				log.debug("Proxying HTTPS request...");
-				return new LocalHttpsFilter(originalRequest, connectedUrl, config);
+				return new LocalHttpsFilter(originalRequest, connectedUrl, config, jvmProxyConfig);
 			}
 
 			log.debug("Proxying HTTP request...");
@@ -177,6 +241,10 @@ public class AtlassianInternalHttpProxy {
 			if (RewriteRule.shouldRewrite(httpObject)) {
 				HttpRequest httpRequest = (HttpRequest) httpObject;
 				URI localUrl = rewriteUri(httpRequest);
+				if(httpRequest.getUri().equals(localUrl.toString())) {
+					return null;
+				}
+
 				log.debug("Proxy redirecting: \n\tFrom: {}\n\tTo: {}", httpRequest.getUri(), localUrl);
 				DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FOUND);
 				HttpHeaders.setHeader(response, Names.CONNECTION, Values.CLOSE);
@@ -209,8 +277,9 @@ public class AtlassianInternalHttpProxy {
 	 */
 	private static final class LocalHttpsFilter extends HttpFiltersAdapter {
 		private final String finalUri;
+		private JvmInitialProxyConfig jvmProxyConfig;
 
-		public LocalHttpsFilter(HttpRequest originalRequest, String connectedUrl, AtlassianInternalHttpProxyConfig config) {
+		public LocalHttpsFilter(HttpRequest originalRequest, String connectedUrl, AtlassianInternalHttpProxyConfig config, JvmInitialProxyConfig jvmProxyConfig) {
 			super(originalRequest);
 			this.finalUri = rewriteUri(connectedUrl + originalRequest.getUri(), config);
 		}
@@ -238,11 +307,8 @@ public class AtlassianInternalHttpProxy {
 			log.debug("Proxy filtering HTTPS response to {}", finalUri);
 		    if(RewriteRule.shouldRewrite(finalUri)) {
 		    	log.debug("Proxy replacing HTTPS response by sending HTTP request to {}", finalUri);
-		    	try(CloseableHttpResponse proxyGet = HttpClientBuilder
-		    		.create()
-		    		.build()
-		    		.execute(new HttpGet(finalUri))){
-
+		    	HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+				try(CloseableHttpResponse proxyGet = httpClientBuilder.build().execute(new HttpGet(finalUri))){
 		    		HttpEntity entity = proxyGet.getEntity();
 		    		byte[] bytes = EntityUtils.toByteArray(entity);
 
@@ -277,6 +343,39 @@ public class AtlassianInternalHttpProxy {
 				return true;
 			}
 			return false;
+		}
+	}
+
+	private static class JvmInitialProxyConfig{
+		private InetSocketAddress httpProxyAddress;
+		private InetSocketAddress httpsProxyAddress;
+
+		private JvmInitialProxyConfig() {
+			String host = System.getProperty("http.proxyHost");
+			String port = System.getProperty("http.proxyPort");
+			if(isNoneBlank(host, port))
+				this.httpProxyAddress = new InetSocketAddress(host, Integer.valueOf(port));
+
+			host = System.getProperty("https.proxyHost");
+			port = System.getProperty("https.proxyPort");
+			if(isNoneBlank(host, port))
+				this.httpsProxyAddress = new InetSocketAddress(host, Integer.valueOf(port));
+		}
+
+		public InetSocketAddress getHttpProxyAddress() {
+			return httpProxyAddress;
+		}
+
+		public InetSocketAddress getHttpsProxyAddress() {
+			return httpsProxyAddress;
+		}
+
+		public boolean hasHttp() {
+			return httpProxyAddress != null;
+		}
+
+		public boolean hasHttps() {
+			return httpsProxyAddress != null;
 		}
 	}
 }
