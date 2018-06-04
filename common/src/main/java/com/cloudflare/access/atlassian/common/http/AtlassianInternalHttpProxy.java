@@ -46,6 +46,21 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.AttributeKey;
 
 
+/**
+ *
+ * This internal proxy intercept requests targetting the local
+ * atlassian application via an external URL and redirects them
+ * to a local address to prevent Access from requesting
+ * a user login.
+ *
+ * This supports HTTP and HTTPS frontends, for the HTTPS the
+ * proxy will downgrade the request to HTTP and impersonate
+ * the certificate.
+ *
+ * Other requests are forwarded to the previously existing
+ * JVM proxy or to a direct connection if no proxy was set before.
+ *
+ */
 public class AtlassianInternalHttpProxy {
 
 	public static final Logger log = LoggerFactory.getLogger(AtlassianInternalHttpProxy.class);
@@ -65,7 +80,7 @@ public class AtlassianInternalHttpProxy {
 			HttpProxyServerBootstrap proxyBootstrapper = DefaultHttpProxyServer.bootstrap()
 			    .withPort(0)
 			    .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
-			    .withFiltersSource(new LocalServerForwardAdapter(config, jvmProxyConfig));
+			    .withFiltersSource(new LocalServerForwardAdapter(config));
 
 			this.server = chainToExistingJVMProxy(proxyBootstrapper, config).start();
 
@@ -177,11 +192,9 @@ public class AtlassianInternalHttpProxy {
 	private static final class LocalServerForwardAdapter extends HttpFiltersSourceAdapter {
 		private final AttributeKey<String> CONNECTED_URL = AttributeKey.valueOf("connected_url");
 		private AtlassianInternalHttpProxyConfig config;
-		private JvmInitialProxyConfig jvmProxyConfig;
 
-		public LocalServerForwardAdapter(AtlassianInternalHttpProxyConfig config, JvmInitialProxyConfig jvmProxyConfig) {
+		public LocalServerForwardAdapter(AtlassianInternalHttpProxyConfig config) {
 			this.config = config;
-			this.jvmProxyConfig = jvmProxyConfig;
 		}
 
 		@Override
@@ -195,7 +208,7 @@ public class AtlassianInternalHttpProxy {
 			String connectedUrl = getConnectedUrlFromChannel(clientCtx);
 			if(connectedUrl != null) {
 				log.debug("Proxying HTTPS request...");
-				return new LocalHttpsFilter(originalRequest, connectedUrl, config, jvmProxyConfig);
+				return new LocalHttpsFilter(originalRequest, connectedUrl, config);
 			}
 
 			log.debug("Proxying HTTP request...");
@@ -277,9 +290,8 @@ public class AtlassianInternalHttpProxy {
 	 */
 	private static final class LocalHttpsFilter extends HttpFiltersAdapter {
 		private final String finalUri;
-		private JvmInitialProxyConfig jvmProxyConfig;
 
-		public LocalHttpsFilter(HttpRequest originalRequest, String connectedUrl, AtlassianInternalHttpProxyConfig config, JvmInitialProxyConfig jvmProxyConfig) {
+		private LocalHttpsFilter(HttpRequest originalRequest, String connectedUrl, AtlassianInternalHttpProxyConfig config) {
 			super(originalRequest);
 			this.finalUri = rewriteUri(connectedUrl + originalRequest.getUri(), config);
 		}
