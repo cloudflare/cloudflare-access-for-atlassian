@@ -55,9 +55,6 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		System.out.println(RequestInspector.getRequestedResourceInfo(httpRequest));
-		System.out.println(RequestInspector.getHeadersAndCookies(httpRequest));
-
 		cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
 	}
 
