@@ -236,9 +236,48 @@ These images are configured to:
 
 I recommend having a reverse proxy in front of the Atlassian containers, with distinct paths forwarding to JIRA, Confluence and Bitbucket.
 
+<details><summary>Sample NGINX configuration:</summary>
+<p>
+
+```
+server {
+    listen 80 default_server;
+    server_name <yourservename.com>;
+
+    location /jira {
+        proxy_pass http://localhost:8080/jira;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /confluence {
+        proxy_pass http://localhost:8090/confluence;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /bitbucket {
+        proxy_pass http://localhost:7990/bitbucket;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+}
+```
+
+</p>
+</details>
+
 ## Images
 
 - [JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/)
+- [Confluence](https://hub.docker.com/r/felipebn/confluence-cf-access-plugin-dev/)
 - [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/)
 
 ## Plugin testing
