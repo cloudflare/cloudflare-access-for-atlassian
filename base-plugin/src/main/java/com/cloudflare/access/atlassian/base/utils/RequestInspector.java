@@ -28,7 +28,7 @@ public class RequestInspector {
 		Enumeration<String> headers = request.getHeaderNames();
 		while (headers.hasMoreElements()) {
 			String headerName = headers.nextElement();
-			sb.append(String.format("Header[%s]: '%s'\n", headerName, enumerationAsList(request.getHeaders(headerName))));
+			sb.append(String.format("Header[%s]: '%s'%n", headerName, enumerationAsList(request.getHeaders(headerName))));
 		}
 		sb.append(divider);
 		sb.append("\n\n");
@@ -38,7 +38,7 @@ public class RequestInspector {
 			sb.append("No cookies in the request!\n");
 		}else {
 			for (Cookie cookie : cookies) {
-				sb.append(String.format("Cookie[%s]@'%s': '%s'\n", cookie.getName(), cookie.getDomain(), cookie.getValue()));
+				sb.append(String.format("Cookie[%s]@'%s': '%s'%n", cookie.getName(), cookie.getDomain(), cookie.getValue()));
 			}
 		}
 
@@ -55,7 +55,7 @@ public class RequestInspector {
 		Enumeration<String> sessionKeys = httpSession.getAttributeNames();
 		while (sessionKeys.hasMoreElements()) {
 			String key = sessionKeys.nextElement();
-			sb.append(String.format("Session[%s]: '%s'\n", key, Objects.toString(httpSession.getAttribute(key))));
+			sb.append(String.format("Session[%s]: '%s'%n", key, Objects.toString(httpSession.getAttribute(key))));
 		}
 		return sb.toString();
 	}

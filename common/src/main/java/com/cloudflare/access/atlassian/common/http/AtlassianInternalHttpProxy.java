@@ -366,12 +366,12 @@ public class AtlassianInternalHttpProxy {
 			String host = System.getProperty("http.proxyHost");
 			String port = System.getProperty("http.proxyPort");
 			if(isNoneBlank(host, port))
-				this.httpProxyAddress = new InetSocketAddress(host, Integer.valueOf(port));
+				this.httpProxyAddress = new InetSocketAddress(host, Integer.parseInt(port));
 
 			host = System.getProperty("https.proxyHost");
 			port = System.getProperty("https.proxyPort");
 			if(isNoneBlank(host, port))
-				this.httpsProxyAddress = new InetSocketAddress(host, Integer.valueOf(port));
+				this.httpsProxyAddress = new InetSocketAddress(host, Integer.parseInt(port));
 		}
 
 		public InetSocketAddress getHttpProxyAddress() {

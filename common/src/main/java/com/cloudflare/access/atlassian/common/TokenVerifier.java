@@ -44,7 +44,7 @@ public class TokenVerifier {
 			return jwt;
 		}catch (JwtException e) {
 			//TODO log
-			throw new InvalidJWTException(String.format("Bad JWT: '%s' \nError: %s", token, e.getMessage()), e);
+			throw new InvalidJWTException(String.format("Bad JWT: '%s' %nError: %s", token, e.getMessage()), e);
 		}catch (JwsException | NullPointerException e) {
 			//TODO log
 			throw new InvalidJWTException(String.format("Bad JWT: '%s'", token), e);

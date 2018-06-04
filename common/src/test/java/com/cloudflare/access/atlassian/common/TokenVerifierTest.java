@@ -79,7 +79,7 @@ public class TokenVerifierTest {
 
 	@Test
 	public void shouldNotAcceptBadSigning() {
-		expectedException.expect(new ExceptionMatcher (InvalidJWTException.class, String.format("Bad JWT: '%s' \nError: Invalid Signature", token)));
+		expectedException.expect(new ExceptionMatcher (InvalidJWTException.class, String.format("Bad JWT: '%s' %nError: Invalid Signature", token)));
 		String badJwkJson = "{\n" +
 				"			\"kid\": \"bccdf99ac336c9278e3c7ac71bebcbe467bbbfd1fb013c84c93889da077b9d79\",\n" +
 				"			\"kty\": \"RSA\",\n" +

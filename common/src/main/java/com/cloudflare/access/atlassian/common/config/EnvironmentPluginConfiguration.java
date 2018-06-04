@@ -15,7 +15,7 @@ public class EnvironmentPluginConfiguration implements PluginConfiguration{
 	@Override
 	public AtlassianInternalHttpProxyConfig getInternalProxyConfig() {
 		String host = getEnvValueOrDefault(CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS, "localhost");
-		int port = Integer.valueOf(EnvUtils.getEnvValueOrThrow(CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT));
+		int port = Integer.parseInt(EnvUtils.getEnvValueOrThrow(CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT));
 		boolean useHttps = Boolean.parseBoolean(getEnvValueOrDefault(CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_HTTPS, "false"));
 		return new AtlassianInternalHttpProxyConfig(host, port, useHttps);
 	}
