@@ -53,7 +53,8 @@ public class CloudflareAccessService {
 		this.failureHandler = failureHandler;
 	}
 
-	void setAuthContext(AuthenticationContext authContext){
+	//TODO make package protected
+	public void setAuthContext(AuthenticationContext authContext){
 		this.authContext = authContext;
 	}
 

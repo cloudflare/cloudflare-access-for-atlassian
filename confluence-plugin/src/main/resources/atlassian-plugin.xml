@@ -24,7 +24,6 @@
     <context>atl.general</context>
   </web-resource>
   
-  
   <servlet-filter name="Cloudflare Access Logout Filter" key="cloudflareAccessLogoutFilter" class="com.cloudflare.access.atlassian.confluence.auth.LogoutFilter" location="before-login" weight="100">
     <description>Intercepts logout calls and logout user from Cloudflare Access</description>
     <url-pattern>/logout*</url-pattern>

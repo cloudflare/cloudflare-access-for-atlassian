@@ -1,6 +1,7 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -17,9 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
-import com.cloudflare.access.atlassian.base.utils.RequestInspector;
-import com.cloudflare.access.atlassian.common.config.EnvironmentPluginConfiguration;
-import com.cloudflare.access.atlassian.common.http.AtlassianInternalHttpProxy;
+import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
+import com.cloudflare.access.atlassian.jira.config.ConfigurationService;
 
 @Named("CloudflareAccessAuthenticationFilter")
 public class CloudflareAccessAuthenticationFilter implements Filter{
@@ -28,24 +28,22 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 
 	@Inject
 	private CloudflareAccessService cloudflareAccess;
+	@Inject
+	private ConfigurationService configurationService;
 
 	@Inject
-	public CloudflareAccessAuthenticationFilter(CloudflareAccessService cloudflareAccess) {
+	public CloudflareAccessAuthenticationFilter(CloudflareAccessService cloudflareAccess, ConfigurationService configurationService) {
 		this.cloudflareAccess = cloudflareAccess;
+		this.configurationService = configurationService;
 	}
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		log.debug("Initializing internal proxy...");
-		AtlassianInternalHttpProxy.INSTANCE.init(new EnvironmentPluginConfiguration().getInternalProxyConfig());
-		log.debug("Filter initialized");
 	}
 
 	@Override
 	public void destroy() {
-		log.debug("Shutting down internal proxy...");
-		AtlassianInternalHttpProxy.INSTANCE.shutdown();
-		log.debug("Filter destroyed");
+
 	}
 
 	@Override
@@ -55,7 +53,13 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
+		Optional<PluginConfiguration> pluginConfiguration = configurationService.getPluginConfiguration();
+		if(pluginConfiguration.isPresent()) {
+			cloudflareAccess.setAuthContext(pluginConfiguration.get().getAuthenticationContext());
+			cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
+		}else {
+			chain.doFilter(httpRequest, httpResponse);
+		}
 	}
 
 }

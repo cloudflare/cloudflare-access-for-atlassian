@@ -7,9 +7,6 @@
         <param name="plugin-logo">images/cf-logo.png</param>
     </plugin-info>
 
-    <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="jira-plugin"/>
-
     <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" 
     				class="com.cloudflare.access.atlassian.jira.auth.CloudflareAccessAuthenticationFilter" 
     				location="before-login" weight="200">
@@ -28,4 +25,17 @@
         <dispatcher>FORWARD</dispatcher>
     </servlet-filter>
     
+    <resource type="i18n" name="i18n" location="pluginMessages"/>
+    
+	<servlet key="cloudflareAccessConfigServlet" class="com.cloudflare.access.atlassian.jira.config.ConfigurationServlet">
+	  <url-pattern>/cloudflareaccess/config</url-pattern>
+	</servlet>
+	
+	<web-item key="cloudflareAccessConfigMenuItem" name="Cloudflare Access Configuration" 
+				section="top_system_section/security_section" 
+				weight="70" >
+	  <description>Link to Cloudflare Access Configuration page.</description> 
+	  <label>Cloudflare Access</label> 
+	  <link linkId="cloudflareAccessConfigLink">/plugins/servlet/cloudflareaccess/config</link> 
+	</web-item> 
 </atlassian-plugin>
