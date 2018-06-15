@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.jira.support;
+package com.cloudflare.access.atlassian.base.support.impl;
 
 import java.util.Optional;
 
@@ -8,9 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.support.PluginStateWatchService;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.http.AtlassianInternalHttpProxy;
-import com.cloudflare.access.atlassian.jira.config.ConfigurationService;
 
 @Component
 public class DefaultPluginStateWatchService implements PluginStateWatchService{

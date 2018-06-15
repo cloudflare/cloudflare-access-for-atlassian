@@ -27,11 +27,12 @@
     
     <resource type="i18n" name="i18n" location="pluginMessages"/>
     
-	<servlet key="cloudflareAccessConfigServlet" class="com.cloudflare.access.atlassian.jira.config.ConfigurationServlet">
+	<servlet name="Cloudflare Access Configuration Servlet" key="cloudflareAccessConfigServlet" class="com.cloudflare.access.atlassian.base.config.ConfigurationServlet">
+	  <description>Servlet to process configuration requests</description> 
 	  <url-pattern>/cloudflareaccess/config</url-pattern>
 	</servlet>
 	
-	<web-item key="cloudflareAccessConfigMenuItem" name="Cloudflare Access Configuration" 
+	<web-item name="Cloudflare Access Configuration Link" key="cloudflareAccessConfigMenuItem" 
 				section="top_system_section/security_section" 
 				weight="70" >
 	  <description>Link to Cloudflare Access Configuration page.</description> 

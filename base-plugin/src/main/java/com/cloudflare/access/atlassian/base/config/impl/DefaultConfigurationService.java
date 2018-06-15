@@ -1,6 +1,6 @@
-package com.cloudflare.access.atlassian.jira.config;
+package com.cloudflare.access.atlassian.base.config.impl;
 
-import static com.cloudflare.access.atlassian.jira.config.ConfigurationVariables.*;
+import static com.cloudflare.access.atlassian.base.config.ConfigurationVariables.*;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -15,6 +15,9 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
+import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
+import com.cloudflare.access.atlassian.base.config.PersistentPluginConfiguration;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 
 @Component

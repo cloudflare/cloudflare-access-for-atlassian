@@ -126,18 +126,6 @@
 		    <scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.atlassian.templaterenderer</groupId>
-			<artifactId>atlassian-template-renderer-api</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.bval</groupId>
-		    <artifactId>bval-jsr</artifactId>
-		    <version>1.1.2</version>
-		</dependency>
-
         <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
         <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
         <!--

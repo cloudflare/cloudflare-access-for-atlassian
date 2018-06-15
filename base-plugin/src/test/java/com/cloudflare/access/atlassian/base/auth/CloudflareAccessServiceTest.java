@@ -5,6 +5,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,6 +23,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
+import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
+import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CloudflareAccessServiceTest {
@@ -30,6 +34,8 @@ public class CloudflareAccessServiceTest {
 	private PluginAccessor pluginAcessor;
 	@Mock
 	private CloudflarePluginDetails pluginDetails;
+	@Mock
+	private ConfigurationService configurationService;
 	@Mock
 	private AtlassianUserService userService;
 	@Mock
@@ -44,6 +50,8 @@ public class CloudflareAccessServiceTest {
 	@Before
 	public void setupDefaults() {
 		when(pluginAcessor.isPluginEnabled(anyString())).thenReturn(true);
+		PluginConfiguration mockPluginConfiguration = mockPluginConfiguration(authContext);
+		when(configurationService.getPluginConfiguration()).thenReturn(Optional.of(mockPluginConfiguration));
 	}
 
 	@Test
@@ -57,8 +65,7 @@ public class CloudflareAccessServiceTest {
 		User user = mock(User.class);
 		when(userService.getUser(authContext.getTokenOwnerEmail())).thenReturn(user);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
-		cloudflareAccessService.setAuthContext(authContext);
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(successHandler,times(1)).handle(httpRequest, httpResponse, chain, user);
@@ -78,8 +85,7 @@ public class CloudflareAccessServiceTest {
 		RuntimeException userRetrievalExcpetion = new RuntimeException("two users with same email");
 		when(userService.getUser(authContext.getTokenOwnerEmail())).thenThrow(userRetrievalExcpetion);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
-		cloudflareAccessService.setAuthContext(authContext);
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(failureHandler,times(1)).handle(httpRequest, httpResponse, userRetrievalExcpetion);
@@ -96,8 +102,7 @@ public class CloudflareAccessServiceTest {
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
 		FilterChain chain = mock(FilterChain.class);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
-		cloudflareAccessService.setAuthContext(authContext);
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
@@ -115,8 +120,7 @@ public class CloudflareAccessServiceTest {
 
 		when(whitelistRules.isRequestWhitelisted(httpRequest)).thenReturn(true);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
-		cloudflareAccessService.setAuthContext(authContext);
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(whitelistRules,times(1)).isRequestWhitelisted(httpRequest);
@@ -140,8 +144,7 @@ public class CloudflareAccessServiceTest {
 		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(false)).thenReturn(httpSession);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, userService, whitelistRules, successHandler, failureHandler);
-		cloudflareAccessService.setAuthContext(authContext);
+		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
 		cloudflareAccessService.processLogoutRequest(httpRequest, httpResponse, chain);
 
 		verify(httpResponse, times(1)).sendRedirect(authContext.getLogoutUrl());
@@ -161,5 +164,11 @@ public class CloudflareAccessServiceTest {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setMaxAge(maxAge);
 		return cookie;
+	}
+
+	private PluginConfiguration mockPluginConfiguration(AuthenticationContext authContext) {
+		PluginConfiguration mockPluginConfiguration = mock(PluginConfiguration.class);
+		when(mockPluginConfiguration.getAuthenticationContext()).thenReturn(authContext);
+		return mockPluginConfiguration;
 	}
 }

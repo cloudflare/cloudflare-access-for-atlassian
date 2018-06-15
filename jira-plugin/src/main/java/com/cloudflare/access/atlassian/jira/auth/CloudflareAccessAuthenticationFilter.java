@@ -1,7 +1,6 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -14,27 +13,19 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
-import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
-import com.cloudflare.access.atlassian.jira.config.ConfigurationService;
 
 @Named("CloudflareAccessAuthenticationFilter")
 public class CloudflareAccessAuthenticationFilter implements Filter{
 
-	private static final Logger log = LoggerFactory.getLogger(CloudflareAccessAuthenticationFilter.class);
+	//private static final Logger log = LoggerFactory.getLogger(CloudflareAccessAuthenticationFilter.class);
 
 	@Inject
 	private CloudflareAccessService cloudflareAccess;
-	@Inject
-	private ConfigurationService configurationService;
 
 	@Inject
-	public CloudflareAccessAuthenticationFilter(CloudflareAccessService cloudflareAccess, ConfigurationService configurationService) {
+	public CloudflareAccessAuthenticationFilter(CloudflareAccessService cloudflareAccess) {
 		this.cloudflareAccess = cloudflareAccess;
-		this.configurationService = configurationService;
 	}
 
 	@Override
@@ -43,7 +34,6 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 
 	@Override
 	public void destroy() {
-
 	}
 
 	@Override
@@ -53,13 +43,7 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		Optional<PluginConfiguration> pluginConfiguration = configurationService.getPluginConfiguration();
-		if(pluginConfiguration.isPresent()) {
-			cloudflareAccess.setAuthContext(pluginConfiguration.get().getAuthenticationContext());
-			cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
-		}else {
-			chain.doFilter(httpRequest, httpResponse);
-		}
+		cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
 	}
 
 }

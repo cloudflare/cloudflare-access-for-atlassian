@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.jira.config;
+package com.cloudflare.access.atlassian.base.config;
 
 import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;

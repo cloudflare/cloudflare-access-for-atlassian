@@ -65,6 +65,30 @@
             <version>1</version>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+			<groupId>com.atlassian.templaterenderer</groupId>
+			<artifactId>atlassian-template-renderer-api</artifactId>
+			<version>${atlassian.template.renderer.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>com.atlassian.sal</groupId>
+		    <artifactId>sal-api</artifactId>
+		    <version>${atlassian.sal.version}</version>
+		    <scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>javax.validation</groupId>
+		    <artifactId>validation-api</artifactId>
+		    <version>1.1.0.Final</version>
+		    <scope>provided</scope>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.bval</groupId>
+		    <artifactId>bval-jsr</artifactId>
+		    <version>1.1.2</version>
+		</dependency>
         
         <dependency>
 			<groupId>junit</groupId>
@@ -91,5 +115,7 @@
 		<atlassian.plugins.api.version>4.4.7</atlassian.plugins.api.version>
 		<atlassian.seraph.version>3.0.3</atlassian.seraph.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+		<atlassian.template.renderer.version>3.0.0</atlassian.template.renderer.version>
+		<atlassian.sal.version>3.1.0</atlassian.sal.version>
 	</properties>
 </project>

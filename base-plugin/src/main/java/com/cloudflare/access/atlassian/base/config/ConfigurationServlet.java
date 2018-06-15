@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.jira.config;
+package com.cloudflare.access.atlassian.base.config;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -107,11 +107,6 @@ public class ConfigurationServlet extends HttpServlet{
 	    String authDomain = request.getParameter("authDomain");
 	    String localConnectorHost = request.getParameter("localConnectorHost");
 	    String localConnectorPort = request.getParameter("localConnectorPort");
-
-	    System.out.println(String.format("POST param [%s]=%s", "tokenAudience", tokenAudience));
-	    System.out.println(String.format("POST param [%s]=%s", "authDomain", authDomain));
-	    System.out.println(String.format("POST param [%s]=%s", "localConnectorHost", localConnectorHost));
-	    System.out.println(String.format("POST param [%s]=%s", "localConnectorPort", localConnectorPort));
 
 	    int localConnectorPortNumber = StringUtils.isNumeric(localConnectorPort) ? Integer.parseInt(localConnectorPort) : 0;
 

@@ -18,18 +18,14 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.seraph.auth.DefaultAuthenticator;
+import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.utils.RequestInspector;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
-import com.cloudflare.access.atlassian.common.context.EnvironmentAuthenticationContext;
 
 @Component
 public class CloudflareAccessService {
 
 	private static final Logger log = LoggerFactory.getLogger(CloudflareAccessService.class);
-
-
-
-	private AuthenticationContext authContext = new EnvironmentAuthenticationContext();
 
 	private PluginAccessor pluginAcessor;
 	private CloudflarePluginDetails pluginDetails;
@@ -37,31 +33,29 @@ public class CloudflareAccessService {
 	private AtlassianProductWhitelistRules whitelistRules;
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	private FailedAuthenticationRequestHandler failureHandler;
+	private ConfigurationService configurationService;
 
 	@Autowired
 	public CloudflareAccessService(@ComponentImport PluginAccessor pluginAcessor,
 									CloudflarePluginDetails pluginDetails,
+									ConfigurationService configurationService,
 									AtlassianUserService userService,
 									AtlassianProductWhitelistRules whitelistRules,
 									SuccessfulAuthenticationRequestHandler successHandler,
 									FailedAuthenticationRequestHandler failureHandler) {
 		this.pluginAcessor = pluginAcessor;
 		this.pluginDetails = pluginDetails;
+		this.configurationService = configurationService;
 		this.userService = userService;
 		this.whitelistRules = whitelistRules;
 		this.successHandler = successHandler;
 		this.failureHandler = failureHandler;
 	}
 
-	//TODO make package protected
-	public void setAuthContext(AuthenticationContext authContext){
-		this.authContext = authContext;
-	}
-
 	public void processAuthRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 		try {
-			if(isPluginDisabled()) {
-				log.debug("Plugin is disabled, bypassing auth process");
+			if(isPluginDisabledOrNotConfigured()) {
+				log.debug("Plugin is disabled or not configured yet, bypassing auth process");
 				chain.doFilter(request, response);
 				return;
 			}
@@ -85,8 +79,8 @@ public class CloudflareAccessService {
 	}
 
 	public void processLogoutRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-		if(isPluginDisabled()) {
-			log.debug("Plugin is disabled, bypassing logout redirect");
+		if(isPluginDisabledOrNotConfigured()) {
+			log.debug("Plugin is disabled or no configured yet, bypassing logout redirect");
 			chain.doFilter(request, response);
 			return;
 		}
@@ -104,6 +98,7 @@ public class CloudflareAccessService {
 
 		clearCookies(request, response);
 
+		AuthenticationContext authContext = getAuthContext();
 		log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());
 		response.sendRedirect(authContext.getLogoutUrl());
 	}
@@ -128,12 +123,24 @@ public class CloudflareAccessService {
 				name.startsWith("seraph");
 	}
 
+	private boolean isPluginDisabledOrNotConfigured() {
+		return isPluginDisabled() || (isPluginConfigured() == false);
+	}
+
 	private boolean isPluginDisabled() {
 		return pluginAcessor.isPluginEnabled(pluginDetails.getPluginKey()) == false;
 	}
 
 	private CloudflareToken getValidTokenFromRequest(HttpServletRequest request) {
-		return new CloudflareToken(request, authContext);
+		return new CloudflareToken(request, getAuthContext());
+	}
+
+	private boolean isPluginConfigured() {
+		return configurationService.getPluginConfiguration().isPresent();
+	}
+
+	private AuthenticationContext getAuthContext() {
+		return configurationService.getPluginConfiguration().get().getAuthenticationContext();
 	}
 
 

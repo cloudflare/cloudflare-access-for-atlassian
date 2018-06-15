@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.jira.support;
+package com.cloudflare.access.atlassian.base.support;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;

@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.jira.config;
+package com.cloudflare.access.atlassian.base.config;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
