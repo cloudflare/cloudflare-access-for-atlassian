@@ -47,7 +47,7 @@
   </servlet>
   	
   <web-item name="Cloudflare Access Configuration Link" key="cloudflareAccessConfigMenuItem" 
-  			section="system.admin" 
+  			section="system.admin/security" 
   			weight="70" >
     <description>Link to Cloudflare Access Configuration page.</description> 
     <label>Cloudflare Access</label> 

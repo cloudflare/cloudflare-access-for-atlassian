@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.cloudflare.access.atlassian.base.config.ConfigurationChangedEvent;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
@@ -59,10 +60,17 @@ public class DefaultConfigurationService implements ConfigurationService{
 	}
 
 	private Optional<ConfigurationVariablesActiveObject> findFirst() {
-		ConfigurationVariablesActiveObject[] result = activeObjects.find(ConfigurationVariablesActiveObject.class);
-		if(result.length == 0)
-			return Optional.empty();
-		return Optional.of(result[0]);
+		ConfigurationVariablesActiveObject persistedConfig = activeObjects.executeInTransaction(new TransactionCallback<ConfigurationVariablesActiveObject>() {
+
+			@Override
+			public ConfigurationVariablesActiveObject doInTransaction() {
+				ConfigurationVariablesActiveObject[] result = activeObjects.find(ConfigurationVariablesActiveObject.class);
+				if(result.length == 0) return null;
+				return result[0];
+			}
+		});
+
+		return Optional.ofNullable(persistedConfig);
 	}
 
 	@Override

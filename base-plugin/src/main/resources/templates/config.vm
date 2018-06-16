@@ -6,7 +6,9 @@
     $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
 </head>
 <body class="page-type-admin">
+	#if( $showTitle )
 	<h2>Cloudflare Access Plugin Configuration</h2>
+	#end
 	
 	#if( $result )
 		<div class="aui-message $result.msgCssClass">

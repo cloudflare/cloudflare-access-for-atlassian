@@ -3,6 +3,7 @@ package com.cloudflare.access.atlassian.bitbucket.auth;
 import org.springframework.stereotype.Component;
 
 import com.cloudflare.access.atlassian.base.auth.CloudflarePluginDetails;
+import com.cloudflare.access.atlassian.base.support.AtlassianApplicationType;
 
 @Component
 public class BitbucketPluginDetails implements CloudflarePluginDetails{
@@ -15,4 +16,8 @@ public class BitbucketPluginDetails implements CloudflarePluginDetails{
 		return "com.cloudflare.access.atlassian.bitbucket-plugin";
 	}
 
+	@Override
+	public AtlassianApplicationType getApplicationType() {
+		return AtlassianApplicationType.BITBUCKET;
+	}
 }

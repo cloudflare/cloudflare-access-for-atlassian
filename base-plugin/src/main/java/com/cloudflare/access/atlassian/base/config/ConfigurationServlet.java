@@ -1,6 +1,7 @@
 package com.cloudflare.access.atlassian.base.config;
 
 import java.io.IOException;
+import java.lang.annotation.ElementType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.Path.Node;
+import javax.validation.TraversableResolver;
 import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,25 +29,37 @@ import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.RenderingException;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.cloudflare.access.atlassian.base.auth.CloudflarePluginDetails;
+import com.cloudflare.access.atlassian.base.support.AtlassianApplicationType;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 
 @Scanned
 public class ConfigurationServlet extends HttpServlet{
 
 	private static final long serialVersionUID = -4504881490626321134L;
 	private static final String CTX_RESULT = "result";
+	private static final String CTX_SHOW_TITLE = "showTitle";
 	private static final String CTX_CONFIG = "config";
+
 
 	private final UserManager userManager;
 	private final TemplateRenderer renderer;
     private final ConfigurationService configurationService;
+    private final CloudflarePluginDetails pluginDetails;
+
+    private final Supplier<ValidatorFactory> validatorFactorySupplier;
 
 	@Inject
 	public ConfigurationServlet(@ComponentImport UserManager userManager,
 								@ComponentImport TemplateRenderer renderer,
-								ConfigurationService configurationService){
+								ConfigurationService configurationService,
+								CloudflarePluginDetails pluginDetails){
 		this.userManager = userManager;
 		this.renderer = renderer;
 		this.configurationService = configurationService;
+		this.pluginDetails = pluginDetails;
+		this.validatorFactorySupplier = Suppliers.memoize(() -> createValidatorFactory());
 	}
 
 	@Override
@@ -51,7 +68,7 @@ public class ConfigurationServlet extends HttpServlet{
 	    	return;
 	    }
 
-	    Map<String, Object> context = new HashMap<>();
+	    Map<String, Object> context = createContext();
 
 	    configurationService
 	    	.loadConfigurationVariables()
@@ -67,9 +84,9 @@ public class ConfigurationServlet extends HttpServlet{
 	    }
 
 	    ConfigurationVariables updatedConfig = loadFromRequest(request);
-	    Set<ConstraintViolation<ConfigurationVariables>> violations = Validation.buildDefaultValidatorFactory().getValidator().validate(updatedConfig);
+	    Set<ConstraintViolation<ConfigurationVariables>> violations = validateConfig(updatedConfig);
 
-	    Map<String, Object> context = new HashMap<>();
+	    Map<String, Object> context = createContext();
 
 	    if(violations.isEmpty()) {
 	    	try {
@@ -86,6 +103,12 @@ public class ConfigurationServlet extends HttpServlet{
 
 	    context.put(CTX_CONFIG, updatedConfig);
 	    renderTemplate(context, response);
+	}
+
+	private Set<ConstraintViolation<ConfigurationVariables>> validateConfig(ConfigurationVariables updatedConfig) {
+		return validatorFactorySupplier.get()
+	    		.getValidator()
+	    		.validate(updatedConfig);
 	}
 
 	private boolean userIsNotAuthorized(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -113,4 +136,28 @@ public class ConfigurationServlet extends HttpServlet{
 		return new ConfigurationVariables(tokenAudience, authDomain, localConnectorHost, localConnectorPortNumber);
 	}
 
+	private Map<String, Object> createContext(){
+		Map<String, Object> context = new HashMap<>();
+		context.put(CTX_SHOW_TITLE, this.pluginDetails.getApplicationType() != AtlassianApplicationType.CONFLUENCE);
+		return context;
+	}
+
+	private static final ValidatorFactory createValidatorFactory() {
+		return Validation.byDefaultProvider()
+	    		.configure()
+	    		.traversableResolver(new TraversableResolver() {
+					@Override
+					public boolean isReachable(Object traversableObject, Node traversableProperty, Class<?> rootBeanType,
+							Path pathToTraversableObject, ElementType elementType) {
+						return true;
+					}
+
+					@Override
+					public boolean isCascadable(Object traversableObject, Node traversableProperty, Class<?> rootBeanType,
+							Path pathToTraversableObject, ElementType elementType) {
+						return true;
+					}
+				})
+	    		.buildValidatorFactory();
+	}
 }
