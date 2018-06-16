@@ -78,6 +78,12 @@
 		    <scope>provided</scope>
 		</dependency>
 		<dependency>
+		  <groupId>com.atlassian.activeobjects</groupId>
+		  <artifactId>activeobjects-plugin</artifactId>
+		  <version>${active.objects.version}</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
 		    <groupId>javax.validation</groupId>
 		    <artifactId>validation-api</artifactId>
 		    <version>1.1.0.Final</version>
@@ -87,8 +93,14 @@
 		<dependency>
 		    <groupId>org.apache.bval</groupId>
 		    <artifactId>bval-jsr</artifactId>
-		    <version>1.1.2</version>
+		    <version>${apache.bval.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.bval</groupId>
+		    <artifactId>bval-extras</artifactId>
+		    <version>${apache.bval.version}</version>
+		</dependency>
+				
         
         <dependency>
 			<groupId>junit</groupId>
@@ -117,5 +129,7 @@
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
 		<atlassian.template.renderer.version>3.0.0</atlassian.template.renderer.version>
 		<atlassian.sal.version>3.1.0</atlassian.sal.version>
+		<active.objects.version>1.5.0</active.objects.version>
+		<apache.bval.version>1.1.2</apache.bval.version>
 	</properties>
 </project>

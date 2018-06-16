@@ -1,83 +1,68 @@
 package com.cloudflare.access.atlassian.base.config.impl;
 
-import static com.cloudflare.access.atlassian.base.config.ConfigurationVariables.*;
-
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.pluginsettings.PluginSettings;
-import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.atlassian.sal.api.transaction.TransactionCallback;
-import com.atlassian.sal.api.transaction.TransactionTemplate;
+import com.cloudflare.access.atlassian.base.config.ConfigurationChangedEvent;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
+import com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject;
 import com.cloudflare.access.atlassian.base.config.PersistentPluginConfiguration;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 
 @Component
 public class DefaultConfigurationService implements ConfigurationService{
 
-	private final PluginSettingsFactory pluginSettingsFactory;
-	private final TransactionTemplate transactionTemplate;
+	private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationService.class);
+	private final ActiveObjects activeObjects;
+	private final EventPublisher eventPublisher;
 
 	@Inject
-	public DefaultConfigurationService(@ComponentImport PluginSettingsFactory pluginSettingsFactory,
-								@ComponentImport TransactionTemplate transactionTemplate) {
+	public DefaultConfigurationService(@ComponentImport ActiveObjects activeObjects,
+										@ComponentImport EventPublisher eventPublisher) {
 		super();
-		this.pluginSettingsFactory = pluginSettingsFactory;
-		this.transactionTemplate = transactionTemplate;
+		this.activeObjects = activeObjects;
+		this.eventPublisher = eventPublisher;
 	}
 
 	@Override
 	public void save(ConfigurationVariables configVariables) {
-		transactionTemplate.execute(new TransactionCallback<Void>() {
-			@Override
-			public Void doInTransaction() {
-				PluginSettings settings = pluginSettingsFactory.createGlobalSettings();
+		ConfigurationVariablesActiveObject ao = findFirst()
+				.orElseGet(() -> activeObjects.create(ConfigurationVariablesActiveObject.class));
 
-				settings.put(TOKEN_AUDIENCE_SETTINGS_KEY, configVariables.getTokenAudience());
-			    settings.put(AUTH_DOMAIN_SETTINGS_KEY, configVariables.getAuthDomain());
-			    settings.put(LOCAL_CONNECTOR_HOST_SETTINGS_KEY, configVariables.getLocalConnectorHost());
-			    settings.put(LOCAL_CONNECTOR_PORT_SETTINGS_KEY, String.valueOf(configVariables.getLocalConnectorPort()));
-			    settings.put(VALID_FLAG_SETTINGS_KEY, "true");
+		ao.setTokenAudience(configVariables.getTokenAudience());
+		ao.setAuthDomain(configVariables.getAuthDomain());
+		ao.setLocalConnectorHost(configVariables.getLocalConnectorHost());
+		ao.setLocalConnectorPort(configVariables.getLocalConnectorPort());
+		ao.save();
 
-			    return null;
-			}
-		});
+		log.info("Publishing configuration changed event...");
+		eventPublisher.publish(new ConfigurationChangedEvent(this));
 	}
 
 	@Override
 	public Optional<ConfigurationVariables> loadConfigurationVariables() {
-		return transactionTemplate.execute(new TransactionCallback<Optional<ConfigurationVariables>>() {
-			@Override
-			public Optional<ConfigurationVariables> doInTransaction() {
-				PluginSettings settings = pluginSettingsFactory.createGlobalSettings();
+		Optional<ConfigurationVariablesActiveObject> persistedVariables = findFirst();
 
-				String validFlag = (String) settings.get(VALID_FLAG_SETTINGS_KEY);
+		if(persistedVariables.isPresent())
+			return Optional.of(new ConfigurationVariables(persistedVariables.get()));
 
-				if(Objects.equals(validFlag, "true") == false) {
-					return Optional.empty();
-				}
+		return Optional.empty();
+	}
 
-				String tokenAudience = (String) settings.get(TOKEN_AUDIENCE_SETTINGS_KEY);
-			    String authDomain = (String) settings.get(AUTH_DOMAIN_SETTINGS_KEY);
-			    String localConnectorHost = (String) settings.get(LOCAL_CONNECTOR_HOST_SETTINGS_KEY);
-			    String localConnectorPortSetting = (String) settings.get(LOCAL_CONNECTOR_PORT_SETTINGS_KEY);
-
-			    int localConnectorPort = 0;
-			    if(StringUtils.isNotBlank(localConnectorPortSetting)) {
-			    	localConnectorPort = Integer.parseInt(localConnectorPortSetting);
-			    }
-
-			    return Optional.of(new ConfigurationVariables(tokenAudience, authDomain, localConnectorHost, localConnectorPort));
-			}
-		});
+	private Optional<ConfigurationVariablesActiveObject> findFirst() {
+		ConfigurationVariablesActiveObject[] result = activeObjects.find(ConfigurationVariablesActiveObject.class);
+		if(result.length == 0)
+			return Optional.empty();
+		return Optional.of(result[0]);
 	}
 
 	@Override

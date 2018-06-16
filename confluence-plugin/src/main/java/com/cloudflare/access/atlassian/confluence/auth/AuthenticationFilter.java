@@ -14,17 +14,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
-import com.cloudflare.access.atlassian.common.config.EnvironmentPluginConfiguration;
-import com.cloudflare.access.atlassian.common.http.AtlassianInternalHttpProxy;
 
 @Named("CloudflareAccessAuthenticationFilter")
 public class AuthenticationFilter implements Filter{
 
-	private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
+	//private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
 	private CloudflareAccessService cloudflareAccess;
 
@@ -35,16 +30,10 @@ public class AuthenticationFilter implements Filter{
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		log.debug("Initializing internal proxy...");
-		AtlassianInternalHttpProxy.INSTANCE.init(new EnvironmentPluginConfiguration().getInternalProxyConfig());
-		log.debug("Filter initialized");
 	}
 
 	@Override
 	public void destroy() {
-		log.debug("Shutting down internal proxy...");
-		AtlassianInternalHttpProxy.INSTANCE.shutdown();
-		log.debug("Filter destroyed");
 	}
 
 	@Override

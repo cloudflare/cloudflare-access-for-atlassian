@@ -5,6 +5,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.apache.bval.extras.constraints.net.Domain;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -25,6 +26,7 @@ public class ConfigurationVariables {
 
 	@NotNull(message="cfaccess.config.authDomain.should.not.be.empty")
 	@Size(min=1, message="cfaccess.config.authDomain.should.not.be.empty")
+	@Domain(message="cfaccess.config.authDomain.should.be.valid")
 	private String authDomain;
 
 	private String localConnectorHost;
@@ -32,6 +34,14 @@ public class ConfigurationVariables {
 	@Min(value=1, message="cfaccess.config.localConnectorPort.should.be.in.valid.range")
 	@Max(value=65535, message="cfaccess.config.localConnectorPort.should.be.in.valid.range")
 	private int localConnectorPort;
+
+	public ConfigurationVariables(ConfigurationVariablesActiveObject activeObject) {
+		super();
+		this.tokenAudience = activeObject.getTokenAudience();
+		this.authDomain = activeObject.getAuthDomain();
+		this.localConnectorPort = activeObject.getLocalConnectorPort();
+		this.localConnectorHost = activeObject.getLocalConnectorHost();
+	}
 
 	public ConfigurationVariables(String tokenAudience, String authDomain, String localConnectorHost,
 			int localConnectorPort) {

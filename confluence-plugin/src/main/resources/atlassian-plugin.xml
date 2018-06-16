@@ -8,8 +8,6 @@
     <param name="plugin-icon">images/cf-icon.png</param>
     <param name="plugin-logo">images/cf-logo.png</param>
   </plugin-info>
-  <!-- add our i18n resource -->
-  <resource type="i18n" name="i18n" location="confluence-plugin"/>
   
   <servlet-filter name="Cloudflare Access Auth Filter" key="cloudflareAccessAuthFilter" class="com.cloudflare.access.atlassian.confluence.auth.AuthenticationFilter" location="before-login" weight="200">
     <description>Check authentication headers</description>
@@ -18,7 +16,7 @@
     <dispatcher>FORWARD</dispatcher>
   </servlet-filter>
   
-  <web-resource key="webResources">
+  <web-resource name="Cloudflare Access Plugin web resources" key="webResources">
     <resource type="download" name="override.css" location="/css/override.css"/>
     <context>com.cloudflare.access.atlassian</context>
     <context>atl.general</context>
@@ -35,4 +33,24 @@
     <description key="authentication-error-servlet.description">Custom error page to display authentication errors</description>
     <url-pattern>/cloudflareaccess/auth/error.vm</url-pattern>
   </servlet>
+  
+  <resource type="i18n" name="i18n" location="pluginMessages"/>
+  
+  <ao name="Cloudflare Access Active Objects" key="cloudflareAccessActiveObjects" >
+    <description>The module configuring the Active Objects service used by this plugin</description>
+    <entity>com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject</entity>
+  </ao>
+  
+  <servlet name="Cloudflare Access Configuration Servlet" key="cloudflareAccessConfigServlet" class="com.cloudflare.access.atlassian.base.config.ConfigurationServlet">
+    <description>Servlet to process configuration requests</description> 
+    <url-pattern>/cloudflareaccess/config</url-pattern>
+  </servlet>
+  	
+  <web-item name="Cloudflare Access Configuration Link" key="cloudflareAccessConfigMenuItem" 
+  			section="system.admin" 
+  			weight="70" >
+    <description>Link to Cloudflare Access Configuration page.</description> 
+    <label>Cloudflare Access</label> 
+    <link linkId="cloudflareAccessConfigLink">/plugins/servlet/cloudflareaccess/config</link> 
+  </web-item> 
 </atlassian-plugin>

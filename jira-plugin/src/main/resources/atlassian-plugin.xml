@@ -27,6 +27,11 @@
     
     <resource type="i18n" name="i18n" location="pluginMessages"/>
     
+	<ao name="Cloudflare Access Active Objects" key="cloudflareAccessActiveObjects" >
+	  <description>The module configuring the Active Objects service used by this plugin</description>
+	  <entity>com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject</entity>
+	</ao>
+    
 	<servlet name="Cloudflare Access Configuration Servlet" key="cloudflareAccessConfigServlet" class="com.cloudflare.access.atlassian.base.config.ConfigurationServlet">
 	  <description>Servlet to process configuration requests</description> 
 	  <url-pattern>/cloudflareaccess/config</url-pattern>
