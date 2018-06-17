@@ -7,10 +7,7 @@
         <param name="plugin-logo">images/cf-logo.png</param>
     </plugin-info>
 
-    <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="bitbucket-plugin"/>
-    
-	<web-resource key="webResources">
+	<web-resource name="Cloudflare Access Web Resources" key="webResources">
 		<resource type="download" name="override.css" location="/css/override.css"/>
 		<context>bitbucket.page.errors</context>
 	</web-resource>
@@ -40,5 +37,24 @@
     <http-auth-success-handler key="containerAuthenticationSuccessHandler"
                        class="bean:cloudflareAccessAuthenticationHandler"
                        weight="50"/>
+                       
+    <resource type="i18n" name="i18n" location="pluginMessages"/>
     
+	<ao name="Cloudflare Access Active Objects" key="cloudflareAccessActiveObjects" >
+	  <description>The module configuring the Active Objects service used by this plugin</description>
+	  <entity>com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject</entity>
+	</ao>
+    
+	<servlet name="Cloudflare Access Configuration Servlet" key="cloudflareAccessConfigServlet" class="com.cloudflare.access.atlassian.base.config.ConfigurationServlet">
+	  <description>Servlet to process configuration requests</description> 
+	  <url-pattern>/cloudflareaccess/config</url-pattern>
+	</servlet>
+	
+	<web-item name="Cloudflare Access Configuration Link" key="cloudflareAccessConfigMenuItem" 
+				section="atl.admin/admin-general-section" 
+				weight="90" >
+	  <description>Link to Cloudflare Access Configuration page.</description> 
+	  <label>Cloudflare Access</label> 
+	  <link linkId="cloudflareAccessConfigLink">/plugins/servlet/cloudflareaccess/config</link> 
+	</web-item> 
 </atlassian-plugin>
