@@ -12,19 +12,14 @@ Currently supported products are:
 This instructions applies to all supported Atlassian products, installed locally.
  
 1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
-1. Add the environment variables below to your server with the value from Cloudflare Access settings :
-    - `CF_ACCESS_ATLASSIAN_AUDIENCE`: Token audience from your Access configuration
-    - `CF_ACCESS_ATLASSIAN_ISSUER`: Token issuer, your authentication domain. Something like: `https://<Your Authentication Domain>`
-    - `CF_ACCESS_ATLASSIAN_CERTS_URL`: Certificates URL. Something like `https://<Your Authentication Domain>/cdn-cgi/access/certs`
-    - `CF_ACCESS_ATLASSIAN_LOGOUT_URL`: Logout URL to redirect users. Something like `https://<Your Authentication Domain>/cdn-cgi/access/logout`
-    - `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_ADDRESS`: (optional) Local IP or hostname where the service is listening to. Default value is `localhost`.
-    - `CF_ACCESS_ATLASSIAN_SERVICE_LOCAL_PORT`: Local Port where the service is listening to.
-1. Restart the application
 1. Login in the Atlassian application as administrator
 1. Go to *Manage add-ons* on the administration page or menu
 1. Select *Upload add-on* and upload the JAR you downloaded
+1. Go to System configuration or Administraion page
+1. Go to "Cloudflare Access" menu on the left side menu
+1. Setup your Cloudflare Access and server details
 
-After installing the plugin, you need to add the proxy certificate to your product in order to enable internal HTTPS calls:
+After installing and configuring the plugin, you need to add the proxy certificate to the Atlassian application in order to enable internal HTTPS calls:
 
 1. Go to your Atlassian application home directory
 1. Go to `cloudflare-access-atlassian-plugin`
@@ -46,8 +41,6 @@ If you are using Application Links like JIRA + Bitbucket or JIRA + Confluence, y
 1. When creating the link with applications already behind Access you will receive a warning asking to replace the URL as id redirected once. When this happens just replace the URL in the field with the unsecured URL.
 
 
-
-
 ### Helpful links
 
 - Home Directory: [JIRA](https://confluence.atlassian.com/adminjiraserver073/jira-application-home-directory-861253888.html) [Confluence](https://confluence.atlassian.com/doc/confluence-home-and-other-important-directories-590259707.html) [Bitbucket](https://confluence.atlassian.com/bitbucketserver/bitbucket-server-home-directory-776640890.html)
@@ -56,6 +49,30 @@ If you are using Application Links like JIRA + Bitbucket or JIRA + Confluence, y
 
 
 # Troubleshooting
+
+## Locked out: no user is able to access the application
+
+**Symptoms:**
+
+- No user, even the administrator, is not able to access the Atlassian application even being authenticated on Cloudflare Access
+
+**Cause:**
+
+- Plugin misconfigutation on Atlassian application; OR
+- Changes on Cloudflare Access configuration;
+
+**Solution:**
+
+Restart the application with `cloudflareAccessPlugin.filters.disabled` flag set to `true` and verify the plugin configuration against Cloudflare Access configuration.
+
+To change the flag include the following in your system `JAVA_OPTS` environment variable:
+
+```
+-DcloudflareAccessPlugin.filters.disabled=true
+```
+After updating your system `JAVA_OPTS` restart the Atlassian application, you will be able to login with your application credentials and verify the configuration.
+
+After verifying the configuration you should remove the flag and restart the application.
 
 ## Plugin upload/installation never complete
 
@@ -70,7 +87,7 @@ uploading files.
 
 **Solution:**
 
-Check the network panel while uploading the plugin looking for `4xx` HTTP errors. 
+Check the browser network panel while uploading the plugin looking for `4xx` HTTP errors. 
 
 If you see a `HTTP 413`, you need to increase the upload file size limit on your reverse proxy.
 
@@ -161,7 +178,6 @@ The solution is to configure the local proxy (Nginx/Apache) to set the `Origin` 
 Also this leads to other CSRF checks where content is not returned, in that case is best to install and manage the Atlassian product manually.
 
 # Building
-
 
 Install the Atlassian SDK following instructions on [Set up the Atlassian Plugin SDK and build a project](https://developer.atlassian.com/server/framework/atlassian-sdk/set-up-the-atlassian-plugin-sdk-and-build-a-project/).
  
@@ -284,11 +300,10 @@ server {
  
 1. Start the desired Atlassian application container ([JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/), [Confluence](https://hub.docker.com/r/felipebn/confluence-cf-access-plugin-dev/), [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/))
 1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
-1. Login in the Atlassian application as administrator
-1. Go to *Manage add-ons* on the administration page or menu
-1. Select *Upload add-on* and upload the JAR you downloaded
+1. Follow the [installation instructions](#installation)
+1. Add proxy certificates as indicated below
 
-After installing the plugin, you need to add the proxy certificate to your product in order to enable internal HTTPS calls:
+Follow the steps below to add the proxy certificates when using the provided docker images:
 
 1. Attach to the running container with `docker exec -it <container_id_or_name> /bin/bash`
 1. Go to `/var/atlassian/<product name in lower case>/cloudflare-access-atlassian-plugin`
