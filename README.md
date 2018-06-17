@@ -15,8 +15,8 @@ This instructions applies to all supported Atlassian products, installed locally
 1. Login in the Atlassian application as administrator
 1. Go to *Manage add-ons* on the administration page or menu
 1. Select *Upload add-on* and upload the JAR you downloaded
-1. Go to System configuration or Administraion page
-1. Go to "Cloudflare Access" menu on the left side menu
+1. Go to *System configuration* or administration page
+1. Go to *Cloudflare Access* menu on the left side menu
 1. Setup your Cloudflare Access and server details
 
 After installing and configuring the plugin, you need to add the proxy certificate to the Atlassian application in order to enable internal HTTPS calls:
@@ -54,7 +54,7 @@ If you are using Application Links like JIRA + Bitbucket or JIRA + Confluence, y
 
 **Symptoms:**
 
-- No user, even the administrator, is not able to access the Atlassian application even being authenticated on Cloudflare Access
+- No user, even the administrator, is able to access the Atlassian application even being authenticated on Cloudflare Access
 
 **Cause:**
 
