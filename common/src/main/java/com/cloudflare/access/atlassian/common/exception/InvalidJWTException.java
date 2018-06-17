@@ -1,6 +1,6 @@
 package com.cloudflare.access.atlassian.common.exception;
 
-public class InvalidJWTException extends RuntimeException {
+public class InvalidJWTException extends CloudflareAccessUnauthorizedException {
 
 	private static final long serialVersionUID = 2608865350569604759L;
 

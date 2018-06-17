@@ -28,6 +28,7 @@ import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
+import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CloudflareAccessServiceTest {
@@ -91,7 +92,7 @@ public class CloudflareAccessServiceTest {
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
 		FilterChain chain = mock(FilterChain.class);
 
-		RuntimeException userRetrievalExcpetion = new RuntimeException("two users with same email");
+		CloudflareAccessUnauthorizedException userRetrievalExcpetion = new CloudflareAccessUnauthorizedException("two users with same email");
 		when(userService.getUser(authContext.getTokenOwnerEmail())).thenThrow(userRetrievalExcpetion);
 
 		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();

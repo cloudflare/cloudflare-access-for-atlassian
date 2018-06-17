@@ -15,6 +15,7 @@ import com.atlassian.crowd.search.query.entity.restriction.TermRestriction;
 import com.atlassian.crowd.search.query.entity.restriction.constants.UserTermKeys;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.cloudflare.access.atlassian.base.auth.AtlassianUserService;
+import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 import com.google.common.collect.Iterators;
 
 @Component
@@ -39,11 +40,11 @@ public class DefaultAtlassianUserService implements AtlassianUserService{
 		User user  = Iterators.getNext(users, null);
 
 		if(user == null) {
-			throw new IllegalArgumentException(String.format("No user matching '%s'", userEmail));
+			throw new CloudflareAccessUnauthorizedException(String.format("No user matching '%s'", userEmail));
 		}
 
 		if(users.hasNext()) {
-			throw new IllegalArgumentException(String.format("More than one user matching '%s'", userEmail));
+			throw new CloudflareAccessUnauthorizedException(String.format("More than one user matching '%s'", userEmail));
 		}
 
 		return user;

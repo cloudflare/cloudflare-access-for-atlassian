@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.cloudflare.access.atlassian.common.TokenVerifier;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
+import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 
 public class CloudflareToken {
 
@@ -42,7 +43,7 @@ public class CloudflareToken {
 
 		if(isBlank(jwt)) {
 			log.debug("JWT not available in cookie");
-			throw new IllegalStateException("No Cloudflare Access token available in the request");
+			throw new CloudflareAccessUnauthorizedException("No Cloudflare Access token available in the request");
 		}
 		return jwt;
 	}

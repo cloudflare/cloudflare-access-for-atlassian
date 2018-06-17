@@ -23,6 +23,7 @@ import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.cloudflare.access.atlassian.base.utils.RequestInspector;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
+import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 
 @Component
 public class CloudflareAccessService {
@@ -74,12 +75,15 @@ public class CloudflareAccessService {
 			CloudflareToken token = getValidTokenFromRequest(request);
 			User user = userService.getUser(token.getUserEmail());
 			successHandler.handle(request, response, chain, user);
-		}catch (Throwable e) {
+		}catch (CloudflareAccessUnauthorizedException e) {
 			log.error("Error processing authentication: " + e.getMessage(), e);
 			log.debug(RequestInspector.getRequestedResourceInfo(request));
 			log.debug(RequestInspector.getHeadersAndCookies(request));
 			clearCookies(request, response);
 			failureHandler.handle(request, response, e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 

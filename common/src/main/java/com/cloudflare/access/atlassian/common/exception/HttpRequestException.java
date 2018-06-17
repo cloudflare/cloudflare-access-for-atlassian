@@ -1,6 +1,6 @@
 package com.cloudflare.access.atlassian.common.exception;
 
-public class HttpRequestException extends RuntimeException {
+public class HttpRequestException extends CloudflareAccessUnauthorizedException {
 
 	private static final long serialVersionUID = 7578492072131158051L;
 

@@ -1,6 +1,6 @@
 package com.cloudflare.access.atlassian.common.exception;
 
-public class CertificateProcessingException extends RuntimeException {
+public class CertificateProcessingException extends CloudflareAccessUnauthorizedException {
 
 	private static final long serialVersionUID = -2327039864502214974L;
 
