@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.confluence.auth;
+package com.cloudflare.access.atlassian.base.auth;
 
 import java.io.IOException;
 import java.util.Map;

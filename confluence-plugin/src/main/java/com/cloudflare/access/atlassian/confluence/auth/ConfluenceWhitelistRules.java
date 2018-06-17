@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import com.cloudflare.access.atlassian.base.auth.AtlassianProductWhitelistRules;
+import com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet;
 import com.google.common.collect.Lists;
 
 @Component
