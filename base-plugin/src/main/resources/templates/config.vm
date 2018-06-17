@@ -10,6 +10,15 @@
 	<h2>Cloudflare Access Plugin Configuration</h2>
 	#end
 	
+	#if( $filteringDisabled )
+		<div class="aui-message aui-message-warning">
+		    <p class="title">
+		        <strong>$i18n.getText('cfaccess.warning.filteringDisabled.title')</strong>
+		    </p>
+		    <p>$i18n.getText('cfaccess.warning.filteringDisabled.message')</p>
+		</div>	
+	#end
+	
 	#if( $result )
 		<div class="aui-message $result.msgCssClass">
 		    <p class="title">
@@ -26,7 +35,6 @@
 			#end
 		    </p>
 		</div>
-	
 	#end
 	
     <form id="config" class="aui" method="POST" action="">

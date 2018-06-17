@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.atlassian.crowd.embedded.api.User;
@@ -19,6 +20,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.seraph.auth.DefaultAuthenticator;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.cloudflare.access.atlassian.base.utils.RequestInspector;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
@@ -34,6 +36,7 @@ public class CloudflareAccessService {
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	private FailedAuthenticationRequestHandler failureHandler;
 	private ConfigurationService configurationService;
+	private final boolean filteringDisabled;
 
 	@Autowired
 	public CloudflareAccessService(@ComponentImport PluginAccessor pluginAcessor,
@@ -42,7 +45,8 @@ public class CloudflareAccessService {
 									AtlassianUserService userService,
 									AtlassianProductWhitelistRules whitelistRules,
 									SuccessfulAuthenticationRequestHandler successHandler,
-									FailedAuthenticationRequestHandler failureHandler) {
+									FailedAuthenticationRequestHandler failureHandler,
+									Environment env) {
 		this.pluginAcessor = pluginAcessor;
 		this.pluginDetails = pluginDetails;
 		this.configurationService = configurationService;
@@ -50,12 +54,13 @@ public class CloudflareAccessService {
 		this.whitelistRules = whitelistRules;
 		this.successHandler = successHandler;
 		this.failureHandler = failureHandler;
+		this.filteringDisabled = EnvironmentFlags.isFiltersDisabled(env);
 	}
 
 	public void processAuthRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 		try {
-			if(isPluginDisabledOrNotConfigured()) {
-				log.debug("Plugin is disabled or not configured yet, bypassing auth process");
+			if(isRequestFilteringDisabled()) {
+				log.debug("Plugin filters are disabled or not configured yet, bypassing auth process");
 				chain.doFilter(request, response);
 				return;
 			}
@@ -79,8 +84,8 @@ public class CloudflareAccessService {
 	}
 
 	public void processLogoutRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-		if(isPluginDisabledOrNotConfigured()) {
-			log.debug("Plugin is disabled or no configured yet, bypassing logout redirect");
+		if(isRequestFilteringDisabled()) {
+			log.debug("Plugin filters are disabled or no configured yet, bypassing logout redirect");
 			chain.doFilter(request, response);
 			return;
 		}
@@ -123,8 +128,8 @@ public class CloudflareAccessService {
 				name.startsWith("seraph");
 	}
 
-	private boolean isPluginDisabledOrNotConfigured() {
-		return isPluginDisabled() || (isPluginConfigured() == false);
+	private boolean isRequestFilteringDisabled() {
+		return isPluginDisabled() || filteringDisabled || (isPluginConfigured() == false);
 	}
 
 	private boolean isPluginDisabled() {
@@ -142,6 +147,5 @@ public class CloudflareAccessService {
 	private AuthenticationContext getAuthContext() {
 		return configurationService.getPluginConfiguration().get().getAuthenticationContext();
 	}
-
 
 }

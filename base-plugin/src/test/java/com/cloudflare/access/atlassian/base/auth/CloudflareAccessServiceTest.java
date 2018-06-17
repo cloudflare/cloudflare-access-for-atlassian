@@ -20,10 +20,12 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.core.env.Environment;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
@@ -44,14 +46,21 @@ public class CloudflareAccessServiceTest {
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	@Mock
 	private FailedAuthenticationRequestHandler failureHandler;
+	@Mock
+	private Environment env;
 
 	private TestAuthenticationContext authContext = new TestAuthenticationContext();
 
 	@Before
 	public void setupDefaults() {
 		when(pluginAcessor.isPluginEnabled(anyString())).thenReturn(true);
+
 		PluginConfiguration mockPluginConfiguration = mockPluginConfiguration(authContext);
 		when(configurationService.getPluginConfiguration()).thenReturn(Optional.of(mockPluginConfiguration));
+	}
+
+	private CloudflareAccessService newCloudflareAccessServiceInstance() {
+		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler, env);
 	}
 
 	@Test
@@ -65,7 +74,7 @@ public class CloudflareAccessServiceTest {
 		User user = mock(User.class);
 		when(userService.getUser(authContext.getTokenOwnerEmail())).thenReturn(user);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(successHandler,times(1)).handle(httpRequest, httpResponse, chain, user);
@@ -85,7 +94,7 @@ public class CloudflareAccessServiceTest {
 		RuntimeException userRetrievalExcpetion = new RuntimeException("two users with same email");
 		when(userService.getUser(authContext.getTokenOwnerEmail())).thenThrow(userRetrievalExcpetion);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(failureHandler,times(1)).handle(httpRequest, httpResponse, userRetrievalExcpetion);
@@ -102,7 +111,7 @@ public class CloudflareAccessServiceTest {
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
 		FilterChain chain = mock(FilterChain.class);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
@@ -120,10 +129,27 @@ public class CloudflareAccessServiceTest {
 
 		when(whitelistRules.isRequestWhitelisted(httpRequest)).thenReturn(true);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(whitelistRules,times(1)).isRequestWhitelisted(httpRequest);
+		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
+		verifyZeroInteractions(successHandler);
+		verifyZeroInteractions(userService);
+		verifyZeroInteractions(httpResponse);
+	}
+
+	@Test
+	public void testNoFilteringIfFilteringIsDisabled() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		when(env.getProperty(EnvironmentFlags.FILTERS_DISABLED, "false")).thenReturn("true");
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
 		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
 		verifyZeroInteractions(successHandler);
 		verifyZeroInteractions(userService);
@@ -144,7 +170,7 @@ public class CloudflareAccessServiceTest {
 		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(false)).thenReturn(httpSession);
 
-		CloudflareAccessService cloudflareAccessService = new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler);
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processLogoutRequest(httpRequest, httpResponse, chain);
 
 		verify(httpResponse, times(1)).sendRedirect(authContext.getLogoutUrl());

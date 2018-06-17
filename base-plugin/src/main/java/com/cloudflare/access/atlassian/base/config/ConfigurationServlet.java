@@ -22,6 +22,7 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -31,6 +32,7 @@ import com.atlassian.templaterenderer.RenderingException;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.cloudflare.access.atlassian.base.auth.CloudflarePluginDetails;
 import com.cloudflare.access.atlassian.base.support.AtlassianApplicationType;
+import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
@@ -40,6 +42,7 @@ public class ConfigurationServlet extends HttpServlet{
 	private static final long serialVersionUID = -4504881490626321134L;
 	private static final String CTX_RESULT = "result";
 	private static final String CTX_SHOW_TITLE = "showTitle";
+	private static final String CTX_FILTERING_DISABLED = "filteringDisabled";
 	private static final String CTX_CONFIG = "config";
 
 
@@ -49,17 +52,20 @@ public class ConfigurationServlet extends HttpServlet{
     private final CloudflarePluginDetails pluginDetails;
 
     private final Supplier<ValidatorFactory> validatorFactorySupplier;
+	private boolean filteringDisabled;
 
 	@Inject
 	public ConfigurationServlet(@ComponentImport UserManager userManager,
 								@ComponentImport TemplateRenderer renderer,
 								ConfigurationService configurationService,
-								CloudflarePluginDetails pluginDetails){
+								CloudflarePluginDetails pluginDetails,
+								Environment env){
 		this.userManager = userManager;
 		this.renderer = renderer;
 		this.configurationService = configurationService;
 		this.pluginDetails = pluginDetails;
 		this.validatorFactorySupplier = Suppliers.memoize(() -> createValidatorFactory());
+		this.filteringDisabled = EnvironmentFlags.isFiltersDisabled(env);
 	}
 
 	@Override
@@ -139,6 +145,7 @@ public class ConfigurationServlet extends HttpServlet{
 	private Map<String, Object> createContext(){
 		Map<String, Object> context = new HashMap<>();
 		context.put(CTX_SHOW_TITLE, this.pluginDetails.getApplicationType() != AtlassianApplicationType.CONFLUENCE);
+		context.put(CTX_FILTERING_DISABLED, this.filteringDisabled);
 		return context;
 	}
 
