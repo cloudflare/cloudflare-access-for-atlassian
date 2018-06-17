@@ -37,26 +37,30 @@
 		</div>
 	#end
 	
-    <form id="config" class="aui" method="POST" action="">
+    <form id="config" class="aui top-label" method="POST" action="">
     
       <div class="field-group">
         <label for="tokenAudience">$i18n.getText("cfaccess.config.tokenAudience") <span class="aui-icon icon-required"> required</span></label>
         <input type="text" class="text long-field" id="tokenAudience" name="tokenAudience" value="$!{config.tokenAudience}">
+        <div class="description">$i18n.getText("cfaccess.config.tokenAudience.description")</div>
       </div>
       
       <div class="field-group">
         <label for="authDomain">$i18n.getText("cfaccess.config.authDomain") <span class="aui-icon icon-required"> required</span></label>
         <input type="text" class="text long-field" id="authDomain" name="authDomain" value="$!{config.authDomain}">
+        <div class="description">$i18n.getText("cfaccess.config.authDomain.description")</div>
       </div>
       
       <div class="field-group">
         <label for="localConnectorHost">$i18n.getText("cfaccess.config.localConnectorHost")</label>
         <input type="text" class="text long-field" id="localConnectorHost" name="localConnectorHost" value="$!{config.localConnectorHost}">
+        <div class="description">$i18n.getText("cfaccess.config.localConnectorHost.description")</div>
       </div>
       
       <div class="field-group">
         <label for="localConnectorPort">$i18n.getText("cfaccess.config.localConnectorPort") <span class="aui-icon icon-required"> required</span></label>
         <input type="text" class="text long-field" id="localConnectorPort" name="localConnectorPort" value="$!{config.localConnectorPort}">
+        <div class="description">$i18n.getText("cfaccess.config.localConnectorPort.description")</div>
       </div>
       
       <div class="field-group">
