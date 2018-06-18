@@ -2,8 +2,6 @@
 <head>
     <meta name="decorator" content="atl.general">
     <title>Error</title>
-     com.atlassian.auiplugin:aui-experimental-iconfont
-     
     $webResourceManager.requireResourcesForContext("com.cloudflare.access.atlassian")
 </head>
 <body class="page-type-admin">
