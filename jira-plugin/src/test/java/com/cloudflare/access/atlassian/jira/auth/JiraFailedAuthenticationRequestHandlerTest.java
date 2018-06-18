@@ -1,5 +1,6 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+
+import com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet;
 
 public class JiraFailedAuthenticationRequestHandlerTest {
 
@@ -37,6 +40,7 @@ public class JiraFailedAuthenticationRequestHandlerTest {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
 
+		when(httpRequest.getHeader("Accept")).thenReturn("text/html");
 		when(httpRequest.getRequestURI()).thenReturn("/secure/website");
 		when(httpRequest.getCookies()).thenReturn(new Cookie[] {new Cookie("JSESSIONID","somehashvalue")});
 
@@ -47,12 +51,13 @@ public class JiraFailedAuthenticationRequestHandlerTest {
 	}
 
 	@Test
-	public void testThatSends401OnTheSubsequentFailure() throws IOException {
+	public void testThatRedirectsToErrorPageOnTheSubsequentFailure() throws IOException {
 		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler();
 
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
 
+		when(httpRequest.getHeader("Accept")).thenReturn("text/html");
 		when(httpRequest.getRequestURI()).thenReturn("/secure/website");
 		when(httpRequest.getCookies()).thenReturn(new Cookie[] {new Cookie("JSESSIONID","somehashvalue2")});
 
@@ -68,9 +73,8 @@ public class JiraFailedAuthenticationRequestHandlerTest {
 
 		when(httpRequest.getRequestURI()).thenReturn(redirectUrlCaptor.getValue());
 		handler.handle(httpRequest, httpResponse, secondException);
-		verify(httpResponse, never()).sendRedirect(redirectUrlCaptor.capture());
-		verify(httpResponse, times(1)).sendError(401, secondException.getMessage());
-		verify(httpResponse, times(1)).addHeader(eq("WWW-Authenticate"), anyString());
+		verify(httpResponse, times(1)).sendRedirect(redirectUrlCaptor.capture());
+		assertTrue(redirectUrlCaptor.getValue().contains(AuthenticationErrorServlet.PATH));
 	}
 
 }

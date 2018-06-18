@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import com.cloudflare.access.atlassian.base.auth.AtlassianProductWhitelistRules;
+import com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet;
 import com.google.common.collect.Lists;
 
 @Component
@@ -16,6 +17,7 @@ public class BitbucketWhitelistRules implements AtlassianProductWhitelistRules{
 	public boolean isRequestWhitelisted(HttpServletRequest httpRequest) {
 		String uri = httpRequest.getRequestURI();
 		List<String> rules = Lists.newArrayList(
+				"^.*"+AuthenticationErrorServlet.PATH+"$",
 				"^.*/rest/gadgets/.*$",
 				"^.*\\.(css|png|woff|ttf)$",
 				"^.*/rest/analytics/1.0/publish/bulk$", /*Prevent leaking cookies as this is a usage tracking and should not attempt auth*/

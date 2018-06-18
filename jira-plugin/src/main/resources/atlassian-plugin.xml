@@ -25,6 +25,16 @@
         <dispatcher>FORWARD</dispatcher>
     </servlet-filter>
     
+    <servlet name="Authentication Error Servlet" i18n-name-key="authentication-error-servlet.name" key="authenticationErrorServlet" class="com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet">
+        <description key="authentication-error-servlet.description">Custom error page to display authentication errors</description>
+        <url-pattern>/cloudflareaccess/auth/error.vm</url-pattern>
+    </servlet>
+    
+	<web-resource name="Cloudflare Access Plugin web resources" key="webResources">
+		<resource type="download" name="override.css" location="/css/override.css"/>
+		<context>com.cloudflare.access.atlassian</context>
+	</web-resource>
+    
     <resource type="i18n" name="i18n" location="pluginMessages"/>
     
 	<ao name="Cloudflare Access Active Objects" key="cloudflareAccessActiveObjects" >

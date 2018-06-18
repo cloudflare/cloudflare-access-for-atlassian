@@ -34,11 +34,12 @@ public class JiraFailedAuthenticationRequestHandler implements FailedAuthenticat
 		try {
 			String requestIdentifier = getRequestIdentifier(httpRequest);
 
-			if(shouldSendCookieCleanupRedirect(httpRequest, requestIdentifier)) {
+			if(acceptsHtml(httpRequest) && shouldSendCookieCleanupRedirect(httpRequest, requestIdentifier)) {
 				httpResponse.sendRedirect(String.format("%s?%s=%s",httpRequest.getRequestURI(), CF_PLUGIN_REQUEST_IDENTIFIER_PARAM, requestIdentifier));
 			}else {
-				send401(httpResponse, e.getMessage(), httpRequest.getServerName());
+				sendErrorResponse(httpRequest, httpResponse, e);
 			}
+
 		}catch (Exception e2) {
 			log.error("Unable to send 401 error with message " + e.getMessage(), e2);
 			throw new RuntimeException(e2);

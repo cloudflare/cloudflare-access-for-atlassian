@@ -17,7 +17,7 @@ public class BitbucketFailedAuthenticationRequestHandler implements FailedAuthen
 	@Override
 	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Throwable e) {
 		try {
-			send401(httpResponse, e.getMessage(), httpRequest.getServerName());
+			sendErrorResponse(httpRequest, httpResponse, e);
 		}catch (Exception e2) {
 			log.error("Unable to send 401 error with message " + e.getMessage(), e2);
 			throw new RuntimeException(e2);
