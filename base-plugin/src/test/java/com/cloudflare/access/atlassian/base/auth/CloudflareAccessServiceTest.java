@@ -1,6 +1,5 @@
 package com.cloudflare.access.atlassian.base.auth;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -48,6 +47,8 @@ public class CloudflareAccessServiceTest {
 	@Mock
 	private FailedAuthenticationRequestHandler failureHandler;
 	@Mock
+	private RememberMeHelperService rememberMeHelperService;
+	@Mock
 	private Environment env;
 
 	private TestAuthenticationContext authContext = new TestAuthenticationContext();
@@ -61,7 +62,7 @@ public class CloudflareAccessServiceTest {
 	}
 
 	private CloudflareAccessService newCloudflareAccessServiceInstance() {
-		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler, env);
+		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler, rememberMeHelperService, env);
 	}
 
 	@Test
@@ -170,6 +171,7 @@ public class CloudflareAccessServiceTest {
 		});
 		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(false)).thenReturn(httpSession);
+		when(httpRequest.getServerName()).thenReturn("example.com");
 
 		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processLogoutRequest(httpRequest, httpResponse, chain);
@@ -178,11 +180,7 @@ public class CloudflareAccessServiceTest {
 		verify(httpSession, times(1)).invalidate();
 
 		ArgumentCaptor<Cookie> cookiesCaptor = ArgumentCaptor.forClass(Cookie.class);
-		verify(httpResponse, times(2)).addCookie(cookiesCaptor.capture());
-
-		assertEquals(cookiesCaptor.getAllValues().size(), 2);
-		assertEquals(cookiesCaptor.getAllValues().get(0).getMaxAge(), 0);
-		assertEquals(cookiesCaptor.getAllValues().get(1).getMaxAge(), 0);
+		verify(rememberMeHelperService, times(1)).clearRemeberMe(httpRequest, httpResponse);
 	}
 
 

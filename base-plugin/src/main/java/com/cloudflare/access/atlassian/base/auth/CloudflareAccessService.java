@@ -4,10 +4,8 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +16,10 @@ import org.springframework.stereotype.Component;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.seraph.auth.DefaultAuthenticator;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.cloudflare.access.atlassian.base.utils.RequestInspector;
+import com.cloudflare.access.atlassian.base.utils.SessionUtils;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 
@@ -37,6 +35,7 @@ public class CloudflareAccessService {
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	private FailedAuthenticationRequestHandler failureHandler;
 	private ConfigurationService configurationService;
+	private RememberMeHelperService rememberMeHelperService;
 	private final boolean filteringDisabled;
 
 	@Autowired
@@ -47,6 +46,7 @@ public class CloudflareAccessService {
 									AtlassianProductWhitelistRules whitelistRules,
 									SuccessfulAuthenticationRequestHandler successHandler,
 									FailedAuthenticationRequestHandler failureHandler,
+									RememberMeHelperService rememberMeHelperService,
 									Environment env) {
 		this.pluginAcessor = pluginAcessor;
 		this.pluginDetails = pluginDetails;
@@ -55,6 +55,7 @@ public class CloudflareAccessService {
 		this.whitelistRules = whitelistRules;
 		this.successHandler = successHandler;
 		this.failureHandler = failureHandler;
+		this.rememberMeHelperService = rememberMeHelperService;
 		this.filteringDisabled = EnvironmentFlags.isFiltersDisabled(env);
 	}
 
@@ -79,7 +80,8 @@ public class CloudflareAccessService {
 			log.error("Error processing authentication: " + e.getMessage(), e);
 			log.debug(RequestInspector.getRequestedResourceInfo(request));
 			log.debug(RequestInspector.getHeadersAndCookies(request));
-			clearCookies(request, response);
+			SessionUtils.clearSession(request);
+			this.rememberMeHelperService.clearRemeberMe(request, response);
 			failureHandler.handle(request, response, e);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -94,42 +96,12 @@ public class CloudflareAccessService {
 			return;
 		}
 
-		final HttpSession httpSession = request.getSession(false);
-		if(httpSession != null) {
-			httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, null);
-			httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, true);
-			try {
-				httpSession.invalidate();
-			}catch (IllegalStateException e) {
-				log.debug("Session was already invalid");
-			}
-		}
-
-		clearCookies(request, response);
+		SessionUtils.clearSession(request);
+		this.rememberMeHelperService.clearRemeberMe(request, response);
 
 		AuthenticationContext authContext = getAuthContext();
 		log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());
 		response.sendRedirect(authContext.getLogoutUrl());
-	}
-
-	private void clearCookies(HttpServletRequest request, HttpServletResponse response) {
-		Cookie[] cookies = request.getCookies();
-		if(cookies == null) {
-			return;
-		}
-		for (Cookie cookie : cookies) {
-			if(shouldDeleteCookie(cookie)) {
-				cookie.setMaxAge(0);
-				log.debug("Deleting cookie '{}'", cookie.getName());
-				response.addCookie(cookie);
-			}
-		}
-	}
-
-	private boolean shouldDeleteCookie(Cookie c) {
-		String name = c.getName().toLowerCase();
-		return name.equalsIgnoreCase("JSESSIONID") ||
-				name.startsWith("seraph");
 	}
 
 	private boolean isRequestFilteringDisabled() {
