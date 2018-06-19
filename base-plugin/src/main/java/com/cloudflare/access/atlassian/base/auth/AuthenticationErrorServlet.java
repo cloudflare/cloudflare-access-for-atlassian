@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import com.cloudflare.access.atlassian.base.utils.SessionUtils;
 import com.google.common.collect.Maps;
 
 @Scanned
@@ -25,12 +24,9 @@ public class AuthenticationErrorServlet extends HttpServlet {
 
 	private TemplateRenderer templateRenderer;
 
-	private RememberMeHelperService rememberMeHelperService;
-
 	@Inject
-	public AuthenticationErrorServlet(@ComponentImport TemplateRenderer templateRenderer, RememberMeHelperService rememberMeHelperService) {
+	public AuthenticationErrorServlet(@ComponentImport TemplateRenderer templateRenderer) {
 		this.templateRenderer = templateRenderer;
-		this.rememberMeHelperService = rememberMeHelperService;
 	}
 
 	@Override
@@ -39,9 +35,6 @@ public class AuthenticationErrorServlet extends HttpServlet {
 
         Map<String, Object> context = Maps.newHashMap();
         context.put("errorMessage", req.getParameter(ERROR_MSG_PARAM));
-
-        SessionUtils.clearSession(req);
-        this.rememberMeHelperService.clearRemeberMe(req, resp);
 
         templateRenderer.render(ERROR_TEMPLATE, context, resp.getWriter());
 	}

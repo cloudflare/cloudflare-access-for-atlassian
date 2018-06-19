@@ -11,15 +11,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet;
 
+@RunWith(MockitoJUnitRunner.class)
 public class JiraFailedAuthenticationRequestHandlerTest {
+
+	@Mock
+	private RememberMeHelperService rememberMeService;
 
 	@Test
 	public void testThatSends401WhenNoCookieIsAvailable() throws IOException {
-		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler();
+		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler(rememberMeService);
 
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
@@ -35,7 +42,7 @@ public class JiraFailedAuthenticationRequestHandlerTest {
 
 	@Test
 	public void testThatSendsRedirectOnTheFirstFailure() throws IOException {
-		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler();
+		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler(rememberMeService);
 
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
@@ -52,7 +59,7 @@ public class JiraFailedAuthenticationRequestHandlerTest {
 
 	@Test
 	public void testThatRedirectsToErrorPageOnTheSubsequentFailure() throws IOException {
-		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler();
+		JiraFailedAuthenticationRequestHandler handler = new JiraFailedAuthenticationRequestHandler(rememberMeService);
 
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);

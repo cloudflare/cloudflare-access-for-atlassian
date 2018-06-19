@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,13 @@ public class JiraFailedAuthenticationRequestHandler implements FailedAuthenticat
 			.expireAfterWrite(1, TimeUnit.MINUTES)
 			.build();
 
+	private RememberMeHelperService rememberMeService;
+
+	@Inject
+	public JiraFailedAuthenticationRequestHandler(RememberMeHelperService rememberMeService) {
+		this.rememberMeService = rememberMeService;
+	}
+
 	@Override
 	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Throwable e) {
 		try {
@@ -37,6 +45,7 @@ public class JiraFailedAuthenticationRequestHandler implements FailedAuthenticat
 			if(acceptsHtml(httpRequest) && shouldSendCookieCleanupRedirect(httpRequest, requestIdentifier)) {
 				httpResponse.sendRedirect(String.format("%s?%s=%s",httpRequest.getRequestURI(), CF_PLUGIN_REQUEST_IDENTIFIER_PARAM, requestIdentifier));
 			}else {
+				rememberMeService.removeRememberMeCookie(httpRequest, httpResponse);
 				sendErrorResponse(httpRequest, httpResponse, e);
 			}
 

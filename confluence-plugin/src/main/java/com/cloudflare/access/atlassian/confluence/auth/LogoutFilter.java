@@ -20,10 +20,12 @@ import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
 public class LogoutFilter implements Filter{
 
 	private CloudflareAccessService cloudflareAccess;
+	private RememberMeHelperService rememberMeService;
 
 	@Inject
-	public LogoutFilter(CloudflareAccessService cloudflareAccess) {
+	public LogoutFilter(CloudflareAccessService cloudflareAccess, RememberMeHelperService rememberMeService) {
 		this.cloudflareAccess = Objects.requireNonNull(cloudflareAccess, "CloudflareAccessService instance not injected by DI container");
+		this.rememberMeService = Objects.requireNonNull(rememberMeService, "RememberMeHelperService instance not injected by DI container");
 	}
 
 	@Override
@@ -38,6 +40,8 @@ public class LogoutFilter implements Filter{
 
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+		this.rememberMeService.removeRememberMeCookie(httpRequest, httpResponse);
 
 		cloudflareAccess.processLogoutRequest(httpRequest, httpResponse, chain);
 	}

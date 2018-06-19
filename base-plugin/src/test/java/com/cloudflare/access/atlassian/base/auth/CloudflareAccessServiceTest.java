@@ -16,7 +16,6 @@ import javax.servlet.http.HttpSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.env.Environment;
@@ -47,8 +46,6 @@ public class CloudflareAccessServiceTest {
 	@Mock
 	private FailedAuthenticationRequestHandler failureHandler;
 	@Mock
-	private RememberMeHelperService rememberMeHelperService;
-	@Mock
 	private Environment env;
 
 	private TestAuthenticationContext authContext = new TestAuthenticationContext();
@@ -62,7 +59,7 @@ public class CloudflareAccessServiceTest {
 	}
 
 	private CloudflareAccessService newCloudflareAccessServiceInstance() {
-		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler, rememberMeHelperService, env);
+		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler, env);
 	}
 
 	@Test
@@ -178,9 +175,6 @@ public class CloudflareAccessServiceTest {
 
 		verify(httpResponse, times(1)).sendRedirect(authContext.getLogoutUrl());
 		verify(httpSession, times(1)).invalidate();
-
-		ArgumentCaptor<Cookie> cookiesCaptor = ArgumentCaptor.forClass(Cookie.class);
-		verify(rememberMeHelperService, times(1)).clearRemeberMe(httpRequest, httpResponse);
 	}
 
 

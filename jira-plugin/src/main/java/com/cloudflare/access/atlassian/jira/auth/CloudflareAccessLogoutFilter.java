@@ -13,6 +13,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.atlassian.sal.api.component.ComponentLocator;
+import com.atlassian.seraph.service.rememberme.RememberMeService;
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
 
 @Named("CloudflareAccessLogoutFilter")
@@ -37,6 +39,8 @@ public class CloudflareAccessLogoutFilter implements Filter{
 
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+		ComponentLocator.getComponent(RememberMeService.class).removeRememberMeCookie(httpRequest, httpResponse);
 
 		cloudflareAccess.processLogoutRequest(httpRequest, httpResponse, chain);
 	}

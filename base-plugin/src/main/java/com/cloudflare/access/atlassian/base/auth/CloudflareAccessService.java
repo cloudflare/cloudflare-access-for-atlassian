@@ -35,7 +35,6 @@ public class CloudflareAccessService {
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	private FailedAuthenticationRequestHandler failureHandler;
 	private ConfigurationService configurationService;
-	private RememberMeHelperService rememberMeHelperService;
 	private final boolean filteringDisabled;
 
 	@Autowired
@@ -46,7 +45,6 @@ public class CloudflareAccessService {
 									AtlassianProductWhitelistRules whitelistRules,
 									SuccessfulAuthenticationRequestHandler successHandler,
 									FailedAuthenticationRequestHandler failureHandler,
-									RememberMeHelperService rememberMeHelperService,
 									Environment env) {
 		this.pluginAcessor = pluginAcessor;
 		this.pluginDetails = pluginDetails;
@@ -55,7 +53,6 @@ public class CloudflareAccessService {
 		this.whitelistRules = whitelistRules;
 		this.successHandler = successHandler;
 		this.failureHandler = failureHandler;
-		this.rememberMeHelperService = rememberMeHelperService;
 		this.filteringDisabled = EnvironmentFlags.isFiltersDisabled(env);
 	}
 
@@ -81,7 +78,6 @@ public class CloudflareAccessService {
 			log.debug(RequestInspector.getRequestedResourceInfo(request));
 			log.debug(RequestInspector.getHeadersAndCookies(request));
 			SessionUtils.clearSession(request);
-			this.rememberMeHelperService.clearRemeberMe(request, response);
 			failureHandler.handle(request, response, e);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -97,7 +93,6 @@ public class CloudflareAccessService {
 		}
 
 		SessionUtils.clearSession(request);
-		this.rememberMeHelperService.clearRemeberMe(request, response);
 
 		AuthenticationContext authContext = getAuthContext();
 		log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());
