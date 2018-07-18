@@ -51,6 +51,12 @@
             <groupId>com.atlassian.bitbucket.server</groupId>
             <artifactId>bitbucket-page-objects</artifactId>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.apache.httpcomponents</groupId>
+            		<artifactId>httpclient</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -86,7 +92,6 @@
 		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
-		    <version>4.5.5</version>
 		</dependency>
 		
         <dependency>
