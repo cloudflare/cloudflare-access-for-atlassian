@@ -19,18 +19,6 @@ This instructions applies to all supported Atlassian products, installed locally
 1. Go to *Cloudflare Access* menu on the left side menu
 1. Setup your Cloudflare Access and server details
 
-After installing and configuring the plugin, you need to add the proxy certificate to the Atlassian application in order to enable internal HTTPS calls:
-
-1. Go to your Atlassian application home directory
-1. Go to `cloudflare-access-atlassian-plugin`
-1. Install the certificate `cfaccess-plugin.pem` into your keystore, example:  
-
-    ```
-    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file cfaccess-plugin.pem -keystore <JAVA_HOME>/lib/security/cacerts -storepass changeit        
-    ```
-
-1. Restart the Atlassian application
-
 
 ### Setting up Application Links
 
@@ -44,9 +32,6 @@ If you are using Application Links like JIRA + Bitbucket or JIRA + Confluence, y
 ### Helpful links
 
 - Home Directory: [JIRA](https://confluence.atlassian.com/adminjiraserver073/jira-application-home-directory-861253888.html) [Confluence](https://confluence.atlassian.com/doc/confluence-home-and-other-important-directories-590259707.html) [Bitbucket](https://confluence.atlassian.com/bitbucketserver/bitbucket-server-home-directory-776640890.html)
-- [Keytool](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/keytool.html)
-- Internal Proxy Motivation: [How to fix gadget titles showing as __MSG_gadget](https://confluence.atlassian.com/jirakb/how-to-fix-gadget-titles-showing-as-__msg_gadget-813697086.html)
-
 
 # Troubleshooting
 
@@ -82,7 +67,7 @@ After verifying the configuration you should remove the flag and restart the app
 
 **Cause:**
 
-Most likely you have a reverser proxy in front of the applicatio with a small limit for 
+Most likely you have a reverse proxy in front of the applicatio with a small limit for 
 uploading files.
 
 **Solution:**
@@ -104,17 +89,11 @@ For NGINX see [this](https://www.cyberciti.biz/faq/linux-unix-bsd-nginx-413-requ
 
 JIRA requests some URL internally through HTTP. Using Access this requests will require authentication but JIRA does not provide any means of passing authentication for this requests.
 
-The plugin includes a HTTP proxy that should be able to forward this requests to a local address and port, set on environment.
-
 **Solution:**
 
-- Check your environment settings, ensure that you provided the right local address and port for the server
-- Try to access the URL presented in the logs from the application server (e.g. using `curl -L <URL>`)
-- Check that you installed the certificate on the JVM keystore
+Go to your Cloudflare Access configuration and create a policy to bypass requests containing `/rest/gadgets/`, example:
 
-**Important:**
-
-- Currently the internal proxy replaces any JVM proxy configuration for HTTP, soon it will chain the proxies together
+> If your main policy path is `/jira` you should create a new one setting the path as `/jira/rest/gadgets/` and containing a bypass policy for everyone.
 
 ## Confluence macros showing *__MSG_xxxx* title or description
 
@@ -131,22 +110,6 @@ Very likelly the macros plugin was unable to load the proper message bundles and
 - Go to Confluence Administration page
 - Go to Cache Management
 - Clear all caches which name contanins "Macro" or "Gadget"
-
-## Application Links - Network error
-
-**Symptoms:**
-
-- Application link shows Network Error label
-- You are seeing "Connection Refused" exceptions on the log when trying to setup the link
-
-**Cause:**
-
-This usually would happen after a plugin update as Application Links logic caches the proxy configuration and the proxy port will change after updating the plugin.
-
-**Solution:**
-
-Restart the application after the update will clean the proxy cache and the application link should be back to normal.
-
 
 ## CSRF configuration for REST calls
 
@@ -181,51 +144,6 @@ Also this leads to other CSRF checks where content is not returned, in that case
 
 Install the Atlassian SDK following instructions on [Set up the Atlassian Plugin SDK and build a project](https://developer.atlassian.com/server/framework/atlassian-sdk/set-up-the-atlassian-plugin-sdk-and-build-a-project/).
  
-Install the Bintray repository for custom dependency by including the snippet below in your Maven `settings.xml`.
-
-<details><summary>Click to expand snippet</summary>
-<p>
-
-```
-<?xml version="1.0" encoding="UTF-8" ?>
-<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'
-          xmlns='http://maven.apache.org/SETTINGS/1.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
-    <!-- ... -->
-    <profiles>
-        <profile>
-            <repositories>
-                <repository>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <id>bintray-felipebn-maven</id>
-                    <name>bintray</name>
-                    <url>https://dl.bintray.com/felipebn/maven</url>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <id>bintray-felipebn-maven</id>
-                    <name>bintray-plugins</name>
-                    <url>https://dl.bintray.com/felipebn/maven</url>
-                </pluginRepository>
-            </pluginRepositories>
-            <id>bintray</id>
-        </profile>
-    </profiles>
-    <activeProfiles>
-        <activeProfile>bintray</activeProfile>
-    </activeProfiles>
-    <!-- ... -->
-</settings>
-```
-
-</p>
-</details>
-
 
 To build the modules `common` and `base-plugin`:
 
@@ -301,20 +219,3 @@ server {
 1. Start the desired Atlassian application container ([JIRA](https://hub.docker.com/r/felipebn/jira-cf-access-plugin-dev/), [Confluence](https://hub.docker.com/r/felipebn/confluence-cf-access-plugin-dev/), [Bitbucket](https://hub.docker.com/r/felipebn/bitbucket-cf-access-plugin-dev/))
 1. Download product plugin from [Releases](https://github.com/cloudflare/cloudflare-access-for-atlassian/releases)
 1. Follow the [installation instructions](#installation)
-1. Add proxy certificates as indicated below
-
-Follow the steps below to add the proxy certificates when using the provided docker images:
-
-1. Attach to the running container with `docker exec -it <container_id_or_name> /bin/bash`
-1. Go to `/var/atlassian/<product name in lower case>/cloudflare-access-atlassian-plugin`
-1. Install the certificate `cfaccess-plugin.pem` into container JVM keystore:
-
-    ```
-    # JIRA and Confluence images
-    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file cfaccess-plugin.pem -keystore /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/cacerts -storepass changeit
-    
-    # Bitbucket image
-    keytool -noprompt -import -alias "cloudflare-access-local-proxy" -file cfaccess-plugin.pem -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit
-    ```
-1. Stop the container with `docker stop <container id or name>`
-1. Start the container with `docker start <container id or name>`

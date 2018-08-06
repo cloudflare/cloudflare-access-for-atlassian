@@ -41,8 +41,6 @@ public class DefaultConfigurationService implements ConfigurationService{
 
 		ao.setTokenAudience(configVariables.getTokenAudience());
 		ao.setAuthDomain(configVariables.getAuthDomain());
-		ao.setLocalConnectorHost(configVariables.getLocalConnectorHost());
-		ao.setLocalConnectorPort(configVariables.getLocalConnectorPort());
 		ao.save();
 
 		log.info("Publishing configuration changed event...");

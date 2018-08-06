@@ -12,10 +12,4 @@ public interface ConfigurationVariablesActiveObject extends Entity{
 	public String getAuthDomain();
 	public void setAuthDomain(String authDomain);
 
-	public String getLocalConnectorHost();
-	public void setLocalConnectorHost(String localConnectorHost);
-
-	public int getLocalConnectorPort();
-	public void setLocalConnectorPort(int localConnectorPort);
-
 }

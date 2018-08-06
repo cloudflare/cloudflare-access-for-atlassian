@@ -21,7 +21,6 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
@@ -134,12 +133,8 @@ public class ConfigurationServlet extends HttpServlet{
 	private ConfigurationVariables loadFromRequest(HttpServletRequest request) {
 		String tokenAudience = request.getParameter("tokenAudience");
 	    String authDomain = request.getParameter("authDomain");
-	    String localConnectorHost = request.getParameter("localConnectorHost");
-	    String localConnectorPort = request.getParameter("localConnectorPort");
 
-	    int localConnectorPortNumber = StringUtils.isNumeric(localConnectorPort) ? Integer.parseInt(localConnectorPort) : 0;
-
-		return new ConfigurationVariables(tokenAudience, authDomain, localConnectorHost, localConnectorPortNumber);
+		return new ConfigurationVariables(tokenAudience, authDomain);
 	}
 
 	private Map<String, Object> createContext(){
