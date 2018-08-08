@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -121,6 +122,7 @@ public class CloudflareAccessServiceTest {
 	}
 
 	@Test
+	@Ignore("The internal whitelisting will be deprecated")
 	public void testNoTokenValidationIfRequestIsWhitelisted() throws IOException, ServletException {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
@@ -161,7 +163,7 @@ public class CloudflareAccessServiceTest {
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
 		FilterChain chain = mock(FilterChain.class);
 		HttpSession httpSession = mock(HttpSession.class);
-
+		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 		when(httpRequest.getCookies()).thenReturn(new Cookie[] {
 				newCookie("seraph.whatever", "test", 999999),
 				newCookie("JSESSIONID", "test", 999999),
@@ -177,6 +179,28 @@ public class CloudflareAccessServiceTest {
 		verify(httpSession, times(1)).invalidate();
 	}
 
+	@Test
+	public void testLogoutWithoutToken() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+		HttpSession httpSession = mock(HttpSession.class);
+
+		when(httpRequest.getCookies()).thenReturn(new Cookie[] {
+				newCookie("seraph.whatever", "test", 999999),
+				newCookie("JSESSIONID", "test", 999999),
+		});
+		when(httpRequest.getSession()).thenReturn(httpSession);
+		when(httpRequest.getSession(false)).thenReturn(httpSession);
+		when(httpRequest.getServerName()).thenReturn("example.com");
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processLogoutRequest(httpRequest, httpResponse, chain);
+
+		verify(httpResponse, times(0)).sendRedirect(authContext.getLogoutUrl());
+		verify(httpSession, times(0)).invalidate();
+		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
+	}
 
 
 	private Cookie newCookie(String name, String value, int maxAge) {

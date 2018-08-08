@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.cloudflare.access.atlassian.common.TokenVerifier;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
-import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
+import com.cloudflare.access.atlassian.common.exception.InvalidJWTException;
 
 public class CloudflareToken {
 
@@ -22,15 +22,28 @@ public class CloudflareToken {
 
 	private static final Logger log = LoggerFactory.getLogger(CloudflareToken.class);
 
+	private final boolean tokenNotPresent;
 	private JwtToken jwt;
+
+	public CloudflareToken(HttpServletRequest request) {
+		String token = getJWT(request);
+		this.tokenNotPresent = isBlank(token);
+	}
 
 	public CloudflareToken(HttpServletRequest request, AuthenticationContext authContext) {
 		String token = getJWT(request);
-		TokenVerifier tokenVerifier = new TokenVerifier(authContext);
-		this.jwt = tokenVerifier.validate(token);
+		this.tokenNotPresent = isBlank(token);
+		if(this.tokenNotPresent == false) {
+			this.jwt = new TokenVerifier(authContext).validate(token);
+		}
+	}
+
+	public boolean isNotPresent() {
+		return this.tokenNotPresent;
 	}
 
 	public String getUserEmail() {
+		tokenMustBePresent();
 		return (String) jwt.getClaim("email");
 	}
 
@@ -43,7 +56,6 @@ public class CloudflareToken {
 
 		if(isBlank(jwt)) {
 			log.debug("JWT not available in cookie");
-			throw new CloudflareAccessUnauthorizedException("No Cloudflare Access token available in the request");
 		}
 		return jwt;
 	}
@@ -62,5 +74,11 @@ public class CloudflareToken {
 				.findFirst()
 				.map(Cookie::getValue)
 				.orElse(null);
+	}
+
+	private void tokenMustBePresent() {
+		if(this.tokenNotPresent) {
+			throw new InvalidJWTException("Token is not present");
+		}
 	}
 }

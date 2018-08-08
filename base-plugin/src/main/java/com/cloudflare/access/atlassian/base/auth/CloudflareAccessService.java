@@ -64,13 +64,13 @@ public class CloudflareAccessService {
 				return;
 			}
 
-			if(whitelistRules.isRequestWhitelisted(request)) {
-				log.debug("Request is whitelisted: {}", request.getRequestURI());
+			CloudflareToken token = getValidTokenFromRequest(request);
+			if(token.isNotPresent()) {
+				log.debug("JWT token not present, bypassing auth process: {}", request.getRequestURI());
 				chain.doFilter(request, response);
 				return;
 			}
 
-			CloudflareToken token = getValidTokenFromRequest(request);
 			User user = userService.getUser(token.getUserEmail());
 			successHandler.handle(request, response, chain, user);
 		}catch (CloudflareAccessUnauthorizedException e) {
@@ -88,6 +88,12 @@ public class CloudflareAccessService {
 	public void processLogoutRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 		if(isRequestFilteringDisabled()) {
 			log.debug("Plugin filters are disabled or no configured yet, bypassing logout redirect");
+			chain.doFilter(request, response);
+			return;
+		}
+
+		if(new CloudflareToken(request).isNotPresent()) {
+			log.debug("No token present, bypassing logout redirect");
 			chain.doFilter(request, response);
 			return;
 		}

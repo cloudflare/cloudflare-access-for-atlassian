@@ -3,14 +3,13 @@ package com.cloudflare.access.atlassian.base.config;
 import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
-import com.cloudflare.access.atlassian.common.http.SimpleHttp;
 
 public class PersistentPluginConfiguration implements PluginConfiguration{
 
 	private AuthenticationContext authContext;
 
-	public PersistentPluginConfiguration(ConfigurationVariables variables) {
-		this.authContext = new PersistentAuthenticationContext(variables);
+	public PersistentPluginConfiguration(ConfigurationVariables variables, CertificateProvider certificateProvider) {
+		this.authContext = new PersistentAuthenticationContext(variables, certificateProvider);
 	}
 
 	@Override
@@ -23,9 +22,9 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 		private ConfigurationVariables variables;
 		private CertificateProvider certificateProvider;
 
-		public PersistentAuthenticationContext(ConfigurationVariables variables) {
+		public PersistentAuthenticationContext(ConfigurationVariables variables, CertificateProvider certificateProvider) {
 			this.variables = variables;
-			this.certificateProvider = new CertificateProvider(new SimpleHttp());
+			this.certificateProvider = certificateProvider;
 		}
 
 		@Override

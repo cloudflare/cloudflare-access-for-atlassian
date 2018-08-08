@@ -17,7 +17,9 @@ import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject;
 import com.cloudflare.access.atlassian.base.config.PersistentPluginConfiguration;
+import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
+import com.cloudflare.access.atlassian.common.http.SimpleHttp;
 
 @Component
 public class DefaultConfigurationService implements ConfigurationService{
@@ -25,6 +27,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 	private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationService.class);
 	private final ActiveObjects activeObjects;
 	private final EventPublisher eventPublisher;
+	private final CertificateProvider certificateProvider;
 
 	@Inject
 	public DefaultConfigurationService(@ComponentImport ActiveObjects activeObjects,
@@ -32,6 +35,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 		super();
 		this.activeObjects = activeObjects;
 		this.eventPublisher = eventPublisher;
+		this.certificateProvider = new CertificateProvider(new SimpleHttp());
 	}
 
 	@Override
@@ -75,7 +79,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 	public Optional<PluginConfiguration> getPluginConfiguration() {
 		Optional<ConfigurationVariables> variables = loadConfigurationVariables();
 		if(variables.isPresent()) {
-			return Optional.of(new PersistentPluginConfiguration(variables.get()));
+			return Optional.of(new PersistentPluginConfiguration(variables.get(), certificateProvider));
 		}else {
 			return Optional.empty();
 		}

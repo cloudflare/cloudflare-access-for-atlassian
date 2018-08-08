@@ -69,6 +69,12 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
 
         String requestUserName = (String) httpRequest.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
         String sessionUserName = (String) session.getAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE);
+
+        if(requestUserName == null) {
+        	log.debug("Request does not contains a username, moving on...");
+        	return;
+        }
+
         if(sessionUserName != null && !Objects.equals(sessionUserName, requestUserName)) {
         	log.debug("Request user does not match session user...");
         	throw new ExpiredAuthException(sessionUserName, requestUserName);
