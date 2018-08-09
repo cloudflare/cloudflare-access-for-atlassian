@@ -31,7 +31,6 @@ public class CloudflareAccessService {
 	private PluginAccessor pluginAcessor;
 	private CloudflarePluginDetails pluginDetails;
 	private AtlassianUserService userService;
-	private AtlassianProductWhitelistRules whitelistRules;
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	private FailedAuthenticationRequestHandler failureHandler;
 	private ConfigurationService configurationService;
@@ -42,7 +41,6 @@ public class CloudflareAccessService {
 									CloudflarePluginDetails pluginDetails,
 									ConfigurationService configurationService,
 									AtlassianUserService userService,
-									AtlassianProductWhitelistRules whitelistRules,
 									SuccessfulAuthenticationRequestHandler successHandler,
 									FailedAuthenticationRequestHandler failureHandler,
 									Environment env) {
@@ -50,7 +48,6 @@ public class CloudflareAccessService {
 		this.pluginDetails = pluginDetails;
 		this.configurationService = configurationService;
 		this.userService = userService;
-		this.whitelistRules = whitelistRules;
 		this.successHandler = successHandler;
 		this.failureHandler = failureHandler;
 		this.filteringDisabled = EnvironmentFlags.isFiltersDisabled(env);

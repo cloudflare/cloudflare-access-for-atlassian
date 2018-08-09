@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -41,8 +40,6 @@ public class CloudflareAccessServiceTest {
 	@Mock
 	private AtlassianUserService userService;
 	@Mock
-	private AtlassianProductWhitelistRules whitelistRules;
-	@Mock
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	@Mock
 	private FailedAuthenticationRequestHandler failureHandler;
@@ -60,7 +57,7 @@ public class CloudflareAccessServiceTest {
 	}
 
 	private CloudflareAccessService newCloudflareAccessServiceInstance() {
-		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, whitelistRules, successHandler, failureHandler, env);
+		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, successHandler, failureHandler, env);
 	}
 
 	@Test
@@ -118,25 +115,6 @@ public class CloudflareAccessServiceTest {
 		verifyZeroInteractions(successHandler);
 		verifyZeroInteractions(userService);
 		verifyZeroInteractions(httpRequest);
-		verifyZeroInteractions(httpResponse);
-	}
-
-	@Test
-	@Ignore("The internal whitelisting will be deprecated")
-	public void testNoTokenValidationIfRequestIsWhitelisted() throws IOException, ServletException {
-		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-		FilterChain chain = mock(FilterChain.class);
-
-		when(whitelistRules.isRequestWhitelisted(httpRequest)).thenReturn(true);
-
-		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
-		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
-
-		verify(whitelistRules,times(1)).isRequestWhitelisted(httpRequest);
-		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(userService);
 		verifyZeroInteractions(httpResponse);
 	}
 
