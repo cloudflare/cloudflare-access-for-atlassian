@@ -180,6 +180,25 @@ public class CloudflareAccessServiceTest {
 		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
 	}
 
+	@Test
+	public void errorUrlShouldBeWhitelistedWhenTokenIsPresent() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
+		when(httpRequest.getRequestURI()).thenReturn(AuthenticationErrorServlet.PATH);
+
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
+		verifyZeroInteractions(successHandler);
+		verifyZeroInteractions(failureHandler);
+		verifyZeroInteractions(httpResponse);
+		verifyZeroInteractions(chain);
+	}
+
 
 	private Cookie newCookie(String name, String value, int maxAge) {
 		Cookie cookie = new Cookie(name, value);

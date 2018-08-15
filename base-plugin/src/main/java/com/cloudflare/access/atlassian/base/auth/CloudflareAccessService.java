@@ -1,6 +1,9 @@
 package com.cloudflare.access.atlassian.base.auth;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,9 +25,14 @@ import com.cloudflare.access.atlassian.base.utils.RequestInspector;
 import com.cloudflare.access.atlassian.base.utils.SessionUtils;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
+import com.google.common.collect.Sets;
 
 @Component
 public class CloudflareAccessService {
+
+	private static final Set<String> STATIC_RESOURCE_EXTENSIONS =  Sets.newHashSet(
+			"js", "css", "png", "jpg", "jpeg", "woff", "ttf"
+	);
 
 	private static final Logger log = LoggerFactory.getLogger(CloudflareAccessService.class);
 
@@ -64,6 +72,12 @@ public class CloudflareAccessService {
 			CloudflareToken token = getValidTokenFromRequest(request);
 			if(token.isNotPresent()) {
 				log.debug("JWT token not present, bypassing auth process: {}", request.getRequestURI());
+				chain.doFilter(request, response);
+				return;
+			}
+
+			if(isWhitelisted(request)) {
+				log.debug("Request is whitelisted, bypassing");
 				chain.doFilter(request, response);
 				return;
 			}
@@ -112,6 +126,20 @@ public class CloudflareAccessService {
 
 	private CloudflareToken getValidTokenFromRequest(HttpServletRequest request) {
 		return new CloudflareToken(request, getAuthContext());
+	}
+
+	private boolean isWhitelisted(HttpServletRequest request) {
+		final String requestPath = defaultIfBlank(request.getRequestURI(), "");
+		return isErrorPath(requestPath) || isStaticResource(requestPath);
+	}
+
+	private boolean isErrorPath(String requestPath) {
+		return requestPath.endsWith(AuthenticationErrorServlet.PATH);
+	}
+
+	private boolean isStaticResource(String requestPath) {
+		String ext = substringAfterLast(requestPath, ".").toLowerCase();
+		return STATIC_RESOURCE_EXTENSIONS.contains(ext);
 	}
 
 	private boolean isPluginConfigured() {
