@@ -40,11 +40,11 @@ public class DefaultAtlassianUserService implements AtlassianUserService{
 		User user  = Iterators.getNext(users, null);
 
 		if(user == null) {
-			throw new CloudflareAccessUnauthorizedException(String.format("User profile not found", userEmail));
+			throw new CloudflareAccessUnauthorizedException(String.format("Cloudflare Access authentication was successful, but it appears that no user profile in Atlassian matches the email address %s.", userEmail));
 		}
 
 		if(users.hasNext()) {
-			throw new CloudflareAccessUnauthorizedException(String.format("More than one user profile found", userEmail));
+			throw new CloudflareAccessUnauthorizedException(String.format("Cloudflare Access authentication was successful, but it appears that more than one user profile in Atlassian matches the email address %s.", userEmail));
 		}
 
 		return user;
