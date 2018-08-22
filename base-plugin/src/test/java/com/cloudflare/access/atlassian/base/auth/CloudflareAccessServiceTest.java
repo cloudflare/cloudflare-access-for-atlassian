@@ -61,7 +61,7 @@ public class CloudflareAccessServiceTest {
 	}
 
 	@Test
-	public void testAuthenticationSuccess() {
+	public void testAuthenticationSuccess() throws IOException, ServletException {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 
@@ -81,7 +81,7 @@ public class CloudflareAccessServiceTest {
 	}
 
 	@Test
-	public void testAuthenticationFailure() {
+	public void testAuthenticationFailure() throws IOException, ServletException {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 

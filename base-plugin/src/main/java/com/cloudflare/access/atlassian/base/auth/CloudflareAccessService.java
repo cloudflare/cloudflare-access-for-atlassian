@@ -61,7 +61,7 @@ public class CloudflareAccessService {
 		this.filteringDisabled = EnvironmentFlags.isFiltersDisabled(env);
 	}
 
-	public void processAuthRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
+	public void processAuthRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 		try {
 			if(isRequestFilteringDisabled()) {
 				log.debug("Plugin filters are disabled or not configured yet, bypassing auth process");
@@ -90,9 +90,6 @@ public class CloudflareAccessService {
 			log.debug(RequestInspector.getHeadersAndCookies(request));
 			SessionUtils.clearSession(request);
 			failureHandler.handle(request, response, e);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
 		}
 	}
 

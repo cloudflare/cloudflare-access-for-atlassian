@@ -1,6 +1,9 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
+import java.io.IOException;
+
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -22,18 +25,14 @@ public class JiraSuccessfulAuthenticationRequestHandler implements SuccessfulAut
 	private static final Logger log = LoggerFactory.getLogger(JiraSuccessfulAuthenticationRequestHandler.class);
 
 	@Override
-	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain, User user) {
-		try {
-			final HttpSession httpSession = httpRequest.getSession();
-	        httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, user);
-	        httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, null);
-	        ComponentLocator.getComponent(LoginManager.class).onLoginAttempt(httpRequest, user.getName(), true);
-	        ComponentLocator.getComponent(RememberMeService.class).addRememberMeCookie(httpRequest, httpResponse, user.getName());
-	        chain.doFilter(httpRequest, httpResponse);
-		}catch (Throwable e) {
-			log.error("Unable to handle successful authentication: " + e.getMessage(), e);
-			throw new RuntimeException(e);
-		}
+	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain, User user) throws IOException, ServletException {
+		log.debug("Updating logged in key in session with user {}", user.getName());
+		final HttpSession httpSession = httpRequest.getSession();
+        httpSession.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, user);
+        httpSession.setAttribute(DefaultAuthenticator.LOGGED_OUT_KEY, null);
+        ComponentLocator.getComponent(LoginManager.class).onLoginAttempt(httpRequest, user.getName(), true);
+        ComponentLocator.getComponent(RememberMeService.class).addRememberMeCookie(httpRequest, httpResponse, user.getName());
+        chain.doFilter(httpRequest, httpResponse);
 	}
 
 }

@@ -22,15 +22,10 @@ public class BitbucketSuccessfulAuthenticationRequestHandler implements Successf
 	private static final Logger log = LoggerFactory.getLogger(BitbucketSuccessfulAuthenticationRequestHandler.class);
 
 	@Override
-	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain, User user) {
+	public void handle(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain, User user) throws IOException, ServletException {
 		log.info("Handling successful authentication for user {}", user.getName());
 		httpRequest.setAttribute(AUTHENTICATED_USER_NAME_ATTRIBUTE, user.getName());
-		try {
-			chain.doFilter(httpRequest, httpResponse);
-		} catch (IOException | ServletException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		chain.doFilter(httpRequest, httpResponse);
 	}
 
 }
