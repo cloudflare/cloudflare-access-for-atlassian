@@ -26,6 +26,11 @@
 				
 				<p>
 					Please, contact the application administrator.
+					You can continue to reach the application by logging in with your Atlassian credentials. Follow the link below to do so.
+				</p>
+				
+				<p>
+					<a href="?goToLogin" class="aui-button aui-button-primary">Continue with Atlassian credentials</a>
 				</p>
 			</div>
 	    </div>

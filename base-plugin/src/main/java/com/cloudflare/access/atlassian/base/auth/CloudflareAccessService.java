@@ -69,6 +69,12 @@ public class CloudflareAccessService {
 				return;
 			}
 
+			if(isAtlassianFlowEnabled(request)) {
+				log.debug("Atlassian flow is enabled, bypassing");
+				chain.doFilter(request, response);
+				return;
+			}
+
 			CloudflareToken token = getValidTokenFromRequest(request);
 			if(token.isNotPresent()) {
 				log.debug("JWT token not present, bypassing auth process: {}", request.getRequestURI());
@@ -100,6 +106,12 @@ public class CloudflareAccessService {
 			return;
 		}
 
+		if(isAtlassianFlowEnabled(request)) {
+			log.debug("Atlassian flow is enabled, bypassing");
+			chain.doFilter(request, response);
+			return;
+		}
+
 		if(new CloudflareToken(request).isNotPresent()) {
 			log.debug("No token present, bypassing logout redirect");
 			chain.doFilter(request, response);
@@ -115,6 +127,10 @@ public class CloudflareAccessService {
 
 	private boolean isRequestFilteringDisabled() {
 		return isPluginDisabled() || filteringDisabled || (isPluginConfigured() == false);
+	}
+
+	private boolean isAtlassianFlowEnabled(HttpServletRequest request) {
+		return SessionUtils.isAtlassianFlowSession(request);
 	}
 
 	private boolean isPluginDisabled() {
