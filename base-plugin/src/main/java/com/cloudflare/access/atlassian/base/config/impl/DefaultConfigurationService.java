@@ -1,6 +1,8 @@
 package com.cloudflare.access.atlassian.base.config.impl;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
@@ -28,6 +30,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 	private final ActiveObjects activeObjects;
 	private final EventPublisher eventPublisher;
 	private final CertificateProvider certificateProvider;
+	private final Map<CacheKey,ConfigurationVariables> configCache;
 
 	@Inject
 	public DefaultConfigurationService(@ComponentImport ActiveObjects activeObjects,
@@ -36,6 +39,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 		this.activeObjects = activeObjects;
 		this.eventPublisher = eventPublisher;
 		this.certificateProvider = new CertificateProvider(new SimpleHttp());
+		this.configCache = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -49,16 +53,19 @@ public class DefaultConfigurationService implements ConfigurationService{
 
 		log.info("Publishing configuration changed event...");
 		eventPublisher.publish(new ConfigurationChangedEvent(this));
+
+		this.configCache.put(CacheKey.MAIN_CONFIG, configVariables);
 	}
 
 	@Override
 	public Optional<ConfigurationVariables> loadConfigurationVariables() {
-		Optional<ConfigurationVariablesActiveObject> persistedVariables = findFirst();
+		ConfigurationVariables configurationVariables = this.configCache.computeIfAbsent(CacheKey.MAIN_CONFIG, key -> {
+			return findFirst()
+					.map(ConfigurationVariables::new)
+					.orElse(null);
+		});
 
-		if(persistedVariables.isPresent())
-			return Optional.of(new ConfigurationVariables(persistedVariables.get()));
-
-		return Optional.empty();
+		return Optional.ofNullable(configurationVariables);
 	}
 
 	private Optional<ConfigurationVariablesActiveObject> findFirst() {
@@ -83,5 +90,9 @@ public class DefaultConfigurationService implements ConfigurationService{
 		}else {
 			return Optional.empty();
 		}
+	}
+
+	private static enum CacheKey{
+		MAIN_CONFIG;
 	}
 }

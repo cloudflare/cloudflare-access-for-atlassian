@@ -1,6 +1,6 @@
 package com.cloudflare.access.atlassian.base.auth;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -63,6 +63,9 @@ public class CloudflareAccessServiceTest {
 	@Test
 	public void testAuthenticationSuccess() throws IOException, ServletException {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpSession httpSession = mock(HttpSession.class);
+		when(httpRequest.getSession()).thenReturn(httpSession);
+		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
@@ -75,6 +78,7 @@ public class CloudflareAccessServiceTest {
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(successHandler,times(1)).handle(httpRequest, httpResponse, chain, user);
+		verify(httpSession,times(1)).setAttribute("CF_USER_EMAIL", authContext.getTokenOwnerEmail());
 		verifyZeroInteractions(failureHandler);
 		verifyZeroInteractions(httpResponse);
 		verifyZeroInteractions(chain);
@@ -199,6 +203,26 @@ public class CloudflareAccessServiceTest {
 		verifyZeroInteractions(chain);
 	}
 
+	@Test
+	public void shouldSkipSucessHandlerIfSessionAlreadyContainsAuthenticatedUser() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		HttpSession httpSession = mock(HttpSession.class);
+		when(httpSession.getAttribute("CF_USER_EMAIL")).thenReturn(authContext.getTokenOwnerEmail());
+
+		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
+		when(httpRequest.getSession()).thenReturn(httpSession);
+		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
+		verifyZeroInteractions(successHandler);
+		verifyZeroInteractions(failureHandler);
+	}
 
 	private Cookie newCookie(String name, String value, int maxAge) {
 		Cookie cookie = new Cookie(name, value);

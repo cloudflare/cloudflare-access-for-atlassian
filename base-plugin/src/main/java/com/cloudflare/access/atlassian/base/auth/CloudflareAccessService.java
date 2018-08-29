@@ -1,5 +1,6 @@
 package com.cloudflare.access.atlassian.base.auth;
 
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.IOException;
@@ -75,6 +76,12 @@ public class CloudflareAccessService {
 				return;
 			}
 
+			if(isWhitelisted(request)) {
+				log.debug("Request is whitelisted, bypassing");
+				chain.doFilter(request, response);
+				return;
+			}
+
 			CloudflareToken token = getValidTokenFromRequest(request);
 			if(token.isNotPresent()) {
 				log.debug("JWT token not present, bypassing auth process: {}", request.getRequestURI());
@@ -82,14 +89,16 @@ public class CloudflareAccessService {
 				return;
 			}
 
-			if(isWhitelisted(request)) {
-				log.debug("Request is whitelisted, bypassing");
+			if(sessionAlreadyContainsAuthenticatedUser(request, token.getUserEmail())) {
+				log.debug("Session already contains user {} , skipping sucess handler: {}", token.getUserEmail(), request.getRequestURI());
 				chain.doFilter(request, response);
 				return;
 			}
 
 			User user = userService.getUser(token.getUserEmail());
 			successHandler.handle(request, response, chain, user);
+
+			storeUserEmailInSession(request, token.getUserEmail());
 		}catch (CloudflareAccessUnauthorizedException e) {
 			log.error("Error processing authentication: " + e.getMessage(), e);
 			log.debug(RequestInspector.getRequestedResourceInfo(request));
@@ -118,7 +127,7 @@ public class CloudflareAccessService {
 			return;
 		}
 
-		SessionUtils.clearSession(request);
+		clearSession(request);
 
 		AuthenticationContext authContext = getAuthContext();
 		log.debug("Redirecting user to cloudflare logout at " + authContext.getLogoutUrl());
@@ -130,7 +139,7 @@ public class CloudflareAccessService {
 	}
 
 	private boolean isAtlassianFlowEnabled(HttpServletRequest request) {
-		return SessionUtils.isAtlassianFlowSession(request);
+		return isAtlassianFlowSession(request);
 	}
 
 	private boolean isPluginDisabled() {
