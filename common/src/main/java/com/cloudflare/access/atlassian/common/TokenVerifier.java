@@ -4,12 +4,10 @@ import java.time.Instant;
 import java.util.Objects;
 
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
-import org.apache.cxf.rs.security.jose.jwt.JwtException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
@@ -24,31 +22,44 @@ public class TokenVerifier {
 	}
 
 	public JwtToken validate(String token) throws InvalidJWTException{
-		JwtToken jwt = getJWT(token, getSignatureVerifier());
-
-		new ClaimsVerifier(jwt.getClaims())
-			.validateAudience()
-			.validateExpire()
-			.validateIssuer();
-
+		JwtToken jwt = getJWT(token);
+		validateClaims(jwt);
 		return jwt;
 	}
 
-	private JwsSignatureVerifier getSignatureVerifier() {
-		return JwsUtils.getSignatureVerifier(JwkUtils.readJwkKey(context.getSigningKeyAsJson()));
+	private void validateClaims(JwtToken jwt) {
+		try {
+			new ClaimsVerifier(jwt.getClaims())
+				.validateAudience()
+				.validateExpire()
+				.validateIssuer();
+		}catch (Exception e) {
+			throw new InvalidJWTException("Invalid or expired token. Please logout and try again or proceed with your Atlassian credentials.", e);
+		}
 	}
 
-	private JwtToken getJWT(String token, JwsSignatureVerifier signatureVerifier) {
-		try {
-			JwtToken jwt = new JoseJwtConsumer().getJwtToken(token, null, signatureVerifier);
-			return jwt;
-		}catch (JwtException e) {
-			//TODO log
-			throw new InvalidJWTException(String.format("Bad JWT: '%s' %nError: %s", token, e.getMessage()), e);
-		}catch (JwsException | NullPointerException e) {
-			//TODO log
-			throw new InvalidJWTException(String.format("Bad JWT: '%s'", token), e);
+	private JwtToken getJWT(String token)  {
+		Exception lastTryFailureCause = null;
+		for(String jsonKey : context.getSigningKeyAsJson()) {
+			try {
+				JwtToken jwtToken = tryParseJwt(jsonKey, token);
+				if(jwtToken != null)
+					return jwtToken;
+			}catch (Exception e) {
+				lastTryFailureCause = e;
+			}
 		}
+		throw new InvalidJWTException("Invalid or expired token. Please logout and try again or proceed with your Atlassian credentials.", lastTryFailureCause);
+	}
+
+	private JwtToken tryParseJwt(String jsonKey, String token) {
+		JwsSignatureVerifier signatureVerifier = getSignatureVerifier(jsonKey);
+		JwtToken jwt = new JoseJwtConsumer().getJwtToken(token, null, signatureVerifier);
+		return jwt;
+	}
+
+	private JwsSignatureVerifier getSignatureVerifier(String jsonKey) {
+		return JwsUtils.getSignatureVerifier(JwkUtils.readJwkKey(jsonKey));
 	}
 
 	private class ClaimsVerifier{

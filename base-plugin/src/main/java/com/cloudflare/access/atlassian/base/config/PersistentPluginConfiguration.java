@@ -1,5 +1,7 @@
 package com.cloudflare.access.atlassian.base.config;
 
+import java.util.List;
+
 import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
@@ -38,9 +40,9 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 		}
 
 		@Override
-		public String getSigningKeyAsJson() {
+		public List<String> getSigningKeyAsJson() {
 			String url = String.format("https://%s/cdn-cgi/access/certs", variables.getAuthDomain());
-			return this.certificateProvider.getCerticatesAsJson(url).get(0);
+			return this.certificateProvider.getCerticatesAsJson(url);
 		}
 
 		@Override
