@@ -66,5 +66,17 @@
 	  <description>Link to Cloudflare Access Configuration page.</description> 
 	  <label>Cloudflare Access</label> 
 	  <link linkId="cloudflareAccessConfigLink">/plugins/servlet/cloudflareaccess/config</link> 
-	</web-item> 
+	</web-item>
+	
+  	<rest name="Update Check Resource" i18n-name-key="update-check.name" key="updateCheckResource" path="/cloudflare" version="1.0">
+		<description key="update-check.description">Servlet to check for updates</description>
+  	</rest>
+
+	<web-resource name="Cloudflare Access Plugin Global Resources" key="globalWebResources">
+		<resource type="download" name="cloudflareAccessUpdateNotification.js" location="/js/updateNotification.js"/>
+		<context>atl.general</context>
+		<context>atl.admin</context>
+	</web-resource>
+	
+	
 </atlassian-plugin>

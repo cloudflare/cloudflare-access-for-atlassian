@@ -14,6 +14,7 @@ public abstract class SessionUtils {
 
 	private static final String ATLASSIAN_FLOW_FLAG = "ATLASSIAN_FLOW_FLAG";
 	private static final String CF_USER_EMAIL = "CF_USER_EMAIL";
+	private static final String CLOUDFLARE_UPDATE_NOTIFIED_FLAG = "CLOUDFLARE_UPDATE_NOTIFIED";
 
 	public static void clearSession(HttpServletRequest request) {
 		final HttpSession httpSession = request.getSession(false);
@@ -53,4 +54,21 @@ public abstract class SessionUtils {
 			session.setAttribute(CF_USER_EMAIL, email);
 		}
 	}
+
+	public static boolean isUpdateCheckAlreadyNotified(HttpServletRequest req) {
+		HttpSession session = req.getSession(false);
+		if(session != null) {
+			return Objects.equals(true, session.getAttribute(CLOUDFLARE_UPDATE_NOTIFIED_FLAG));
+		}
+		return false;
+	}
+
+	public static void markUpdateCheckNotified(HttpServletRequest req) {
+		HttpSession session = req.getSession(false);
+		if(session != null) {
+			session.setAttribute(CLOUDFLARE_UPDATE_NOTIFIED_FLAG, true);
+		}
+	}
+
+
 }

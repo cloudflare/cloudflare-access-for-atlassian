@@ -10,6 +10,7 @@ public class GithubVersionProviderTest {
 	@Test
 	public void testThatCanRetrieveLatestReleaseInfo() {
 		String latestReleaseVersion = new GithubVersionProvider().getLatestReleaseVersion();
+		System.out.println("Retrieved latest version: " + latestReleaseVersion);
 		assertTrue(StringUtils.isNotBlank(latestReleaseVersion));
 		assertTrue(latestReleaseVersion.matches("[0-9]+\\.[0-9]+\\.[0-9]+$"));
 	}
