@@ -12,6 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ public class PluginUpdateAvailabilityResource{
 
 		log.debug("Comparing versions: [latest: {}, current: {}]", latestReleaseVersion, currentVersion);
 
-		if(VersionComparator.INSTANCE.compare(latestReleaseVersion, currentVersion) > 0) {
+		if(StringUtils.isNotBlank(latestReleaseVersion) && VersionComparator.INSTANCE.compare(latestReleaseVersion, currentVersion) > 0) {
 			return Optional.of(latestReleaseVersion);
 		}
 
