@@ -50,5 +50,4 @@ public class DefaultAtlassianUserService implements AtlassianUserService{
 		return user;
 	}
 
-
 }
