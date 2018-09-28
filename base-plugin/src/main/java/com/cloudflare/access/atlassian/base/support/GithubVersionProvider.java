@@ -35,14 +35,14 @@ public class GithubVersionProvider implements RemoteVersionProvider{
 
 	private String fetchLatestReleasedVersion() {
 		final String latestReleaseUrl = "https://api.github.com/repos/cloudflare/cloudflare-access-for-atlassian/releases/latest";
-
+		String json = "REQUEST_NOT_EXECUTED";
 		try(CloseableHttpClient http = HttpClients.createMinimal()){
 			log.debug("Trying to fetch latest release version from GH API: {}", latestReleaseUrl);
 			HttpGet request = new HttpGet(latestReleaseUrl);
 
 			CloseableHttpResponse response = http.execute(request);
 
-			String json = EntityUtils.toString(response.getEntity());
+			json = EntityUtils.toString(response.getEntity());
 			log.debug("Received JSON: {}", json);
 
 			JsonNode root = new ObjectMapper().readTree(json);
@@ -52,7 +52,7 @@ public class GithubVersionProvider implements RemoteVersionProvider{
 			log.debug("Latest release tag name and semantic version: [tagName:{}, version:{}]", tagName, semanticVersion);
 			return semanticVersion;
 		} catch (Exception e) {
-			log.error("Plugin update check failed, reason: " + e.getMessage(), e);
+			log.error("Plugin update check failed, GH api response: " + json, e);
 			return "";
 		}
 	}
