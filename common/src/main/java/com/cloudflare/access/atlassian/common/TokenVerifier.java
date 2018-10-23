@@ -71,7 +71,6 @@ public class TokenVerifier {
 
 		ClaimsVerifier validateAudience() {
 			if(Objects.equals(claims.getAudience(), context.getAudience()) == false) {
-				//TODO debug log
 				throw new InvalidJWTException("JWT Audience does not match expected audience.");
 			}
 			return this;
@@ -80,7 +79,6 @@ public class TokenVerifier {
 		ClaimsVerifier validateExpire() {
 			Instant nowInstant = Instant.now(context.getClock());
 			if(nowInstant.getEpochSecond() > claims.getExpiryTime()) {
-				//TODO debug log
 				throw new InvalidJWTException(String.format("JWT expired since %s (reference clock is %s).", Instant.ofEpochSecond(claims.getExpiryTime()), nowInstant));
 			}
 			return this;
@@ -88,7 +86,6 @@ public class TokenVerifier {
 
 		ClaimsVerifier validateIssuer() {
 			if(Objects.equals(claims.getIssuer(), context.getIssuer()) == false) {
-				//TODO debug log
 				throw new InvalidJWTException("JWT Issuer does not match expected issuer.");
 			}
 			return this;
