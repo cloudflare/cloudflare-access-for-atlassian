@@ -40,6 +40,22 @@ class TestVerificationContext implements AuthenticationContext{
 				"			\"e\": \"AQAB\",\n" +
 				"			\"n\": \"tFw6PCssph26IC8gkdGCYmRDJWdZnp3tiWqkcJ_ILgRr-FdwITaIroCNWXoB7DoqttjXUSwDgE9emtMk6wo_Lt3jAwmjrkH6Fo663GfcZy0BHf9s8Y2F2cXtgsWu7oKeeXJuh_7fGsmJ44gTKAEa_w7cx0nmRjPlecDWThQMFsejttMuavXfLbtnNfSiJ5VMHuZHfqHW4jCCUYFcrOzaqIWG0covhyrdbIF8oip0wpWtyET7jbuxhASNsJQfBQET-Gkdzd8wvHE4qOdUwlrtgJuLgW2S7MBgBtBmPG3n9cQ4asJRUUE-CXw6PjYbVCyVJ7ifjoo_knWEZpQXhl1rAQ\"\n" +
 				"		}");
+		this.jwkJsons.add("{\n" + 
+				"			\"kid\": \"6593d9acf92b87faca750a78f7b308a844a57ae51c25ed7322fe06d6d8a6b9b0\",\n" + 
+				"			\"kty\": \"RSA\",\n" + 
+				"			\"alg\": \"RS256\",\n" + 
+				"			\"use\": \"sig\",\n" + 
+				"			\"e\": \"AQAB\",\n" + 
+				"			\"n\": \"z5kk3ksqN2_3HRc1I0Wqfmpyii-2GeZiczd1BdUaZCm59HuRpTzFy44sP0Vo1ND8oJA33CnotkSX5TWZpZNfeD3B0HX3GRqYTQxu08le3gL91GlHgJ_yMyNl2tLCTUqDDhFs1YGM0PJCNgsasQHNkaY3bSSkcUlYyoPWWEyPPmU5eOhUbcjRb9sGJV03HyA-93GXEZIVrX4aIdPu7dteMuAb7YiMJ6nnldouydIqmlK4N6iIvPOXQoBuMOIARSnjy6AVYh8pCc9yJPwMn_SxK27HEmfFDxx8Ed_oYWm3-kONhVoTTGd5p9fDX4i2_D2mWMvJ_EhTRlWIA-Qc962O3w\"\n" + 
+				"		}");
+		this.jwkJsons.add("{\n" + 
+				"			\"kid\": \"7b956c1e7ab1ea3a3b4649adbe6ac2cd546e9d373d3b942cfc0c71b4c58f9457\",\n" + 
+				"			\"kty\": \"RSA\",\n" + 
+				"			\"alg\": \"RS256\",\n" + 
+				"			\"use\": \"sig\",\n" + 
+				"			\"e\": \"AQAB\",\n" + 
+				"			\"n\": \"1FsOGfFsdlWJwQlWO5gM_RfzO3EsZOCDPCUR0ltc3f4z89mQEljuMkEgsIQ-0GdZluuo7ucp_CilqOeFOck6QjjNWPAzwkpD1nbvfboBZ2RwHlWlLrY4cubCv63cK1447Zwf_KobylRXpV0rDWw0NUPKHK0YO4rD5eikr2DXwbNIMFmXNxcXxhtAYVgjgNjkkc4hZosvM4KofrTviUQtCwIy2agwpe5PUF1gq7P-jnrhyPFhiV2PW8a820re7Bfg5YoGyUEwwrO4NAjfKb6zRexol4TJAWwSD4kYTc93AVh-Sw1ESbWeNAlLemM3iHhOLhyB0F-J9lfIdE9cMIB7jw\"\n" + 
+				"		}");
 	}
 
 	TestVerificationContext withAudience(String audience) {

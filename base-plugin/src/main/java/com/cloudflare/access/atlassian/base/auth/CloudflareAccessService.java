@@ -94,6 +94,8 @@ public class CloudflareAccessService {
 				chain.doFilter(request, response);
 				return;
 			}
+			
+			//TODO check for oauth or basic auth user, if present let it go...
 
 			User user = userService.getUser(token.getUserEmail());
 			successHandler.handle(request, response, chain, user);

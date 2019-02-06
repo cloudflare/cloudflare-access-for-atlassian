@@ -25,6 +25,7 @@ public class TokenVerifierTest {
 
 	private static String expectedFailureMessage = "Invalid or expired token. Please logout and try again or proceed with your Atlassian credentials.";
 	private static String tokenForFirstSigningKey;
+	private static String tokenForFirstSigningKeyWithEscapedUrl;
 	private static String tokenForSecondSigningKey;
 
 	@Rule
@@ -38,7 +39,13 @@ public class TokenVerifierTest {
 				"eyJhdWQiOlsiYjI2NTg0NmM4NWU3MGFhNDA2NTVhNzZlNTM4NThkZjZjNzljYjJkMDQ1M2ZlZmY0OTVmM2M1Yjc5NWZiNGQ1ZSJdLCJlbWFpbCI6ImZlbGlwZS5uYXNjaW1lbnRvMUBnbWFpbC5jb20iLCJleHAiOjE1MjYwNzA2NDAsImlhdCI6MTUyNTk4NDI0MSwiaXNzIjoiaHR0cHM6Ly9jZmFwbHVnaW4uY2xvdWRmbGFyZWFjY2Vzcy5jb20iLCJub25jZSI6ImRhMWUxOTRkNDI4YTgwZDNhY2IwNzcxOWI4ZDYzZjdlODViZjZlMmVlOWNmZmZiMGQ0Y2FiYWE4YmE0Mzg2Y2QiLCJzdWIiOiI0YjgyYjM4YS05MjM2LTQ5M2QtODc1Mi01ODBhZDAwMGVhM2UifQ",
 				"wrRj3wDqmBIN8f4JX-ioM43mxggGp1BF7QnlF8pvs2bMiscJyZD61GHHBZj9rfnWBTVJ0jEzjk7ZlGmgG8ndKHFzzvqxbtaCalOEnG7rIgZ3ch_JOimABQCguAItM5WbQbDpePD431VKdCqtK4u88QaX-h-TJUqG2DeYA1ZXyi-OevIkYu7vaKjIei0eUa1qr5wtKBYFbjNDVCGfXasiYt8Z75hnzO1jhoNFOowLLECUKtE4-1Uazc3M6kSqKLqARe0aWwm1TWTZlE0Qtbdrup5wulFqHb_zdWvtlJKmPJF3W7d6NmgI17pmk8bW_KYqbkQNwyD_pAnVDXWZBKv3BQ"
 			}).collect(Collectors.joining("."));
-
+		
+		tokenForFirstSigningKeyWithEscapedUrl = Arrays.stream(new String[]{
+				"eyJraWQiOiI2NTkzZDlhY2Y5MmI4N2ZhY2E3NTBhNzhmN2IzMDhhODQ0YTU3YWU1MWMyNWVkNzMyMmZlMDZkNmQ4YTZiOWIwIiwiYWxnIjoiUlMyNTYiLCJ0eXAiOiJKV1QifQ",
+				"eyJhdWQiOiJiMjY1ODQ2Yzg1ZTcwYWE0MDY1NWE3NmU1Mzg1OGRmNmM3OWNiMmQwNDUzZmVmZjQ5NWYzYzViNzk1ZmI0ZDVlIiwiZXhwIjoxNTQ5NDk1Njk0LCJpc3MiOiJodHRwczpcL1wvY2ZhcGx1Z2luLmNsb3VkZmxhcmVhY2Nlc3MuY29tIiwiaWF0IjoxNTQ5NDA5Mjk0LCJzdWIiOiIifQ",
+				"ougV1tAGM2eX_nQCYxA5bmheokL0cSM_4eKHg2xXx7HFam1RX8_5AucpHFt3BvHSmjgw31RadCRNO1kTvNF4ZaZ4Lo8_DIuwVKBssGQ5pCRGTO99a8NaBBMoOn5c-tOXqaKPwcvtZDql_-QtsI15SvuBaAUA3sfFnpm8BGsQLPYkmgt2ZHJclJzUT_rUO5WSEKGOoQLOc0WmYCBik6B2peILFru4hAgLkzNA5DW_Imj5cTvVgg0f7o4gQyuF-bGdtrXq0g84Ikowe2cttlvzGpWp0AfMQRwREiRo4Po2oIJeUG-sTepNdZ8MmmiROprnm0feTVgWmgqY83J6yr0CYA"
+			}).collect(Collectors.joining("."));
+		
 		tokenForSecondSigningKey = Arrays.stream(new String[]{
 				"eyJhbGciOiJSUzI1NiIsImtpZCI6ImZhY2I3MGVhZjIzYTA2NTczZWI0NDk2MDFlMzQ1YjhkMmRlNTYyZmI5NDNkZTU1NmQyY2ZkYTM0ODcwZjc2MjkiLCJ0eXAiOiJKV1QifQ",
 				"eyJhdWQiOlsiYjI2NTg0NmM4NWU3MGFhNDA2NTVhNzZlNTM4NThkZjZjNzljYjJkMDQ1M2ZlZmY0OTVmM2M1Yjc5NWZiNGQ1ZSJdLCJlbWFpbCI6ImZlbGlwZS5uYXNjaW1lbnRvMUBnbWFpbC5jb20iLCJleHAiOjE1MzY4ODAyMjEsImlhdCI6MTUzNjc5MzgyMiwiaXNzIjoiaHR0cHM6Ly9jZmFwbHVnaW4uY2xvdWRmbGFyZWFjY2Vzcy5jb20iLCJub25jZSI6Ijk4MmNmNjAxNjVjMjU3MjFkNDVjOTMyMjBlOTUxMjMwMjM0NzA5ODZkYjVmMTgzZjAwMGQ5MDQ3ODNlZDFmNWYiLCJzdWIiOiI0YjgyYjM4YS05MjM2LTQ5M2QtODc1Mi01ODBhZDAwMGVhM2UifQ",
@@ -104,6 +111,12 @@ public class TokenVerifierTest {
 	public void shouldAcceptValidToken() {
 		TokenVerifier tokenVerifier = new TokenVerifier(new TestVerificationContext());
 		tokenVerifier.validate(tokenForFirstSigningKey);
+	}
+	
+	@Test
+	public void shouldAcceptValidTokenWithEscapedIssuer() {
+		TokenVerifier tokenVerifier = new TokenVerifier(new TestVerificationContext());
+		tokenVerifier.validate(tokenForFirstSigningKeyWithEscapedUrl);
 	}
 
 	@Test
