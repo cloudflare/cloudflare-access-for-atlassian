@@ -31,6 +31,8 @@ import com.google.common.collect.Sets;
 @Component
 public class CloudflareAccessService {
 
+	private static final String AUTHORIZATION_IC_HEADER_NAME = "authorization";
+
 	private static final Set<String> STATIC_RESOURCE_EXTENSIONS =  Sets.newHashSet(
 			"js", "css", "png", "jpg", "jpeg", "woff", "ttf"
 	);
@@ -94,7 +96,13 @@ public class CloudflareAccessService {
 				chain.doFilter(request, response);
 				return;
 			}
-			
+
+			if(basicAuthorizationHeaderIsPresent(request)) {
+				log.debug("Basic Auth header is present skipping user matching...");
+				chain.doFilter(request, response);
+				return;
+			}
+
 			//TODO check for oauth or basic auth user, if present let it go...
 
 			User user = userService.getUser(token.getUserEmail());
@@ -172,6 +180,11 @@ public class CloudflareAccessService {
 
 	private AuthenticationContext getAuthContext() {
 		return configurationService.getPluginConfiguration().get().getAuthenticationContext();
+	}
+
+	private boolean basicAuthorizationHeaderIsPresent(HttpServletRequest request) {
+		String authHeaderValue = request.getHeader(AUTHORIZATION_IC_HEADER_NAME);
+		return isNotBlank(authHeaderValue);
 	}
 
 }

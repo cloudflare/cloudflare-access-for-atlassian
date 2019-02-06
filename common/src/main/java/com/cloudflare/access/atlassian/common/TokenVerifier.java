@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -18,7 +17,7 @@ import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.exception.InvalidJWTException;
 
 public class TokenVerifier {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(TokenVerifier.class);
 
 	private AuthenticationContext context;
