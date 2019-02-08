@@ -31,6 +31,8 @@ import com.google.common.collect.Sets;
 @Component
 public class CloudflareAccessService {
 
+	private static final String AUTHORIZATION_IC_HEADER_NAME = "authorization";
+
 	private static final Set<String> STATIC_RESOURCE_EXTENSIONS =  Sets.newHashSet(
 			"js", "css", "png", "jpg", "jpeg", "woff", "ttf"
 	);
@@ -91,6 +93,12 @@ public class CloudflareAccessService {
 
 			if(sessionAlreadyContainsAuthenticatedUser(request, token.getUserEmail())) {
 				log.debug("Session already contains user {} , skipping sucess handler: {}", token.getUserEmail(), request.getRequestURI());
+				chain.doFilter(request, response);
+				return;
+			}
+
+			if(anyAuthorizationHeaderIsPresent(request)) {
+				log.debug("Authorization header is present skipping user matching...");
 				chain.doFilter(request, response);
 				return;
 			}
@@ -170,6 +178,15 @@ public class CloudflareAccessService {
 
 	private AuthenticationContext getAuthContext() {
 		return configurationService.getPluginConfiguration().get().getAuthenticationContext();
+	}
+
+	private boolean anyAuthorizationHeaderIsPresent(HttpServletRequest request) {
+		String authHeaderValue = request.getHeader(AUTHORIZATION_IC_HEADER_NAME);
+		if(isNotBlank(authHeaderValue)) {
+			log.debug("Auth header found: " + authHeaderValue);
+			return true;
+		}
+		return false;
 	}
 
 }
