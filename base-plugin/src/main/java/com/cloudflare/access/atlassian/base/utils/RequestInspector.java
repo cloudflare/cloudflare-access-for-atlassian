@@ -18,6 +18,7 @@ public class RequestInspector {
 		sb.append("ServerName:" + request.getServerName() + "\n");
 		sb.append("ServletPath:" + request.getServletPath() + "\n");
 		sb.append("Remote Host:" + request.getRemoteHost() + "\n");
+		sb.append("Remote Addr:" + request.getRemoteAddr() + "\n");
 		return sb.toString();
 	}
 
