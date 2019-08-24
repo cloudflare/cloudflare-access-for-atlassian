@@ -133,8 +133,9 @@ public class ConfigurationServlet extends HttpServlet{
 	private ConfigurationVariables loadFromRequest(HttpServletRequest request) {
 		String tokenAudience = request.getParameter("tokenAudience");
 	    String authDomain = request.getParameter("authDomain");
+	    String allowedEmailDomain = request.getParameter("allowedEmailDomain");
 
-		return new ConfigurationVariables(tokenAudience, authDomain);
+		return new ConfigurationVariables(tokenAudience, authDomain, allowedEmailDomain);
 	}
 
 	private Map<String, Object> createContext(){

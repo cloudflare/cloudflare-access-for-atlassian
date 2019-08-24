@@ -14,6 +14,7 @@ public class ConfigurationVariables {
 	public static final String VALID_FLAG_SETTINGS_KEY = SETTINGS_PREFIX + "is.valid";
 	public static final String TOKEN_AUDIENCE_SETTINGS_KEY = SETTINGS_PREFIX + "tokenAudience";
 	public static final String AUTH_DOMAIN_SETTINGS_KEY = SETTINGS_PREFIX + "authDomain";
+	public static final String ALLOWED_EMAIL_DOMAIN_SETTINGS_KEY = SETTINGS_PREFIX + "authDomain";
 
 	@NotNull(message="cfaccess.config.tokenAudience.should.not.be.empty")
 	@Size(min=1, message="cfaccess.config.tokenAudience.should.not.be.empty")
@@ -24,16 +25,21 @@ public class ConfigurationVariables {
 	@Domain(message="cfaccess.config.authDomain.should.be.valid")
 	private String authDomain;
 
+	@Domain(message="cfaccess.config.allowedEmailDomain.should.be.valid")
+	private String allowedEmailDomain;
+
 	public ConfigurationVariables(ConfigurationVariablesActiveObject activeObject) {
 		super();
 		this.tokenAudience = activeObject.getTokenAudience();
 		this.authDomain = activeObject.getAuthDomain();
+		this.allowedEmailDomain = activeObject.getAllowedEmailDomain();
 	}
 
-	public ConfigurationVariables(String tokenAudience, String authDomain) {
+	public ConfigurationVariables(String tokenAudience, String authDomain, String allowedEmailDomain) {
 		super();
 		this.tokenAudience = tokenAudience;
 		this.authDomain = authDomain;
+		this.allowedEmailDomain = allowedEmailDomain;
 	}
 
 	public String getTokenAudience() {
@@ -42,6 +48,10 @@ public class ConfigurationVariables {
 
 	public String getAuthDomain() {
 		return authDomain;
+	}
+
+	public String getAllowedEmailDomain() {
+		return allowedEmailDomain;
 	}
 
 	@Override

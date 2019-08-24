@@ -49,6 +49,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 
 		ao.setTokenAudience(configVariables.getTokenAudience());
 		ao.setAuthDomain(configVariables.getAuthDomain());
+		ao.setAllowedEmailDomain(configVariables.getAllowedEmailDomain());
 		ao.save();
 
 		log.info("Publishing configuration changed event...");
