@@ -103,6 +103,12 @@ public class CloudflareAccessService {
 				return;
 			}
 
+			if(requiresAtlassianAuthentication(token)) {
+				log.debug("User required to do atlassian authentication...");
+				chain.doFilter(request, response);
+				return;
+			}
+
 			User user = userService.getUser(token.getUserEmail());
 			successHandler.handle(request, response, chain, user);
 
@@ -187,6 +193,10 @@ public class CloudflareAccessService {
 			return true;
 		}
 		return false;
+	}
+
+	private boolean requiresAtlassianAuthentication(CloudflareToken token) {
+		return configurationService.emailDomainRequiresAtlassianAuthentication(token.getUserEmail());
 	}
 
 }

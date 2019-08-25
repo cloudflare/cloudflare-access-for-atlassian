@@ -7,6 +7,8 @@ import org.apache.bval.extras.constraints.net.Domain;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import com.cloudflare.access.atlassian.base.config.validation.NullableDomain;
+
 public class ConfigurationVariables {
 
 	private static final String SETTINGS_PREFIX = ConfigurationVariables.class.getName() + ".";
@@ -25,7 +27,7 @@ public class ConfigurationVariables {
 	@Domain(message="cfaccess.config.authDomain.should.be.valid")
 	private String authDomain;
 
-	@Domain(message="cfaccess.config.allowedEmailDomain.should.be.valid")
+	@NullableDomain(message="cfaccess.config.allowedEmailDomain.should.be.valid")
 	private String allowedEmailDomain;
 
 	public ConfigurationVariables(ConfigurationVariablesActiveObject activeObject) {
@@ -58,4 +60,5 @@ public class ConfigurationVariables {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
+
 }

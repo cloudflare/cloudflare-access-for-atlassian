@@ -1,5 +1,7 @@
 package com.cloudflare.access.atlassian.base.config.impl;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,6 +93,17 @@ public class DefaultConfigurationService implements ConfigurationService{
 		}else {
 			return Optional.empty();
 		}
+	}
+
+	@Override
+	public boolean emailDomainRequiresAtlassianAuthentication(String email) {
+		String emailDomain = defaultString(substringAfterLast(email, "@"), "");
+		Optional<String> allowedEmailDomain = getPluginConfiguration().flatMap(cfg -> cfg.getAllowedEmailDomain());
+		if(allowedEmailDomain.isPresent()) {
+			return emailDomain.equalsIgnoreCase(allowedEmailDomain.get()) == false;
+		}
+		//by default, don't require atlassian authentication.
+		return false;
 	}
 
 	private static enum CacheKey{

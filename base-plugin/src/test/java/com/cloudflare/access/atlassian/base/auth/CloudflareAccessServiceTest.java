@@ -46,13 +46,16 @@ public class CloudflareAccessServiceTest {
 	@Mock
 	private Environment env;
 
-	private TestAuthenticationContext authContext = new TestAuthenticationContext();
+	private PluginConfiguration mockPluginConfiguration;
+	private TestAuthenticationContext authContext;
 
 	@Before
 	public void setupDefaults() {
 		when(pluginAcessor.isPluginEnabled(anyString())).thenReturn(true);
 
-		PluginConfiguration mockPluginConfiguration = mockPluginConfiguration(authContext);
+		authContext = new TestAuthenticationContext();
+
+		mockPluginConfiguration = mockPluginConfiguration(authContext);
 		when(configurationService.getPluginConfiguration()).thenReturn(Optional.of(mockPluginConfiguration));
 	}
 
@@ -215,6 +218,48 @@ public class CloudflareAccessServiceTest {
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
+		verifyZeroInteractions(successHandler);
+		verifyZeroInteractions(failureHandler);
+	}
+
+	@Test
+	public void shouldForwardUserWithEmailThatIsRequiredToProvideCredentials() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		when(configurationService.emailDomainRequiresAtlassianAuthentication(authContext.getTokenOwnerEmail())).thenReturn(true);
+
+		HttpSession httpSession = mock(HttpSession.class);
+		when(httpRequest.getSession()).thenReturn(httpSession);
+		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
+		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
+		verifyZeroInteractions(successHandler);
+		verifyZeroInteractions(failureHandler);
+	}
+
+	@Test
+	public void shouldAuthenticateUserWithEmailThatIsAllowedToNotProvideCredentials() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		when(configurationService.emailDomainRequiresAtlassianAuthentication(authContext.getTokenOwnerEmail())).thenReturn(true);
+
+		HttpSession httpSession = mock(HttpSession.class);
+		when(httpRequest.getSession()).thenReturn(httpSession);
+		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
+		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 
 		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);

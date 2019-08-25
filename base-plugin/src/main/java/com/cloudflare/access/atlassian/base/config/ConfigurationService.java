@@ -11,4 +11,6 @@ public interface ConfigurationService {
 	Optional<ConfigurationVariables> loadConfigurationVariables();
 
 	Optional<PluginConfiguration> getPluginConfiguration();
+
+	boolean emailDomainRequiresAtlassianAuthentication(String email);
 }
