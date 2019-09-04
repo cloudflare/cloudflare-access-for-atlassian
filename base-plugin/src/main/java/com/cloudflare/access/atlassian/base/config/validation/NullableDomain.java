@@ -15,7 +15,9 @@ import org.apache.bval.extras.constraints.net.Domain;
 /**
  * Validation annotation to wrap the @Domain annotation allowing nulls.
  *
- * The message from
+ * The domain attribute may be overridden, but the message, group and payload should
+ * always be set using this annotation attributes.
+ *
  * @author felipebn
  *
  */
@@ -27,9 +29,10 @@ public @interface NullableDomain {
 
 	Domain domain() default @Domain();
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    String message() default "{org.apache.bval.extras.constraints.net.Domain.message}";
+	String message() default "{org.apache.bval.extras.constraints.net.Domain.message}";
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
+
 }
