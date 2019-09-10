@@ -52,6 +52,12 @@
       </div>
       
       <div class="field-group">
+        <label for="authDomain">$i18n.getText("cfaccess.config.allowedEmailDomain")</label>
+        <input type="text" class="text long-field" id="allowedEmailDomain" name="allowedEmailDomain" value="$!{config.allowedEmailDomain}">
+        <div class="description">$i18n.getText("cfaccess.config.allowedEmailDomain.description")</div>
+      </div>
+      
+      <div class="field-group">
         <input type="submit" class="button" value="Save">
       </div>
     </form>
