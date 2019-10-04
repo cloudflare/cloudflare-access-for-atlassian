@@ -52,10 +52,10 @@
             <artifactId>bitbucket-page-objects</artifactId>
             <scope>provided</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>org.apache.httpcomponents</groupId>
-            		<artifactId>httpclient</artifactId>
-            	</exclusion>
+                  <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
+                  </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -75,12 +75,12 @@
             <version>${commons.lang3.version}</version>
             <scope>provided</scope>
         </dependency>
-		<dependency>
-			<groupId>com.atlassian.seraph</groupId>
-			<artifactId>atlassian-seraph</artifactId>
-			<version>${seraph.version}</version>
-			<scope>provided</scope>			
-		</dependency>
+        <dependency>
+              <groupId>com.atlassian.seraph</groupId>
+              <artifactId>atlassian-seraph</artifactId>
+              <version>${seraph.version}</version>
+              <scope>provided</scope>                  
+        </dependency>
 
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
@@ -89,18 +89,18 @@
             <scope>compile</scope>
         </dependency>
         
-		<dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-context</artifactId>
-		    <version>${atlassian.spring.version}</version>
-		    <scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		</dependency>
-		
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${atlassian.spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+            
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
@@ -127,19 +127,19 @@
             <version>${gson.version}</version>
         </dependency>
         <dependency>
-        	<groupId>com.cloudflare.access.atlassian</groupId>
-			<artifactId>base-plugin</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-            		<groupId>org.bouncycastle</groupId>
-            		<artifactId>bcprov-jdk15on</artifactId>
-				</exclusion>
-		   	    <exclusion>
-			       <groupId>org.slf4j</groupId>
-			       <artifactId>slf4j-log4j12</artifactId>
-			    </exclusion>
-			</exclusions>
+            <groupId>com.cloudflare.access.atlassian</groupId>
+            <artifactId>base-plugin</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                  <exclusion>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcprov-jdk15on</artifactId>
+                  </exclusion>
+                   <exclusion>
+                   <groupId>org.slf4j</groupId>
+                   <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -164,12 +164,12 @@
 
                         <!-- Add package to export here -->
                         <Export-Package>
-                        	com.cloudflare.access.atlassian.bitbucket.auth
+                              com.cloudflare.access.atlassian.bitbucket.auth
                         </Export-Package>
 
                         <!-- Add package import here -->
                         <Import-Package>
-                        	org.springframework.osgi.*;resolution:="optional",
+                              org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             com.atlassian.plugin.*;, 
                             *;resolution:="optional"
@@ -194,9 +194,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                	<includeExclude>
-                		-.*DefaultFailedAuthHandler.*
-                	</includeExclude>
+                      <includeExclude>
+                            -.*DefaultFailedAuthHandler.*
+                      </includeExclude>
                     <scannedDependencies>
                         <dependency>
                             <groupId>com.atlassian.plugin</groupId>
@@ -215,7 +215,7 @@
     <properties>
         <bitbucket.data.version>6.6.1</bitbucket.data.version>
         <bitbucket.version>6.6.1</bitbucket.version>
-		<seraph.version>4.0.0</seraph.version>
+        <seraph.version>4.0.0</seraph.version>
         <amps.version>6.3.15</amps.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
