@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.atlassian.bitbucket.auth.AuthenticationResult;
 import com.atlassian.bitbucket.auth.HttpAuthenticationContext;
 import com.atlassian.bitbucket.auth.HttpAuthenticationHandler;
 import com.atlassian.bitbucket.auth.HttpAuthenticationSuccessContext;
@@ -35,6 +36,19 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
 	}
 
 	@Override
+	public AuthenticationResult performAuthentication(HttpAuthenticationContext httpAuthenticationContext) {
+		ApplicationUser authenticatedUser = this.authenticate(httpAuthenticationContext);
+		if(authenticatedUser == null) 
+			return null;
+		
+		return new AuthenticationResult.Builder(authenticatedUser).build();
+	}
+	
+	/**
+	 * Public method to support Bitbucket prior 6.x.
+	 * @param httpAuthenticationContext
+	 * @return the authenticated application use or null if not possible to authenticate
+	 */
 	public ApplicationUser authenticate(HttpAuthenticationContext httpAuthenticationContext) {
         HttpServletRequest httpRequest = httpAuthenticationContext.getRequest();
 
@@ -107,4 +121,6 @@ public class BitbucketAccessAuthenticationHandler implements HttpAuthenticationH
 		}
 
 	}
+
+
 }
