@@ -1,7 +1,12 @@
 package com.cloudflare.access.atlassian.base.auth;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -23,6 +28,7 @@ import org.springframework.core.env.Environment;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.support.PluginStateService;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
@@ -45,6 +51,8 @@ public class CloudflareAccessServiceTest {
 	private FailedAuthenticationRequestHandler failureHandler;
 	@Mock
 	private Environment env;
+	@Mock
+	private PluginStateService pluginStateService;
 
 	private PluginConfiguration mockPluginConfiguration;
 	private TestAuthenticationContext authContext;
@@ -52,6 +60,8 @@ public class CloudflareAccessServiceTest {
 	@Before
 	public void setupDefaults() {
 		when(pluginAcessor.isPluginEnabled(anyString())).thenReturn(true);
+		when(pluginStateService.isReady()).thenReturn(true);
+
 
 		authContext = new TestAuthenticationContext();
 
@@ -60,7 +70,7 @@ public class CloudflareAccessServiceTest {
 	}
 
 	private CloudflareAccessService newCloudflareAccessServiceInstance() {
-		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, successHandler, failureHandler, env);
+		return new CloudflareAccessService(pluginAcessor, pluginDetails, configurationService, userService, successHandler, failureHandler, env, pluginStateService);
 	}
 
 	@Test
