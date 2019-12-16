@@ -57,7 +57,7 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 
 		@Override
 		public String getLogoutUrl() {
-			return String.format("https://%s/cdn-cgi/access/logout", variables.getAuthDomain());
+			return "/cdn-cgi/access/logout";
 		}
 
 	}
