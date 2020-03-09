@@ -1,7 +1,12 @@
 package com.cloudflare.access.atlassian.base.auth;
 
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.*;
-import static org.apache.commons.lang3.StringUtils.*;
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.clearSession;
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.isAtlassianFlowSession;
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.sessionAlreadyContainsAuthenticatedUser;
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.storeUserEmailInSession;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 
 import java.io.IOException;
 import java.util.Set;
@@ -21,6 +26,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.support.PluginStateService;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.cloudflare.access.atlassian.base.utils.RequestInspector;
 import com.cloudflare.access.atlassian.base.utils.SessionUtils;
@@ -45,6 +51,7 @@ public class CloudflareAccessService {
 	private SuccessfulAuthenticationRequestHandler successHandler;
 	private FailedAuthenticationRequestHandler failureHandler;
 	private ConfigurationService configurationService;
+	private PluginStateService pluginStateService;
 	private final boolean filteringDisabled;
 
 	@Autowired
@@ -54,7 +61,8 @@ public class CloudflareAccessService {
 									AtlassianUserService userService,
 									SuccessfulAuthenticationRequestHandler successHandler,
 									FailedAuthenticationRequestHandler failureHandler,
-									Environment env) {
+									Environment env,
+									PluginStateService pluginStateService) {
 		this.pluginAcessor = pluginAcessor;
 		this.pluginDetails = pluginDetails;
 		this.configurationService = configurationService;
@@ -62,6 +70,7 @@ public class CloudflareAccessService {
 		this.successHandler = successHandler;
 		this.failureHandler = failureHandler;
 		this.filteringDisabled = EnvironmentFlags.isFiltersDisabled(env);
+		this.pluginStateService = pluginStateService;
 	}
 
 	public void processAuthRequest(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -179,7 +188,7 @@ public class CloudflareAccessService {
 	}
 
 	private boolean isPluginConfigured() {
-		return configurationService.getPluginConfiguration().isPresent();
+		return pluginStateService.isReady() && configurationService.getPluginConfiguration().isPresent();
 	}
 
 	private AuthenticationContext getAuthContext() {
