@@ -50,13 +50,7 @@
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <version>${atlassian.spring.scanner.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>${atlassian.spring.scanner.version}</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -69,8 +63,8 @@
             <artifactId>atlassian-template-renderer-api</artifactId>
             <version>${atlassian.templaterenderer.version}</version>
             <scope>provided</scope>
-		</dependency>
-        
+        </dependency>
+
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
@@ -136,15 +130,15 @@
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <!-- Add package to export here -->
                         <Export-Package>
-                        	com.cloudflare.access.atlassian.confluence.auth.*,
+                            com.cloudflare.access.atlassian.confluence.auth.*,
                         </Export-Package>
                         <!-- Add package import here -->
                         <Import-Package>
-                        	org.springframework.osgi.*;resolution:="optional", 
-                        	org.eclipse.gemini.blueprint.*;resolution:="optional",
-                        	com.atlassian.plugin.*;, 
-                        	com.atlassian.crowd.*;,
-                        	*;resolution:="optional"
+                            org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            com.atlassian.plugin.*;,
+                            com.atlassian.crowd.*;,
+                            *;resolution:="optional"
                         </Import-Package>
                         <!-- Ensure plugin is spring powered -->
                         <Spring-Context>*</Spring-Context>
@@ -164,9 +158,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                	<includeExclude>
-                		-.*DefaultFailedAuthHandler.*
-                	</includeExclude>
+                    <includeExclude>
+                        -.*DefaultFailedAuthHandler.*
+                    </includeExclude>
                     <scannedDependencies>
                         <dependency>
                             <groupId>com.atlassian.plugin</groupId>
@@ -187,7 +181,7 @@
         <confluence.data.version>6.7.1</confluence.data.version>
         <amps.version>6.3.15</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
-        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
+        <atlassian.spring.scanner.version>2.2.0</atlassian.spring.scanner.version>
         <atlassian.templaterenderer.version>2.1.0</atlassian.templaterenderer.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
