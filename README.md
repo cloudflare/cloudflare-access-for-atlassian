@@ -3,7 +3,7 @@
 This project impements a set of plugins for authenticating users through Cloudflare Access on Atlassian products.
 
 Currently supported products are:
-- JIRA
+- JIRA >= 7.2
 - Confluence >= 6.x
 - Bitbucket
 
