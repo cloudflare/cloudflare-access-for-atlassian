@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.cloudflare.access.atlassian.common.CertificateProvider;
-import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 
 public class PersistentPluginConfiguration implements PluginConfiguration{
@@ -27,6 +26,11 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 	@Override
 	public Optional<String> getAllowedEmailDomain() {
 		return Optional.ofNullable(StringUtils.defaultIfEmpty(variables.getAllowedEmailDomain(), null));
+	}
+
+	@Override
+	public UserMatchingAttribute getUserMatchingAttribute() {
+		return variables.getUserMatchingAttribute();
 	}
 
 	public static final class PersistentAuthenticationContext implements AuthenticationContext{

@@ -14,4 +14,7 @@ public interface ConfigurationVariablesActiveObject extends Entity{
 
 	String getAllowedEmailDomain();
 	void setAllowedEmailDomain(String allowedEmailDomain);
+
+	UserMatchingAttribute getUserMatchingAttribute();
+	void setUserMatchingAttribute(UserMatchingAttribute userMatchingAttribute);
 }

@@ -15,6 +15,8 @@ import com.atlassian.crowd.search.query.entity.restriction.TermRestriction;
 import com.atlassian.crowd.search.query.entity.restriction.constants.UserTermKeys;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.cloudflare.access.atlassian.base.auth.AtlassianUserService;
+import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.config.UserMatchingAttribute;
 import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 import com.google.common.collect.Iterators;
 
@@ -22,16 +24,22 @@ import com.google.common.collect.Iterators;
 public class DefaultAtlassianUserService implements AtlassianUserService{
 
 	private CrowdService crowdService;
+	private ConfigurationService configurationService;
 
 	@Autowired
-	public DefaultAtlassianUserService(@ComponentImport CrowdService crowdService) {
+	public DefaultAtlassianUserService(@ComponentImport CrowdService crowdService, ConfigurationService configurationService) {
 		this.crowdService = crowdService;
+		this.configurationService = configurationService;
 	}
 
 	@Override
 	public User getUser(String userEmail) {
+		UserMatchingAttribute userMatchingAttribute = configurationService.getPluginConfiguration()
+				.map(c -> c.getUserMatchingAttribute())
+				.orElse(UserMatchingAttribute.defaultAttribute());
+
 		SearchRestriction userCriteria = Combine.allOf(
-				new TermRestriction<>(UserTermKeys.EMAIL, MatchMode.EXACTLY_MATCHES, userEmail),
+				new TermRestriction<>(userMatchingAttribute.getUserTerm(), MatchMode.EXACTLY_MATCHES, userEmail),
 				new TermRestriction<>(UserTermKeys.ACTIVE, true)
 		);
 		UserQuery<User> query = new UserQuery<>(User.class, userCriteria, 0, Integer.MAX_VALUE);
@@ -40,11 +48,11 @@ public class DefaultAtlassianUserService implements AtlassianUserService{
 		User user  = Iterators.getNext(users, null);
 
 		if(user == null) {
-			throw new CloudflareAccessUnauthorizedException(String.format("Cloudflare Access authentication was successful, but it appears that no user profile matches the email address %s.", userEmail));
+			throw new CloudflareAccessUnauthorizedException(String.format("Cloudflare Access authentication was successful, but it appears that no user profile matches the %s '%s'.", userMatchingAttribute.getDisplayName(), userEmail));
 		}
 
 		if(users.hasNext()) {
-			throw new CloudflareAccessUnauthorizedException(String.format("Cloudflare Access authentication was successful, but it appears that more than one user profile matches the email address %s.", userEmail));
+			throw new CloudflareAccessUnauthorizedException(String.format("Cloudflare Access authentication was successful, but it appears that more than one user profile matches the %s '%s'.", userMatchingAttribute.getDisplayName(), userEmail));
 		}
 
 		return user;

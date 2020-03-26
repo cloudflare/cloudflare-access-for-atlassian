@@ -1,6 +1,7 @@
 package com.cloudflare.access.atlassian.base.config.impl;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,8 +22,8 @@ import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject;
 import com.cloudflare.access.atlassian.base.config.PersistentPluginConfiguration;
+import com.cloudflare.access.atlassian.base.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.CertificateProvider;
-import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.http.SimpleHttp;
 
 @Component
@@ -52,6 +53,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 		ao.setTokenAudience(configVariables.getTokenAudience());
 		ao.setAuthDomain(configVariables.getAuthDomain());
 		ao.setAllowedEmailDomain(configVariables.getAllowedEmailDomain());
+		ao.setUserMatchingAttribute(configVariables.getUserMatchingAttribute());
 		ao.save();
 
 		log.info("Publishing configuration changed event...");
@@ -106,7 +108,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 		return false;
 	}
 
-	private static enum CacheKey{
+	private enum CacheKey{
 		MAIN_CONFIG;
 	}
 }

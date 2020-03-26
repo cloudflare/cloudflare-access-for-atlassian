@@ -1,4 +1,4 @@
-package com.cloudflare.access.atlassian.common.config;
+package com.cloudflare.access.atlassian.base.config;
 
 import java.util.Optional;
 
@@ -9,4 +9,6 @@ public interface PluginConfiguration {
 	AuthenticationContext getAuthenticationContext();
 
 	Optional<String> getAllowedEmailDomain();
+
+	UserMatchingAttribute getUserMatchingAttribute();
 }
