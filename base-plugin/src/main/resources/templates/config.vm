@@ -57,6 +57,20 @@
         <div class="description">$i18n.getText("cfaccess.config.allowedEmailDomain.description")</div>
       </div>
       
+    <div class="field-group">
+        <label for="userMatchingAttribute">$i18n.getText("cfaccess.config.userMatchingAttribute")</label>
+        
+        #set($emailSelected = "#if($config.userMatchingAttribute.name() == 'EMAIL')selected#{else}#end")
+        #set($usernameSelected = "#if($config.userMatchingAttribute.name() == 'USERNAME')selected#{else}#end")
+        
+        <select id="userMatchingAttribute" name="userMatchingAttribute" class="select">
+            <option value="EMAIL" $emailSelected >Email</option>
+            <option value="USERNAME" $usernameSelected >Username</option>
+        </select>
+        
+        <div class="description">$i18n.getText("cfaccess.config.userMatchingAttribute.description")</div>
+      </div>
+      
       <div class="field-group">
         <input type="submit" class="button" value="Save">
       </div>

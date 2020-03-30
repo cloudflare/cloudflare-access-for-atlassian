@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.apache.bval.extras.constraints.net.Domain;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -33,7 +34,7 @@ public class ConfigurationVariables {
 	@NullableDomain(message="cfaccess.config.allowedEmailDomain.should.be.valid")
 	private String allowedEmailDomain;
 
-	@NotNull
+	@NotNull(message="cfaccess.config.userMatchingAttribute.should.be.valid")
 	private UserMatchingAttribute userMatchingAttribute;
 
 	public ConfigurationVariables(ConfigurationVariablesActiveObject activeObject) {
@@ -44,11 +45,12 @@ public class ConfigurationVariables {
 		this.userMatchingAttribute = ObjectUtils.defaultIfNull(activeObject.getUserMatchingAttribute(), UserMatchingAttribute.defaultAttribute());
 	}
 
-	public ConfigurationVariables(String tokenAudience, String authDomain, String allowedEmailDomain) {
+	public ConfigurationVariables(String tokenAudience, String authDomain, String allowedEmailDomain, String userMatchingAttribute) {
 		super();
 		this.tokenAudience = tokenAudience;
 		this.authDomain = authDomain;
 		this.allowedEmailDomain = allowedEmailDomain;
+		this.userMatchingAttribute = EnumUtils.isValidEnum(UserMatchingAttribute.class, userMatchingAttribute) ? UserMatchingAttribute.valueOf(userMatchingAttribute) : UserMatchingAttribute.EMAIL;
 	}
 
 	public String getTokenAudience() {
