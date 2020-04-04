@@ -1,9 +1,12 @@
 package com.cloudflare.access.atlassian.base.config;
 
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.apache.bval.extras.constraints.net.Domain;
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -17,6 +20,7 @@ public class ConfigurationVariables {
 	public static final String TOKEN_AUDIENCE_SETTINGS_KEY = SETTINGS_PREFIX + "tokenAudience";
 	public static final String AUTH_DOMAIN_SETTINGS_KEY = SETTINGS_PREFIX + "authDomain";
 	public static final String ALLOWED_EMAIL_DOMAIN_SETTINGS_KEY = SETTINGS_PREFIX + "authDomain";
+	public static final String USER_MATCHING_ATTRIBUTE_SETTINGS_KEY = SETTINGS_PREFIX + "userMatchingAttribute";
 
 	@NotNull(message="cfaccess.config.tokenAudience.should.not.be.empty")
 	@Size(min=1, message="cfaccess.config.tokenAudience.should.not.be.empty")
@@ -30,18 +34,23 @@ public class ConfigurationVariables {
 	@NullableDomain(message="cfaccess.config.allowedEmailDomain.should.be.valid")
 	private String allowedEmailDomain;
 
+	@NotNull(message="cfaccess.config.userMatchingAttribute.should.be.valid")
+	private UserMatchingAttribute userMatchingAttribute;
+
 	public ConfigurationVariables(ConfigurationVariablesActiveObject activeObject) {
 		super();
 		this.tokenAudience = activeObject.getTokenAudience();
 		this.authDomain = activeObject.getAuthDomain();
 		this.allowedEmailDomain = activeObject.getAllowedEmailDomain();
+		this.userMatchingAttribute = ObjectUtils.defaultIfNull(activeObject.getUserMatchingAttribute(), UserMatchingAttribute.defaultAttribute());
 	}
 
-	public ConfigurationVariables(String tokenAudience, String authDomain, String allowedEmailDomain) {
+	public ConfigurationVariables(String tokenAudience, String authDomain, String allowedEmailDomain, String userMatchingAttribute) {
 		super();
 		this.tokenAudience = tokenAudience;
 		this.authDomain = authDomain;
 		this.allowedEmailDomain = allowedEmailDomain;
+		this.userMatchingAttribute = EnumUtils.isValidEnum(UserMatchingAttribute.class, userMatchingAttribute) ? UserMatchingAttribute.valueOf(userMatchingAttribute) : UserMatchingAttribute.EMAIL;
 	}
 
 	public String getTokenAudience() {
@@ -54,6 +63,11 @@ public class ConfigurationVariables {
 
 	public String getAllowedEmailDomain() {
 		return allowedEmailDomain;
+	}
+
+	@NotNull
+	public UserMatchingAttribute getUserMatchingAttribute() {
+		return userMatchingAttribute;
 	}
 
 	@Override

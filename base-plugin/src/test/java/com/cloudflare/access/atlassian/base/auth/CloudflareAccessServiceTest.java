@@ -28,9 +28,9 @@ import org.springframework.core.env.Environment;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.plugin.PluginAccessor;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
+import com.cloudflare.access.atlassian.base.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.base.support.PluginStateService;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
-import com.cloudflare.access.atlassian.common.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 
