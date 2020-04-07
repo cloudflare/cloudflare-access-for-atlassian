@@ -5,7 +5,7 @@ This project impements a set of plugins for authenticating users through Cloudfl
 Currently supported products are:
 - JIRA >= 7.2
 - Confluence >= 6.x
-- Bitbucket
+- Bitbucket >= 6.x
 
 ## Installation
 
