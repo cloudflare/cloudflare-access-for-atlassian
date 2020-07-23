@@ -1,9 +1,9 @@
 package com.cloudflare.access.atlassian.base.config;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
@@ -37,10 +37,12 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 
 		private ConfigurationVariables variables;
 		private CertificateProvider certificateProvider;
+		private String certificatesUrl;
 
 		public PersistentAuthenticationContext(ConfigurationVariables variables, CertificateProvider certificateProvider) {
 			this.variables = variables;
 			this.certificateProvider = certificateProvider;
+			this.certificatesUrl = String.format("https://%s/cdn-cgi/access/certs", variables.getAuthDomain());
 		}
 
 		@Override
@@ -54,9 +56,8 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 		}
 
 		@Override
-		public List<String> getSigningKeyAsJson() {
-			String url = String.format("https://%s/cdn-cgi/access/certs", variables.getAuthDomain());
-			return this.certificateProvider.getCerticatesAsJson(url);
+		public JsonWebKey getJwk(String kid) {
+			return certificateProvider.getJwk(certificatesUrl, kid);
 		}
 
 		@Override

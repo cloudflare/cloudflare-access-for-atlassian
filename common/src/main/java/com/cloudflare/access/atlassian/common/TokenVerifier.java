@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
@@ -44,27 +44,11 @@ public class TokenVerifier {
 	}
 
 	private JwtToken getJWT(String token)  {
-		Exception lastTryFailureCause = null;
-		for(String jsonKey : context.getSigningKeyAsJson()) {
-			try {
-				JwtToken jwtToken = tryParseJwt(jsonKey, token);
-				if(jwtToken != null)
-					return jwtToken;
-			}catch (Exception e) {
-				lastTryFailureCause = e;
-			}
+		try {
+			return new JwtConsumer(context).getJwtToken(token);
+		}catch (Exception e) {
+			throw new InvalidJWTException("Invalid token, unable to parse/verify. Please logout and try again or proceed with your Atlassian credentials.", e);
 		}
-		throw new InvalidJWTException("Invalid or expired token. Please logout and try again or proceed with your Atlassian credentials.", lastTryFailureCause);
-	}
-
-	private JwtToken tryParseJwt(String jsonKey, String token) {
-		JwsSignatureVerifier signatureVerifier = getSignatureVerifier(jsonKey);
-		JwtToken jwt = new JoseJwtConsumer().getJwtToken(token, null, signatureVerifier);
-		return jwt;
-	}
-
-	private JwsSignatureVerifier getSignatureVerifier(String jsonKey) {
-		return JwsUtils.getSignatureVerifier(JwkUtils.readJwkKey(jsonKey));
 	}
 
 	private class ClaimsVerifier{
@@ -97,6 +81,20 @@ public class TokenVerifier {
 				throw new InvalidJWTException("JWT Issuer does not match expected issuer.");
 			}
 			return this;
+		}
+	}
+
+	private static class JwtConsumer extends JoseJwtConsumer{
+		private final AuthenticationContext context;
+
+		public JwtConsumer(AuthenticationContext context) {
+			this.context = context;
+		}
+
+		@Override
+		protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
+			JsonWebKey jwk = context.getJwk(jwt.getJwsHeader("kid").toString());
+			return JwsUtils.getSignatureVerifier(jwk);
 		}
 	}
 

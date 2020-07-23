@@ -1,15 +1,16 @@
 package com.cloudflare.access.atlassian.common.context;
 
 import java.time.Clock;
-import java.util.List;
+
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public interface AuthenticationContext {
-	public String getAudience();
-	public String getIssuer();
-	public List<String> getSigningKeyAsJson();
-	public String getLogoutUrl();
+	String getAudience();
+	String getIssuer();
+	JsonWebKey getJwk(String kid);
+	String getLogoutUrl();
 
-	default public Clock getClock() {
+	default Clock getClock() {
 		return Clock.systemUTC();
 	}
 }
