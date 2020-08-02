@@ -1,65 +1,48 @@
 package com.cloudflare.access.atlassian.common;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
+import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cloudflare.access.atlassian.common.exception.CertificateProcessingException;
 import com.cloudflare.access.atlassian.common.http.SimpleHttp;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 public class CertificateProvider {
 
-	private final LoadingCache<String, List<String>> certificateCache;
-	private final SimpleHttp http;
+	private static final Logger log = LoggerFactory.getLogger(CertificateProvider.class);
+
+	private final LoadingCache<String, JsonWebKeys> jwkSetCache;
+
+	private SimpleHttp http;
 
 	public CertificateProvider(SimpleHttp http) {
 		this.http = http;
-		this.certificateCache = CacheBuilder
+		this.jwkSetCache = CacheBuilder
 				.newBuilder()
-				.expireAfterWrite(1, TimeUnit.MINUTES)
-				.build(new CacheLoader<String, List<String>>(){
-					@Override
-					public List<String> load(String url) throws Exception {
-						return loadCertificatesAsJson(url);
-					}
-				});
+				.build(CacheLoader.from(this::loadJwk));
 	}
 
-	public List<String> getCerticatesAsJson(String url){
-		try {
-			return certificateCache.get(url);
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-			throw new CertificateProcessingException(String.format("Unable to load certs from Cache '%s': %s", url, e.getMessage()), e);
+	public JsonWebKey getJwk(String url, String kid) {
+		JsonWebKey jwk = jwkSetCache.getUnchecked(url).getKey(kid);
+		if(jwk == null) {
+			jwkSetCache.invalidate(url);
+			jwk = jwkSetCache.getUnchecked(url).getKey(kid);
 		}
+		return jwk;
 	}
 
-	public List<String> loadCertificatesAsJson(String url){
+	private JsonWebKeys loadJwk(String url) {
 		try {
-			String certsJson = http.get(url);
-			return parseJson(certsJson);
+			log.info("Loading JWKs from {} ...", url);
+			return JwkUtils.readJwkSet(http.get(url));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new CertificateProcessingException(String.format("Unable to request/parse certs from URL '%s': %s", url, e.getMessage()), e);
 		}
 	}
-
-	private List<String> parseJson(String certsJsonObject) throws IOException, JsonProcessingException {
-		List<String> certificatesAsJson = new ArrayList<>();
-		ObjectMapper jackson = new ObjectMapper();
-		JsonNode root = jackson.readTree(certsJsonObject);
-		for (JsonNode keysItem : root.withArray("keys")) {
-			certificatesAsJson.add(jackson.writeValueAsString(keysItem));
-		}
-		return certificatesAsJson;
-	}
-
 }
