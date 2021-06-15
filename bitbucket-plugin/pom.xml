@@ -211,6 +211,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>cloudflare-access-${project.artifactId}-${project.version}</finalName>
     </build>
     <properties>
         <bitbucket.data.version>6.6.1</bitbucket.data.version>

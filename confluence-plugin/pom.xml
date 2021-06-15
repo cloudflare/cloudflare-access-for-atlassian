@@ -175,6 +175,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>cloudflare-access-${project.artifactId}-${project.version}</finalName>
     </build>
     <properties>
         <confluence.version>6.7.1</confluence.version>
