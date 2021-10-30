@@ -1,12 +1,14 @@
 package com.cloudflare.access.atlassian.base.config;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
+import com.google.common.collect.Sets;
 
 public class PersistentPluginConfiguration implements PluginConfiguration{
 
@@ -46,8 +48,8 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 		}
 
 		@Override
-		public String getAudience() {
-			return variables.getTokenAudience();
+		public Set<String> getAudiences() {
+			return Sets.newHashSet(variables.getTokenAudience());
 		}
 
 		@Override

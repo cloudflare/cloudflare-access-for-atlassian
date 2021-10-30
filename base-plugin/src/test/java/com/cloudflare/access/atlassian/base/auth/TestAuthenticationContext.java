@@ -7,6 +7,7 @@ import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -18,17 +19,17 @@ import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 class TestAuthenticationContext implements AuthenticationContext{
 
 	private final JsonWebKeys jwkSet;
-	private String audience;
+	private Set<String> audiences;
 	private String issuer;
 	private Clock clock;
 	private String validToken;
 
 	public TestAuthenticationContext() {
 		super();
-		this.audience = "b265846c85e70aa40655a76e53858df6c79cb2d0453feff495f3c5b795fb4d5e";
-		this.issuer = "https://cfaplugin.cloudflareaccess.com";
+		withAudiences("b265846c85e70aa40655a76e53858df6c79cb2d0453feff495f3c5b795fb4d5e");
+		withIssuer("https://cfaplugin.cloudflareaccess.com");
 		LocalDateTime nineOClock = LocalDateTime.of(2018, Month.MAY, 10, 20, 00);
-		this.clock = Clock.fixed(nineOClock.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+		withClock(Clock.fixed(nineOClock.toInstant(ZoneOffset.UTC), ZoneOffset.UTC));
 		List<String> jwkJsons = Collections.singletonList("{\n" +
 				"			\"kid\": \"bccdf99ac336c9278e3c7ac71bebcbe467bbbfd1fb013c84c93889da077b9d79\",\n" +
 				"			\"kty\": \"RSA\",\n" +
@@ -47,8 +48,8 @@ class TestAuthenticationContext implements AuthenticationContext{
 		this.validToken = Arrays.stream(tokenParts).collect(Collectors.joining("."));
 	}
 
-	TestAuthenticationContext withAudience(String audience) {
-		this.audience = audience;
+	TestAuthenticationContext withAudiences(String...audiences) {
+		this.audiences = Arrays.stream(audiences).collect(Collectors.toSet());
 		return this;
 	}
 
@@ -63,8 +64,8 @@ class TestAuthenticationContext implements AuthenticationContext{
 	}
 
 	@Override
-	public String getAudience() {
-		return this.audience;
+	public Set<String> getAudiences() {
+		return this.audiences;
 	}
 
 	@Override

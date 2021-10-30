@@ -28,6 +28,8 @@ public class TokenVerifierTest {
 	private static String tokenForFirstSigningKey;
 	private static String tokenForFirstSigningKeyWithEscapedUrl;
 	private static String tokenForSecondSigningKey;
+	private static String secondAudience = "dD8R7Ugv6f3w74S3t9dVGVZkgGJYK8KuBnKfzRV4mdgpsWc833kV6xtFRt47MkYu";
+	private static String tokenWithAnotherAudience;
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
@@ -52,6 +54,12 @@ public class TokenVerifierTest {
 				"eyJhdWQiOlsiYjI2NTg0NmM4NWU3MGFhNDA2NTVhNzZlNTM4NThkZjZjNzljYjJkMDQ1M2ZlZmY0OTVmM2M1Yjc5NWZiNGQ1ZSJdLCJlbWFpbCI6ImZlbGlwZS5uYXNjaW1lbnRvMUBnbWFpbC5jb20iLCJleHAiOjE1MzY4ODAyMjEsImlhdCI6MTUzNjc5MzgyMiwiaXNzIjoiaHR0cHM6Ly9jZmFwbHVnaW4uY2xvdWRmbGFyZWFjY2Vzcy5jb20iLCJub25jZSI6Ijk4MmNmNjAxNjVjMjU3MjFkNDVjOTMyMjBlOTUxMjMwMjM0NzA5ODZkYjVmMTgzZjAwMGQ5MDQ3ODNlZDFmNWYiLCJzdWIiOiI0YjgyYjM4YS05MjM2LTQ5M2QtODc1Mi01ODBhZDAwMGVhM2UifQ",
 				"fBBDqgM48N12HHaBMsj7FVgBrhfJ5JsgwhIaJYECAM59UgO-uOyAG-Zz-_wLE3lJ9VLvTZKfaN7URzJsGvydb6ni6PJAzdccHHsS6WBRite1FqO-_wn0HYBrHBaz9v66FhmY4feVqZ_pLO0Lm4uSQ6uWXtPEjwpKchnDBSDKWdiz8NWjbQ8oLUTCCNxEfCmmPHcVjCgnjcqsKJiHSvPYxzQtQf_IHkFoywnSGUv00QniI1J2KxUweNcUzVllCKDqMnwFWvcZOePct6_YDB6aiQ2SoRNk3fDmdMhw_RVUKE-SKavju-MNF_QiqJCOj0s0chP7uw2jyDGHI5vCG43nyw"
 			}).collect(Collectors.joining("."));
+
+		tokenWithAnotherAudience = Arrays.stream(new String[]{
+				"eyJhbGciOiJSUzI1NiIsImtpZCI6IkI1TVMwcDluN2lUankzVW16cmhqRlJkUmxBSlkwaGh3WFM5Ymc4NU1zbTAiLCJ0eXAiOiJKV1QifQ",
+				"eyJhdWQiOlsiZEQ4UjdVZ3Y2ZjN3NzRTM3Q5ZFZHVlprZ0dKWUs4S3VCbktmelJWNG1kZ3BzV2M4MzNrVjZ4dEZSdDQ3TWtZdSJdLCJlbWFpbCI6ImZlbGlwZS5uYXNjaW1lbnRvMUBnbWFpbC5jb20iLCJleHAiOjE1MjYwNzA2NDAsImlhdCI6MTUyNTk4NDI0MSwiaXNzIjoiaHR0cHM6Ly9jZmFwbHVnaW4uY2xvdWRmbGFyZWFjY2Vzcy5jb20iLCJub25jZSI6ImRhMWUxOTRkNDI4YTgwZDNhY2IwNzcxOWI4ZDYzZjdlODViZjZlMmVlOWNmZmZiMGQ0Y2FiYWE4YmE0Mzg2Y2QiLCJzdWIiOiI0YjgyYjM4YS05MjM2LTQ5M2QtODc1Mi01ODBhZDAwMGVhM2UifQ",
+				"VwCMxp3c19byqo2cCl_hMNABI67g87fywwbOd223_IikUVxH3K1yrd50vRIGmoTtkGvy89rE0dhmRFlSwv_0fTVi1SJWsi0cW8urhtH4xL115eqTQufKpQGlrSvESj3byLgKKyoVst2IlGcdRbFTdSgcKEGs7EPKclOKMWR8awEuiwdh4bN7s-s_P1WFcP8TpbqCk_Z6aHSWZXaOHVplklYAIDtKES3XADWHRA8kqH7Dfp-p0htiI8OoLba84ZVYnxWvPcakuwdBKSIWmhvz8v6qT-T8EWMCT1SXMS2HNDLiKg0rr9eIvLMe5uk7KyGHbspeXXiuKr_ZXlpIPMklng"
+			}).collect(Collectors.joining("."));
 	}
 
 	@Test
@@ -59,7 +67,7 @@ public class TokenVerifierTest {
 	public void shouldNotAcceptBadAudience(String expectedAudience) {
 		expectedException.expect(new ExceptionMatcher (InvalidJWTException.class, expectedFailureMessage));
 
-		TokenVerifier tokenVerifier = new TokenVerifier(new TestVerificationContext().withAudience(expectedAudience));
+		TokenVerifier tokenVerifier = new TokenVerifier(new TestVerificationContext().withAudiences(expectedAudience));
 		tokenVerifier.validate(tokenForFirstSigningKey);
 	}
 
@@ -126,6 +134,15 @@ public class TokenVerifierTest {
 		Clock secondTokenClock = Clock.fixed(halfPastOne.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
 		TokenVerifier tokenVerifier = new TokenVerifier(new TestVerificationContext().withClock(secondTokenClock));
 		tokenVerifier.validate(tokenForSecondSigningKey);
+	}
+
+	@Test
+	public void shouldAcceptTokensWithDifferentAudiences() {
+		TestVerificationContext context = new TestVerificationContext().withAdditionalAudience(secondAudience);
+		TokenVerifier tokenVerifier = new TokenVerifier(context);
+
+		tokenVerifier.validate(tokenForFirstSigningKey);
+		tokenVerifier.validate(tokenWithAnotherAudience);
 	}
 
 	private static class ExceptionMatcher extends BaseMatcher<Exception> {
