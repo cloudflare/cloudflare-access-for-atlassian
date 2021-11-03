@@ -1,6 +1,8 @@
 package com.cloudflare.access.atlassian.base.config;
 
 
+import java.util.Arrays;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -39,7 +41,10 @@ public class ConfigurationVariables {
 
 	public ConfigurationVariables(ConfigurationVariablesActiveObject activeObject) {
 		super();
-		this.tokenAudience = activeObject.getTokenAudience();
+		this.tokenAudience = Arrays.stream(activeObject.getTokenAudiences())
+				.findFirst()
+				.map(TokenAudienceActiveObject::getValue)
+				.orElse(null);
 		this.authDomain = activeObject.getAuthDomain();
 		this.allowedEmailDomain = activeObject.getAllowedEmailDomain();
 		this.userMatchingAttribute = ObjectUtils.defaultIfNull(activeObject.getUserMatchingAttribute(), UserMatchingAttribute.defaultAttribute());
