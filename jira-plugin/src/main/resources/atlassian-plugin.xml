@@ -54,6 +54,8 @@
 	<ao name="Cloudflare Access Active Objects" key="cloudflareAccessActiveObjects" >
 	  <description>The module configuring the Active Objects service used by this plugin</description>
 	  <entity>com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject</entity>
+
+	  <upgradeTask>com.cloudflare.access.atlassian.base.config.migration.AOMigrationTask0001</upgradeTask>
 	</ao>
     
 	<servlet name="Cloudflare Access Configuration Servlet" key="cloudflareAccessConfigServlet" class="com.cloudflare.access.atlassian.base.config.ConfigurationServlet">
