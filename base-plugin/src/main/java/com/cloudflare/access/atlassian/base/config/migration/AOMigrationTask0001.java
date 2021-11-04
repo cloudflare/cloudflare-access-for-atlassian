@@ -1,7 +1,5 @@
 package com.cloudflare.access.atlassian.base.config.migration;
 
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +8,6 @@ import com.atlassian.activeobjects.external.ActiveObjectsUpgradeTask;
 import com.atlassian.activeobjects.external.ModelVersion;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject;
 import com.cloudflare.access.atlassian.base.config.TokenAudienceActiveObject;
-import com.google.common.collect.Sets;
 
 public class AOMigrationTask0001 implements ActiveObjectsUpgradeTask {
 
