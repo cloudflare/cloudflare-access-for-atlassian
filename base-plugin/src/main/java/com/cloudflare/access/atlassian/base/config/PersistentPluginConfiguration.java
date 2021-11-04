@@ -8,7 +8,6 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
-import com.google.common.collect.Sets;
 
 public class PersistentPluginConfiguration implements PluginConfiguration{
 
@@ -49,7 +48,7 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 
 		@Override
 		public Set<String> getAudiences() {
-			return Sets.newHashSet(variables.getTokenAudience());
+			return variables.getTokenAudiences();
 		}
 
 		@Override

@@ -20,6 +20,7 @@ import com.atlassian.event.api.EventPublisher;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariablesActiveObject;
 import com.cloudflare.access.atlassian.base.config.TokenAudienceActiveObject;
+import com.google.common.collect.Sets;
 
 import net.java.ao.EntityManager;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
@@ -49,7 +50,7 @@ public class DefaultConfigurationServiceTest {
 	
 	@Test
 	public void saveShouldPersistSingleAudience() throws SQLException {
-		configService.save(new ConfigurationVariables("the_audience", "domain", "testdomain.com", "someattribute"));
+		configService.save(new ConfigurationVariables(Sets.newHashSet("the_audience"), "domain", "testdomain.com", "someattribute"));
 		
 		ConfigurationVariablesActiveObject[] configs = entityManager.find(ConfigurationVariablesActiveObject.class);
 		
@@ -59,9 +60,27 @@ public class DefaultConfigurationServiceTest {
 	}
 	
 	@Test
+	public void saveShouldPersistMultipleAudiences() throws SQLException {
+		configService.save(new ConfigurationVariables(
+				Sets.newHashSet("the_audience_01", "the_audience_02", "the_audience_03"),
+				"domain",
+				"testdomain.com",
+				"someattribute"));
+
+		ConfigurationVariablesActiveObject[] configs = entityManager.find(ConfigurationVariablesActiveObject.class);
+
+		assertThat(configs.length, is(1));
+		assertThat(configs[0].getTokenAudiences().length, is(3));
+		Collection<String> audiences = Arrays.stream(configs[0].getTokenAudiences())
+				.map(TokenAudienceActiveObject::getValue)
+				.collect(Collectors.toList());
+		assertThat(audiences , hasItems("the_audience_01", "the_audience_02", "the_audience_03"));
+	}
+
+	@Test
 	public void saveShouldRemovePreviousAudiences() throws SQLException {
-		configService.save(new ConfigurationVariables("the_audience_01", "domain", "testdomain.com", "someattribute"));
-		configService.save(new ConfigurationVariables("the_audience_02", "domain", "testdomain.com", "someattribute"));
+		configService.save(new ConfigurationVariables(Sets.newHashSet("the_audience_01"), "domain", "testdomain.com", "someattribute"));
+		configService.save(new ConfigurationVariables(Sets.newHashSet("the_audience_02"), "domain", "testdomain.com", "someattribute"));
 		ConfigurationVariablesActiveObject[] configs = entityManager.find(ConfigurationVariablesActiveObject.class);
 		
 		assertThat(configs.length, is(1));

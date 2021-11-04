@@ -21,7 +21,6 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.cloudflare.access.atlassian.base.config.ConfigurationChangedEvent;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
@@ -31,7 +30,6 @@ import com.cloudflare.access.atlassian.base.config.PluginConfiguration;
 import com.cloudflare.access.atlassian.base.config.TokenAudienceActiveObject;
 import com.cloudflare.access.atlassian.common.CertificateProvider;
 import com.cloudflare.access.atlassian.common.http.SimpleHttp;
-import com.google.common.collect.Sets;
 
 import net.java.ao.Entity;
 
@@ -75,7 +73,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 
 	private void saveAudiences(ConfigurationVariables configVariables, ConfigurationVariablesActiveObject currentConfig) {
 		Collection<TokenAudienceActiveObject> currentAudiences = Arrays.stream(currentConfig.getTokenAudiences()).collect(Collectors.toList());
-		Set<String> updatedAudienceTags = Sets.newHashSet(configVariables.getTokenAudience());
+		Set<String> updatedAudienceTags = configVariables.getTokenAudiences();
 
 		TokenAudienceActiveObject[] removedAudiences = currentAudiences.stream()
 			.filter(aud -> updatedAudienceTags.contains(aud.getValue()) == false)

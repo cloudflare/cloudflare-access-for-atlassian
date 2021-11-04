@@ -2,6 +2,9 @@ package com.cloudflare.access.atlassian.base.config;
 
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,7 +29,7 @@ public class ConfigurationVariables {
 
 	@NotNull(message="cfaccess.config.tokenAudience.should.not.be.empty")
 	@Size(min=1, message="cfaccess.config.tokenAudience.should.not.be.empty")
-	private String tokenAudience;
+	private Set<String> tokenAudiences;
 
 	@NotNull(message="cfaccess.config.authDomain.should.not.be.empty")
 	@Size(min=1, message="cfaccess.config.authDomain.should.not.be.empty")
@@ -41,25 +44,24 @@ public class ConfigurationVariables {
 
 	public ConfigurationVariables(ConfigurationVariablesActiveObject activeObject) {
 		super();
-		this.tokenAudience = Arrays.stream(activeObject.getTokenAudiences())
-				.findFirst()
+		this.tokenAudiences = Arrays.stream(activeObject.getTokenAudiences())
 				.map(TokenAudienceActiveObject::getValue)
-				.orElse(null);
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 		this.authDomain = activeObject.getAuthDomain();
 		this.allowedEmailDomain = activeObject.getAllowedEmailDomain();
 		this.userMatchingAttribute = ObjectUtils.defaultIfNull(activeObject.getUserMatchingAttribute(), UserMatchingAttribute.defaultAttribute());
 	}
 
-	public ConfigurationVariables(String tokenAudience, String authDomain, String allowedEmailDomain, String userMatchingAttribute) {
+	public ConfigurationVariables(Set<String> tokenAudiences, String authDomain, String allowedEmailDomain, String userMatchingAttribute) {
 		super();
-		this.tokenAudience = tokenAudience;
+		this.tokenAudiences = tokenAudiences;
 		this.authDomain = authDomain;
 		this.allowedEmailDomain = allowedEmailDomain;
 		this.userMatchingAttribute = EnumUtils.isValidEnum(UserMatchingAttribute.class, userMatchingAttribute) ? UserMatchingAttribute.valueOf(userMatchingAttribute) : UserMatchingAttribute.EMAIL;
 	}
 
-	public String getTokenAudience() {
-		return tokenAudience;
+	public Set<String> getTokenAudiences() {
+		return tokenAudiences;
 	}
 
 	public String getAuthDomain() {
