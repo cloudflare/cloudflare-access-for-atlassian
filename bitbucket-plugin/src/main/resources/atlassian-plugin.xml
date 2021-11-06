@@ -74,8 +74,8 @@
 		<description key="update-check.description">Servlet to check for updates</description>
   	</rest>
 
-	<web-resource name="Cloudflare Access Plugin Global Resources" key="globalWebResources">
-		<resource type="download" name="cloudflareAccessUpdateNotification.js" location="/js/updateNotification.js"/>
+	<web-resource name="Cloudflare Access Plugin Global Resources" key="globalWebResourcesV2">
+		<resource type="download" name="cloudflareAccessPlugin.js" location="/js/cloudflareAccessPlugin.js"/>
 		<context>atl.general</context>
 		<context>atl.admin</context>
 	</web-resource>
