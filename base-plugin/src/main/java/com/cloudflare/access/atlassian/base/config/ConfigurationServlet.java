@@ -2,8 +2,10 @@ package com.cloudflare.access.atlassian.base.config;
 
 import java.io.IOException;
 import java.lang.annotation.ElementType;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +23,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
@@ -34,6 +37,7 @@ import com.cloudflare.access.atlassian.base.support.AtlassianApplicationType;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import com.google.common.collect.Sets;
 
 @Scanned
 public class ConfigurationServlet extends HttpServlet{
@@ -131,12 +135,15 @@ public class ConfigurationServlet extends HttpServlet{
 	}
 
 	private ConfigurationVariables loadFromRequest(HttpServletRequest request) {
-		String tokenAudience = request.getParameter("tokenAudience");
+		Set<String> tokenAudiences = Arrays.stream(request.getParameterValues("tokenAudience"))
+				.filter(StringUtils::isNotBlank)
+				.map(String::trim)
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 	    String authDomain = request.getParameter("authDomain");
 	    String allowedEmailDomain = request.getParameter("allowedEmailDomain");
 	    String userMatchingAttribute = request.getParameter("userMatchingAttribute");
 
-		return new ConfigurationVariables(tokenAudience, authDomain, allowedEmailDomain, userMatchingAttribute);
+		return new ConfigurationVariables(tokenAudiences, authDomain, allowedEmailDomain, userMatchingAttribute);
 	}
 
 	private Map<String, Object> createContext(){

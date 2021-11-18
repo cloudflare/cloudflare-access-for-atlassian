@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,16 +20,16 @@ import com.cloudflare.access.atlassian.common.context.AuthenticationContext;
 class TestVerificationContext implements AuthenticationContext{
 
 	private final JsonWebKeys jwkSet;
-	private String audience;
+	private Set<String> audiences;
 	private String issuer;
 	private Clock clock;
 
 	public TestVerificationContext() {
 		super();
-		this.audience = "b265846c85e70aa40655a76e53858df6c79cb2d0453feff495f3c5b795fb4d5e";
-		this.issuer = "https://cfaplugin.cloudflareaccess.com";
+		withAudiences("b265846c85e70aa40655a76e53858df6c79cb2d0453feff495f3c5b795fb4d5e");
+		withIssuer("https://cfaplugin.cloudflareaccess.com");
 		LocalDateTime nineOClock = LocalDateTime.of(2018, Month.MAY, 10, 20, 00);
-		this.clock = Clock.fixed(nineOClock.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+		withClock(Clock.fixed(nineOClock.toInstant(ZoneOffset.UTC), ZoneOffset.UTC));
 		List<String> jwkJsons = new ArrayList<>();
 		jwkJsons.add("{\n" +
 				"			\"kid\": \"bccdf99ac336c9278e3c7ac71bebcbe467bbbfd1fb013c84c93889da077b9d79\",\n" +
@@ -61,12 +63,25 @@ class TestVerificationContext implements AuthenticationContext{
 				"			\"e\": \"AQAB\",\n" +
 				"			\"n\": \"1FsOGfFsdlWJwQlWO5gM_RfzO3EsZOCDPCUR0ltc3f4z89mQEljuMkEgsIQ-0GdZluuo7ucp_CilqOeFOck6QjjNWPAzwkpD1nbvfboBZ2RwHlWlLrY4cubCv63cK1447Zwf_KobylRXpV0rDWw0NUPKHK0YO4rD5eikr2DXwbNIMFmXNxcXxhtAYVgjgNjkkc4hZosvM4KofrTviUQtCwIy2agwpe5PUF1gq7P-jnrhyPFhiV2PW8a820re7Bfg5YoGyUEwwrO4NAjfKb6zRexol4TJAWwSD4kYTc93AVh-Sw1ESbWeNAlLemM3iHhOLhyB0F-J9lfIdE9cMIB7jw\"\n" +
 				"		}");
+		jwkJsons.add("{\n" +
+				"           \"kid\": \"B5MS0p9n7iTjy3UmzrhjFRdRlAJY0hhwXS9bg85Msm0\",\n" +
+				"           \"kty\": \"RSA\",\n" +
+				"           \"alg\": \"RS256\",\n" +
+				"           \"use\": \"sig\",\n" +
+				"           \"e\": \"AQAB\",\n" +
+				"           \"n\": \"huLKORZdrfihcfFPe2zeR2ToexvJKXnxX_Ynz2AA5tiDzQzFjjcYfkmt0s4b9yLXuw-LGeo7mH5sJeWeEITW_bUhaMUdHPmbGI5ouNilgy73pocQvicIY8JNLKplm5tWFt_zu3k3D2YuULsN7AkaePyYvWswCFiA7RlT6GznaxY9BjIsfaMaCGMLb8M5IWf5pKCLJflQXCEdeoHxIH9YNXZ2ifucLqZnv_my1twzyi-QHF0u5B74IpTYBHNqlzE2A-_JvzVYs4S_xqd6_YGE4tZ0OCMhjKSdVZ1xxFyHW3rYZpTsKxB20elKWIzErxx3h31Eb7NlPXgPyc34VLeqtw\"\n" +
+				"       }");
 		jwkSet = new JsonWebKeys();
 		jwkSet.setKeys(jwkJsons.stream().map(JwkUtils::readJwkKey).collect(Collectors.toList()));
 	}
 
-	TestVerificationContext withAudience(String audience) {
-		this.audience = audience;
+	TestVerificationContext withAudiences(String...audiences) {
+		this.audiences = Arrays.stream(audiences).collect(Collectors.toSet());
+		return this;
+	}
+
+	TestVerificationContext withAdditionalAudience(String audience) {
+		this.audiences = Stream.concat(Stream.of(audience), audiences.stream()).collect(Collectors.toSet());
 		return this;
 	}
 
@@ -86,8 +101,8 @@ class TestVerificationContext implements AuthenticationContext{
 	}
 
 	@Override
-	public String getAudience() {
-		return this.audience;
+	public Set<String> getAudiences() {
+		return this.audiences;
 	}
 
 	@Override

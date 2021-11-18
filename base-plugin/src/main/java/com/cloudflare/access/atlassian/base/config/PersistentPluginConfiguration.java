@@ -1,6 +1,7 @@
 package com.cloudflare.access.atlassian.base.config;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -46,8 +47,8 @@ public class PersistentPluginConfiguration implements PluginConfiguration{
 		}
 
 		@Override
-		public String getAudience() {
-			return variables.getTokenAudience();
+		public Set<String> getAudiences() {
+			return variables.getTokenAudiences();
 		}
 
 		@Override

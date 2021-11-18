@@ -41,8 +41,26 @@
     
       <div class="field-group">
         <label for="tokenAudience">$i18n.getText("cfaccess.config.tokenAudience") <span class="aui-icon icon-required"> required</span></label>
-        <input type="text" class="text long-field" id="tokenAudience" name="tokenAudience" value="$!{config.tokenAudience}">
         <div class="description">$i18n.getText("cfaccess.config.tokenAudience.description")</div>
+
+        #if( $config.tokenAudiences.size() == 0 )
+	        <div style="margin-top: 8px">
+                <input type="text" class="text long-field" name="tokenAudience" value="">
+	        </div>
+        #end
+
+        #foreach( $audience in $config.tokenAudiences )
+	        <div style="margin-top: 8px">
+                <input type="text" class="text long-field" name="tokenAudience" value="$audience">
+                #if( $velocityCount > 1 )
+                    <button type="button" class="aui-button aui-button-link" onclick="window.CloudflareAccessPlugin.removeAudienceInput(this)">Remove</button>
+                #end
+	        </div>
+        #end
+
+        <div style="margin-top: 8px">
+            <button type="button" class="aui-button aui-button-compact" onclick="window.CloudflareAccessPlugin.addAudienceInput(this.parentElement)">Add Audience</button>
+        </div>
       </div>
       
       <div class="field-group">
@@ -72,7 +90,7 @@
       </div>
       
       <div class="field-group">
-        <input type="submit" class="button" value="Save">
+        <input type="submit" class="aui-button aui-button-primary" value="Save">
       </div>
     </form>
 </body>

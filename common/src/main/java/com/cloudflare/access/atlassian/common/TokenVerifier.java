@@ -59,8 +59,8 @@ public class TokenVerifier {
 		}
 
 		ClaimsVerifier validateAudience() {
-			if(Objects.equals(claims.getAudience(), context.getAudience()) == false) {
-				log.debug("Invalid audience, expecting '{}' but received '{}'", context.getAudience(), claims.getAudience());
+			if(context.getAudiences().contains(claims.getAudience()) == false) {
+				log.debug("Invalid audience, expecting one of '{}' but received '{}'", context.getAudiences(), claims.getAudience());
 				throw new InvalidJWTException("JWT Audience does not match expected audience.");
 			}
 			return this;
