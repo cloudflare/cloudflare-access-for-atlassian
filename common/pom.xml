@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.cloudflare.access.atlassian</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.15.0</version>
+		<version>2.15.1</version>
 	</parent>
 
 	<artifactId>common</artifactId>
@@ -44,6 +44,14 @@
 		    <version>1.9.5</version>
 		    <scope>test</scope>
 		</dependency>
+		<dependency>
+		  <!-- Including a slf4j implementation for logging in tests only -->
+		  <!-- Runtime logging implementation is provided by Atlassian service instance -->
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>slf4j-jdk14</artifactId>
+		  <version>1.7.32</version>
+		  <scope>test</scope>
+		</dependency>
 		
 		<dependency>
 		  <groupId>org.apache.cxf</groupId>
@@ -66,12 +74,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.6.6</version>
-            <scope>provided</scope>
-		</dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>2.15.0</version>
             <scope>provided</scope>
 		</dependency>
 
