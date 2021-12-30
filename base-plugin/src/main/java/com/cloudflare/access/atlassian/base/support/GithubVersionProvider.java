@@ -7,12 +7,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.cloudflare.access.atlassian.common.http.SimpleHttp;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Supplier;
@@ -22,9 +22,15 @@ import com.google.common.base.Suppliers;
 public class GithubVersionProvider implements RemoteVersionProvider{
 
 	private static final Logger log = LoggerFactory.getLogger(GithubVersionProvider.class);
-	private Supplier<String> fetchResult;
+	private final Supplier<String> fetchResult;
+	private final String latestReleaseCheckUrl;
 
 	public GithubVersionProvider() {
+		this("https://api.github.com/repos/cloudflare/cloudflare-access-for-atlassian/releases/latest");
+	}
+
+	GithubVersionProvider(String latestReleaseCheckUrl){
+		this.latestReleaseCheckUrl = latestReleaseCheckUrl;
 		this.fetchResult = Suppliers.memoizeWithExpiration(this::fetchLatestReleasedVersion, 5, TimeUnit.MINUTES);
 	}
 
@@ -34,11 +40,11 @@ public class GithubVersionProvider implements RemoteVersionProvider{
 	}
 
 	private String fetchLatestReleasedVersion() {
-		final String latestReleaseUrl = "https://api.github.com/repos/cloudflare/cloudflare-access-for-atlassian/releases/latest";
 		String json = "REQUEST_NOT_EXECUTED";
-		try(CloseableHttpClient http = HttpClients.createMinimal()){
-			log.debug("Trying to fetch latest release version from GH API: {}", latestReleaseUrl);
-			HttpGet request = new HttpGet(latestReleaseUrl);
+
+		try(CloseableHttpClient http = SimpleHttp.httpClientWithTimeout()){
+			log.debug("Trying to fetch latest release version from GH API: {}", this.latestReleaseCheckUrl);
+			HttpGet request = new HttpGet(this.latestReleaseCheckUrl);
 
 			CloseableHttpResponse response = http.execute(request);
 
