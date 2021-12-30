@@ -31,7 +31,7 @@ public class GithubVersionProvider implements RemoteVersionProvider{
 
 	GithubVersionProvider(String latestReleaseCheckUrl){
 		this.latestReleaseCheckUrl = latestReleaseCheckUrl;
-		this.fetchResult = Suppliers.memoizeWithExpiration(this::fetchLatestReleasedVersion, 5, TimeUnit.MINUTES);
+		this.fetchResult = Suppliers.memoizeWithExpiration(this::fetchLatestReleasedVersion, 1, TimeUnit.HOURS);
 	}
 
 	@Override
