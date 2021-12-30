@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
-import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.cloudflare.access.atlassian.base.config.ConfigurationChangedEvent;
 import com.cloudflare.access.atlassian.base.config.ConfigurationService;
 import com.cloudflare.access.atlassian.base.config.ConfigurationVariables;
@@ -34,20 +34,22 @@ import com.cloudflare.access.atlassian.common.http.SimpleHttp;
 import net.java.ao.Entity;
 
 @Component
-@Transactional
 public class DefaultConfigurationService implements ConfigurationService{
 
 	private static final Logger log = LoggerFactory.getLogger(DefaultConfigurationService.class);
 	private final ActiveObjects activeObjects;
+
 	private final EventPublisher eventPublisher;
 	private final CertificateProvider certificateProvider;
 	private final Map<CacheKey,ConfigurationVariables> configCache;
 
 	@Inject
-	public DefaultConfigurationService(@ComponentImport ActiveObjects activeObjects,
-										@ComponentImport EventPublisher eventPublisher) {
+	public DefaultConfigurationService(
+			@ComponentImport ActiveObjects activeObjects,
+			@ComponentImport EventPublisher eventPublisher) {
 		super();
 		this.activeObjects = activeObjects;
+
 		this.eventPublisher = eventPublisher;
 		this.certificateProvider = new CertificateProvider(new SimpleHttp());
 		this.configCache = new ConcurrentHashMap<>();
@@ -61,14 +63,18 @@ public class DefaultConfigurationService implements ConfigurationService{
 		entity.setAuthDomain(configVariables.getAuthDomain());
 		entity.setAllowedEmailDomain(configVariables.getAllowedEmailDomain());
 		entity.setUserMatchingAttribute(configVariables.getUserMatchingAttribute());
-		
-		saveAudiences(configVariables, entity);
-		entity.save();
 
-		log.info("Publishing configuration changed event...");
-		eventPublisher.publish(new ConfigurationChangedEvent(this));
+		activeObjects.executeInTransaction(() -> {
+			saveAudiences(configVariables, entity);
+			entity.save();
 
-		this.configCache.put(CacheKey.MAIN_CONFIG, configVariables);
+			log.info("Publishing configuration changed event...");
+			eventPublisher.publish(new ConfigurationChangedEvent(this));
+
+			this.configCache.put(CacheKey.MAIN_CONFIG, configVariables);
+
+			return true;
+		});
 	}
 
 	private void saveAudiences(ConfigurationVariables configVariables, ConfigurationVariablesActiveObject currentConfig) {
@@ -79,11 +85,11 @@ public class DefaultConfigurationService implements ConfigurationService{
 			.filter(aud -> updatedAudienceTags.contains(aud.getValue()) == false)
 			.toArray(TokenAudienceActiveObject[]::new);
 		activeObjects.delete(removedAudiences);
-		
+
 		Set<String> currentAudienceTags = currentAudiences.stream()
 				.map(aud -> aud.getValue())
 				.collect(Collectors.toSet());
-		
+
 		updatedAudienceTags
 			.stream()
 			.filter(tag -> currentAudienceTags.contains(tag) == false)
@@ -95,7 +101,7 @@ public class DefaultConfigurationService implements ConfigurationService{
 			})
 			.forEach(Entity::save);
 	}
-	
+
 	@Override
 	public Optional<ConfigurationVariables> loadConfigurationVariables() {
 		ConfigurationVariables configurationVariables = this.configCache.computeIfAbsent(CacheKey.MAIN_CONFIG, key -> {
@@ -107,10 +113,23 @@ public class DefaultConfigurationService implements ConfigurationService{
 		return Optional.ofNullable(configurationVariables);
 	}
 
-	private Optional<ConfigurationVariablesActiveObject> findFirst() {
-		ConfigurationVariablesActiveObject[] result = activeObjects.find(ConfigurationVariablesActiveObject.class);
-		if(result.length == 0) return Optional.empty();
-		return Optional.of(result[0]);
+	Optional<ConfigurationVariablesActiveObject> findFirst() {
+		ConfigurationVariablesActiveObject persistedConfig = activeObjects.executeInTransaction(new TransactionCallback<ConfigurationVariablesActiveObject>() {
+
+			@Override
+			public ConfigurationVariablesActiveObject doInTransaction() {
+				ConfigurationVariablesActiveObject[] result = activeObjects.find(ConfigurationVariablesActiveObject.class);
+				if(result.length == 0) return null;
+				return withPreloadedRelations(result[0]);
+			}
+
+			private ConfigurationVariablesActiveObject withPreloadedRelations(ConfigurationVariablesActiveObject entity) {
+				entity.getTokenAudiences();
+				return entity;
+			}
+		});
+
+		return Optional.ofNullable(persistedConfig);
 	}
 
 	@Override
