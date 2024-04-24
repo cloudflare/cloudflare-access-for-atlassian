@@ -5,7 +5,7 @@
     <parent>
         <artifactId>parent</artifactId>
         <groupId>com.cloudflare.access.atlassian</groupId>
-        <version>2.15.2</version>
+        <version>SEM_VER</version>
     </parent>
     <artifactId>confluence-plugin</artifactId>
     <organization>
