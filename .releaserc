@@ -1,0 +1,24 @@
+{
+    "branches": [
+        "master",
+        "setup-semantic-release-action"
+    ],
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        ["@semantic-release/exec", {
+          "prepareCmd": "atlas-mvn --batch-mode versions:set -DnewVersion=${nextRelease.version}",
+          "publishCmd": "./atlas-package.sh"
+        }],
+        [
+          "@semantic-release/github",
+          {
+            "assets": [
+              { "path": "bitbucket-plugin/target/*.jar", "label": "Cloudlare Access for Bitbucket ${nextRelease.version}" },
+              { "path": "confluence-plugin/target/*.jar", "label": "Cloudlare Access for Confluence ${nextRelease.version}" },
+              { "path": "jira-plugin/target/*.jar", "label": "Cloudlare Access for JIRA ${nextRelease.version}" },
+            ]
+          }
+        ]
+    ]
+}
