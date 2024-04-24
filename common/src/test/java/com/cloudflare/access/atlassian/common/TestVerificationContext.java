@@ -71,6 +71,14 @@ class TestVerificationContext implements AuthenticationContext{
 				"           \"e\": \"AQAB\",\n" +
 				"           \"n\": \"huLKORZdrfihcfFPe2zeR2ToexvJKXnxX_Ynz2AA5tiDzQzFjjcYfkmt0s4b9yLXuw-LGeo7mH5sJeWeEITW_bUhaMUdHPmbGI5ouNilgy73pocQvicIY8JNLKplm5tWFt_zu3k3D2YuULsN7AkaePyYvWswCFiA7RlT6GznaxY9BjIsfaMaCGMLb8M5IWf5pKCLJflQXCEdeoHxIH9YNXZ2ifucLqZnv_my1twzyi-QHF0u5B74IpTYBHNqlzE2A-_JvzVYs4S_xqd6_YGE4tZ0OCMhjKSdVZ1xxFyHW3rYZpTsKxB20elKWIzErxx3h31Eb7NlPXgPyc34VLeqtw\"\n" +
 				"       }");
+		jwkJsons.add("{\n" +
+				"    \"kty\": \"RSA\",\n" +
+				"    \"e\": \"AQAB\",\n" +
+				"    \"use\": \"sig\",\n" +
+				"    \"kid\": \"LclHlXOdxeA7idWcI6JRWaGuSKg=\",\n" +
+				"    \"alg\": \"RS256\",\n" +
+				"    \"n\": \"kNRbOFoHAmxbkFdD3EtLrB8RxE0M4ooABZgZQ4FuJ5izsVy9o1v3eWFimkog8P4pylQMlb1zN0A_TM6KY6l0zEzb1xUaWyu-K04ntJO4HwDdjTZT4Wwu9hIm8__2X7jlMATpzSSmEZZochutHQtvM8-3au8AsS0sbxAclin6EF90DneRen1YJExlsDO2XjcacoirV3yIkNqJWUO-FSvOWGVe2wCYhupdA91A1cXfBiqZyJKm8u86y4K29lu3EnAhV19XPfrIPJId-2bL8NV8gjMHsfLkoIVn8uhK4Npa5Wm17YLdVTu-BHjzwzWlP0QVX1dVybedQ7JeumisBC02VQ\"\n" +
+				"}");
 		jwkSet = new JsonWebKeys();
 		jwkSet.setKeys(jwkJsons.stream().map(JwkUtils::readJwkKey).collect(Collectors.toList()));
 	}
