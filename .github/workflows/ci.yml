@@ -18,3 +18,31 @@ jobs:
         run: ./.github/workflows/scripts/setup_atlas.sh
       - name: Run tests
         run: atlas-mvn --batch-mode clean test
+      - name: Set version to PR reference
+        run: atlas-mvn --batch-mode versions:set -DnewVersion=PR-${{ github.event.pull_request.number }}
+      - name: Package preview Jars
+        run: atlas-mvn --batch-mode package -Dmaven.test.skip=true
+      - name: "Push artifact: Bitbucket Plugin PR-${{ github.event.pull_request.number }}"
+        uses: actions/upload-artifact@v4
+        with:
+          name: Bitbucket Plugin PR-${{ github.event.pull_request.number }}
+          path: "./bitbucket-plugin/target/*.jar"
+          compression-level: 0
+          overwrite: true
+          retention-days: 7
+      - name: "Push artifact: Confluence Plugin PR-${{ github.event.pull_request.number }}"
+        uses: actions/upload-artifact@v4
+        with:
+          name: Confluence Plugin PR-${{ github.event.pull_request.number }}
+          path: "./confluence-plugin/target/*.jar"
+          compression-level: 0
+          overwrite: true
+          retention-days: 7
+      - name: "Push artifact: JIRA Plugin PR-${{ github.event.pull_request.number }}"
+        uses: actions/upload-artifact@v4
+        with:
+          name: JIRA Plugin PR-${{ github.event.pull_request.number }}
+          path: "./jira-plugin/target/*.jar"
+          compression-level: 0
+          overwrite: true
+          retention-days: 7
