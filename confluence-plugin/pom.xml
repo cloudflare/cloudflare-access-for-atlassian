@@ -79,11 +79,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.2-atlassian-1</version>
-        </dependency>
-        <dependency>
             <groupId>com.cloudflare.access.atlassian</groupId>
             <artifactId>base-plugin</artifactId>
             <version>${project.version}</version>
