@@ -2,8 +2,11 @@ package com.cloudflare.access.atlassian.base.support;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.cloudflare.access.atlassian.common.http.SimpleHttp;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
@@ -51,8 +52,9 @@ public class GithubVersionProvider implements RemoteVersionProvider{
 			json = EntityUtils.toString(response.getEntity());
 			log.debug("Received JSON: {}", json);
 
-			JsonNode root = new ObjectMapper().readTree(json);
-			String tagName = root.get("tag_name").asText();
+			Map<String, Object> root = new JsonMapObjectReaderWriter(true).fromJson(json);
+
+			String tagName = Objects.toString(root.get("tag_name"));
 			String semanticVersion = defaultIfBlank(tagName, "").replaceFirst("^v", "");
 
 			log.debug("Latest release tag name and semantic version: [tagName:{}, version:{}]", tagName, semanticVersion);
