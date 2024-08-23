@@ -16,3 +16,6 @@ local.properties
 # Maven
 target/
 *.xml.versionsBackup
+
+# Intellij
+.idea/
