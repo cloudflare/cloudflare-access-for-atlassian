@@ -122,11 +122,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.cloudflare.access.atlassian</groupId>
             <artifactId>base-plugin</artifactId>
             <version>${project.version}</version>
@@ -223,7 +218,6 @@
         <atlassian.spring.scanner.version>2.1.3</atlassian.spring.scanner.version>
         <atlassian.spring.version>5.1.7.RELEASE</atlassian.spring.version>
         <commons.lang3.version>3.5</commons.lang3.version>
-        <gson.version>2.8.0</gson.version>
         <javax.inject.version>1</javax.inject.version>
         <jsr311.version>1.1.1</jsr311.version>
         <junit.libversion>4.13.1</junit.libversion>
