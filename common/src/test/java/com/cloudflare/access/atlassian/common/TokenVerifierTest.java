@@ -20,16 +20,25 @@ import com.cloudflare.access.atlassian.common.exception.InvalidJWTException;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 
+/**
+ * Verifies multiple variations of token and keys scenarios for verifying tokens.
+ *
+ * When adding a new token to this suite it may be necessary to add a new JWK entry in {@link TestVerificationContext}
+ * that matches the kid in the JWT if not possible to reuse the existing JWKs.
+ *
+ */
 @RunWith(DataProviderRunner.class)
 public class TokenVerifierTest {
 
-	private static String expectedFailureMessage = "Invalid or expired token. Please logout and try again or proceed with your Atlassian credentials.";
-	private static String expectedVerificationFailureMessage = "Invalid token, unable to parse/verify. Please logout and try again or proceed with your Atlassian credentials.";
+	private static final String expectedFailureMessage = "Invalid or expired token. Please logout and try again or proceed with your Atlassian credentials.";
+	private static final String expectedVerificationFailureMessage = "Invalid token, unable to parse/verify. Please logout and try again or proceed with your Atlassian credentials.";
+	private static final String firstAudience = "b265846c85e70aa40655a76e53858df6c79cb2d0453feff495f3c5b795fb4d5e";
+	private static final String secondAudience = "dD8R7Ugv6f3w74S3t9dVGVZkgGJYK8KuBnKfzRV4mdgpsWc833kV6xtFRt47MkYu";
 	private static String tokenForFirstSigningKey;
 	private static String tokenForFirstSigningKeyWithEscapedUrl;
 	private static String tokenForSecondSigningKey;
-	private static String secondAudience = "dD8R7Ugv6f3w74S3t9dVGVZkgGJYK8KuBnKfzRV4mdgpsWc833kV6xtFRt47MkYu";
 	private static String tokenWithAnotherAudience;
+	private static String tokenWithMultipleAudiences;
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
@@ -60,6 +69,12 @@ public class TokenVerifierTest {
 				"eyJhdWQiOlsiZEQ4UjdVZ3Y2ZjN3NzRTM3Q5ZFZHVlprZ0dKWUs4S3VCbktmelJWNG1kZ3BzV2M4MzNrVjZ4dEZSdDQ3TWtZdSJdLCJlbWFpbCI6ImZlbGlwZS5uYXNjaW1lbnRvMUBnbWFpbC5jb20iLCJleHAiOjE1MjYwNzA2NDAsImlhdCI6MTUyNTk4NDI0MSwiaXNzIjoiaHR0cHM6Ly9jZmFwbHVnaW4uY2xvdWRmbGFyZWFjY2Vzcy5jb20iLCJub25jZSI6ImRhMWUxOTRkNDI4YTgwZDNhY2IwNzcxOWI4ZDYzZjdlODViZjZlMmVlOWNmZmZiMGQ0Y2FiYWE4YmE0Mzg2Y2QiLCJzdWIiOiI0YjgyYjM4YS05MjM2LTQ5M2QtODc1Mi01ODBhZDAwMGVhM2UifQ",
 				"VwCMxp3c19byqo2cCl_hMNABI67g87fywwbOd223_IikUVxH3K1yrd50vRIGmoTtkGvy89rE0dhmRFlSwv_0fTVi1SJWsi0cW8urhtH4xL115eqTQufKpQGlrSvESj3byLgKKyoVst2IlGcdRbFTdSgcKEGs7EPKclOKMWR8awEuiwdh4bN7s-s_P1WFcP8TpbqCk_Z6aHSWZXaOHVplklYAIDtKES3XADWHRA8kqH7Dfp-p0htiI8OoLba84ZVYnxWvPcakuwdBKSIWmhvz8v6qT-T8EWMCT1SXMS2HNDLiKg0rr9eIvLMe5uk7KyGHbspeXXiuKr_ZXlpIPMklng"
 			}).collect(Collectors.joining("."));
+
+		tokenWithMultipleAudiences = Arrays.stream(new String[]{
+				"eyJhbGciOiJSUzI1NiIsImtpZCI6IkxjbEhsWE9keGVBN2lkV2NJNkpSV2FHdVNLZz0iLCJ0eXAiOiJKV1QifQ",
+				"eyJhdWQiOlsiYjI2NTg0NmM4NWU3MGFhNDA2NTVhNzZlNTM4NThkZjZjNzljYjJkMDQ1M2ZlZmY0OTVmM2M1Yjc5NWZiNGQ1ZSIsImREOFI3VWd2NmYzdzc0UzN0OWRWR1Zaa2dHSllLOEt1Qm5LZnpSVjRtZGdwc1djODMza1Y2eHRGUnQ0N01rWXUiXSwiZW1haWwiOiJmZWxpcGUubmFzY2ltZW50bzFAZ21haWwuY29tIiwiZXhwIjoxNTI2MDcwNjQwLCJpYXQiOjE1MjU5ODQyNDEsImlzcyI6Imh0dHBzOi8vY2ZhcGx1Z2luLmNsb3VkZmxhcmVhY2Nlc3MuY29tIiwibm9uY2UiOiJkYTFlMTk0ZDQyOGE4MGQzYWNiMDc3MTliOGQ2M2Y3ZTg1YmY2ZTJlZTljZmZmYjBkNGNhYmFhOGJhNDM4NmNkIiwic3ViIjoiNGI4MmIzOGEtOTIzNi00OTNkLTg3NTItNTgwYWQwMDBlYTNlIn0",
+				"dVAiHd0Wa0UQ-7W7L2TRwJRss4SB6sWl_BBn2dPbj3bsm1ggRARPfpvff1tM-0l24DltMUObwGGPVlFcdmHMKzb0K7nL7Ki-wLx2E8aW78nGlMiqU5dAi_r6DpsfNuNmVKU5GGdPSxZ4KuEjgmJRC4LSlyso59Q8utv-Sn7YnrKC9ywI14C5QoU0JVr0NxgOaVk9kTyI2TNJd4XxtkfvFzctdI0wTXy5J350T8VolnDpozOwAFIWCo_FRBnNg9NsJCr34nXjfYfjQydxv53B05N3RrgLqnOa3udrIFHK26zQqmRf0xXaPDVI96PadbWH0r6FPUU8TVW8QnRX68EsGQ"
+		}).collect(Collectors.joining("."));
 	}
 
 	@Test
@@ -143,6 +158,33 @@ public class TokenVerifierTest {
 
 		tokenVerifier.validate(tokenForFirstSigningKey);
 		tokenVerifier.validate(tokenWithAnotherAudience);
+	}
+
+	@Test
+	@DataProvider(value={ firstAudience, secondAudience })
+	public void shouldAcceptTokensWithMultipleAudiencesAndSingleAudienceInContext(String audience) {
+		TestVerificationContext context = new TestVerificationContext().withAudiences(audience);
+		TokenVerifier tokenVerifier = new TokenVerifier(context);
+
+		tokenVerifier.validate(tokenWithMultipleAudiences);
+	}
+
+	@Test
+	public void shouldAcceptTokensWithMultipleAudiencesWithMultipleAudiencesInContext() {
+		TestVerificationContext context = new TestVerificationContext().withAudiences(
+				"somerandomaudienceintoken", secondAudience, firstAudience);
+		TokenVerifier tokenVerifier = new TokenVerifier(context);
+
+		tokenVerifier.validate(tokenWithMultipleAudiences);
+	}
+
+	@Test
+	public void shouldNotAcceptTokensWithMultipleAudiencesIfNoMatch() {
+		expectedException.expect(new ExceptionMatcher (InvalidJWTException.class, expectedFailureMessage));
+		TestVerificationContext context = new TestVerificationContext().withAudiences("random audience");
+		TokenVerifier tokenVerifier = new TokenVerifier(context);
+
+		tokenVerifier.validate(tokenWithMultipleAudiences);
 	}
 
 	private static class ExceptionMatcher extends BaseMatcher<Exception> {

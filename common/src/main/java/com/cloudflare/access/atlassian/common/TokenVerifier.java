@@ -1,8 +1,10 @@
 package com.cloudflare.access.atlassian.common;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Objects;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
@@ -59,9 +61,10 @@ public class TokenVerifier {
 		}
 
 		ClaimsVerifier validateAudience() {
-			if(context.getAudiences().contains(claims.getAudience()) == false) {
-				log.debug("Invalid audience, expecting one of '{}' but received '{}'", context.getAudiences(), claims.getAudience());
-				throw new InvalidJWTException("JWT Audience does not match expected audience.");
+			final boolean hasMatchingAudience = claims.getAudiences().stream().anyMatch(aud -> context.getAudiences().contains(aud));
+			if(!hasMatchingAudience) {
+				log.debug("Invalid audiences, expecting one of '{}' but there is no intersection with JWT audiences '{}'", context.getAudiences(), claims.getAudiences());
+				throw new InvalidJWTException("None of JWT Audiences matches any of the configured expected audiences.");
 			}
 			return this;
 		}

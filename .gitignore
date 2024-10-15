@@ -13,6 +13,9 @@ local.properties
 .classpath
 .project
 
+# Intellij
+.idea
+
 # Maven
 target/
 *.xml.versionsBackup
