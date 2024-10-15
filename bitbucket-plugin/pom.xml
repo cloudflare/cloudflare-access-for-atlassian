@@ -216,7 +216,7 @@
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <atlassian.spring.scanner.version>2.1.3</atlassian.spring.scanner.version>
-        <atlassian.spring.version>5.1.7.RELEASE</atlassian.spring.version>
+        <atlassian.spring.version>5.2.21.RELEASE</atlassian.spring.version>
         <commons.lang3.version>3.5</commons.lang3.version>
         <javax.inject.version>1</javax.inject.version>
         <jsr311.version>1.1.1</jsr311.version>
