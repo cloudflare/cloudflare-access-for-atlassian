@@ -23,9 +23,25 @@
     <dependencies>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-api</artifactId>
+            <artifactId>jira-core</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <!--
+                    Excludes 3rd party dependencies no longer accessible via Maven.
+                    These could be included following https://developer.atlassian.com/server/jira/platform/building-jira-from-source/?_ga=2.113995079.1928104162.1738187303-2050016759.1738061433#third-party-libraries
+                    but that would require additional setup not really necessary as they are not
+                    required directly by the plugin, only in runtime.
+                -->
+                <exclusion>
+                    <groupId>jndi</groupId>
+                    <artifactId>jndi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jta</groupId>
+                    <artifactId>jta</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
 		<dependency>
@@ -33,20 +49,6 @@
 			<artifactId>jira-sal-plugin</artifactId>
 			<version>${jira.version}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-core</artifactId>
-            <version>${jira.version}</version>
-            <scope>provided</scope>
-            <!-- Excluded as would conflict with common
-            <exclusions>
-            	<exclusion>
-            		<groupId>org.bouncycastle</groupId>
-            		<artifactId>bcprov-jdk15on</artifactId>
-            	</exclusion>
-            </exclusions>
-            -->
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.crowd</groupId>
