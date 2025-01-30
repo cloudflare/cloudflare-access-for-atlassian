@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -54,7 +54,7 @@ public class CloudflareAccessService {
 	private PluginStateService pluginStateService;
 	private final boolean filteringDisabled;
 
-	@Autowired
+	@Inject
 	public CloudflareAccessService(@ComponentImport PluginAccessor pluginAcessor,
 									CloudflarePluginDetails pluginDetails,
 									ConfigurationService configurationService,
