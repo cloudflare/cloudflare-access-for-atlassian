@@ -37,7 +37,6 @@ import com.cloudflare.access.atlassian.base.support.AtlassianApplicationType;
 import com.cloudflare.access.atlassian.base.utils.EnvironmentFlags;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Sets;
 
 @Scanned
 public class ConfigurationServlet extends HttpServlet{

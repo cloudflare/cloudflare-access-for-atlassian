@@ -15,9 +15,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<netty.version>4.0.44.Final</netty.version>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -39,11 +38,12 @@
 		    <scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-all</artifactId>
-		    <version>1.9.5</version>
-		    <scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.15.2</version>
+			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 		  <!-- Including a slf4j implementation for logging in tests only -->
 		  <!-- Runtime logging implementation is provided by Atlassian service instance -->
@@ -80,8 +80,7 @@
 		<dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>20.0</version>
-            <scope>provided</scope>
+            <version>32.1.3-jre</version>
         </dependency>
         
         <dependency>

@@ -17,22 +17,40 @@
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.atlassian.plugins</groupId>
+			<artifactId>atlassian-plugins-osgi-javaconfig</artifactId>
+			<version>${osgi.javaconfig.version}</version>
+		</dependency>
+		<!-- OSGi Java Config dependencies -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.framework</artifactId>
+			<version>4.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.6.6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>spring-osgi-core</artifactId>
-            <version>1.1.3</version>
             <scope>provided</scope>
         </dependency>
 		<dependency>
@@ -45,12 +63,6 @@
 			<groupId>com.atlassian.plugins</groupId>
 			<artifactId>atlassian-plugins-api</artifactId>
 			<version>${atlassian.plugins.api.version}</version>
-			<scope>provided</scope>			
-		</dependency>
-		<dependency>
-			<groupId>com.atlassian.seraph</groupId>
-			<artifactId>atlassian-seraph</artifactId>
-			<version>${atlassian.seraph.version}</version>
 			<scope>provided</scope>			
 		</dependency>
         <dependency>
@@ -84,15 +96,15 @@
 		  <scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.atlassian.event</groupId>
+			<artifactId>atlassian-event</artifactId>
+			<version>${atlassian.event.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 		    <groupId>javax.validation</groupId>
 		    <artifactId>validation-api</artifactId>
 		    <version>1.1.0.Final</version>
-		    <scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-core</artifactId>
-		    <version>4.3.21.RELEASE</version>
 		    <scope>provided</scope>
 		</dependency>
 
@@ -119,12 +131,6 @@
             <version>2.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugins.rest</groupId>
-            <artifactId>atlassian-rest-common</artifactId>
-            <version>1.0.2</version>
-            <scope>provided</scope>
-        </dependency>
         
         <dependency>
 			<groupId>junit</groupId>
@@ -132,18 +138,24 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-all</artifactId>
-		    <version>1.9.5</version>
-		    <scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.15.2</version>
+			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>com.atlassian.activeobjects</groupId>
             <artifactId>activeobjects-test</artifactId>
             <version>${active.objects.version}</version>
             <scope>test</scope>
-        </dependency>		
-        <dependency>
+        </dependency>
+		<dependency>
+			<groupId>com.atlassian.profiling</groupId>
+			<artifactId>atlassian-profiling</artifactId>
+			<version>5.0.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
             <groupId>hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>1.8.0.10</version>
@@ -155,15 +167,31 @@
             <version>1.3</version>
         </dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<properties>
-		<crowd.version>3.1.1</crowd.version>
-		<atlassian.plugins.api.version>4.4.7</atlassian.plugins.api.version>
-		<atlassian.seraph.version>3.0.3</atlassian.seraph.version>
+		<osgi.javaconfig.version>0.2.0</osgi.javaconfig.version>
+		<spring.version>4.2.5.RELEASE</spring.version>
+		<atlassian.sal.version>6.0.5</atlassian.sal.version>
+		<active.objects.version>6.1.1</active.objects.version>
+		<crowd.version>6.0.3</crowd.version>
+		<atlassian.event.version>5.0.1</atlassian.event.version>
+
+		<atlassian.plugins.api.version>8.0.15</atlassian.plugins.api.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
 		<atlassian.template.renderer.version>3.0.0</atlassian.template.renderer.version>
-		<atlassian.sal.version>3.1.0</atlassian.sal.version>
-		<active.objects.version>1.5.0</active.objects.version>
+
 		<apache.bval.version>1.1.2</apache.bval.version>
 	</properties>
 </project>
