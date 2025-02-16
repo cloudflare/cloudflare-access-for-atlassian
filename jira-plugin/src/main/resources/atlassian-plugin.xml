@@ -27,7 +27,7 @@
     
     <servlet name="Authentication Error Servlet" i18n-name-key="authentication-error-servlet.name" key="authenticationErrorServlet" class="com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet">
         <description key="authentication-error-servlet.description">Custom error page to display authentication errors</description>
-        <url-pattern>/cloudflareaccess/auth/error.vm</url-pattern>
+        <url-pattern>/cloudflareaccess/auth/error</url-pattern>
 	    <init-param>
 	    	<param-name>loginPath</param-name>
 	    	<param-value>/login.jsp</param-value>

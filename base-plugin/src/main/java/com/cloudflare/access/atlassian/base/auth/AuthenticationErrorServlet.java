@@ -28,7 +28,7 @@ public class AuthenticationErrorServlet extends HttpServlet {
 	public static final String ERROR_MSG_PARAM = "reason";
 	private static final String REDIRECT_TO_LOGIN_PARAM = "goToLogin";
 
-	public static final String PATH = "/plugins/servlet/cloudflareaccess/auth/error.vm";
+	public static final String PATH = "/plugins/servlet/cloudflareaccess/auth/error";
 	private static final String ERROR_TEMPLATE = "/templates/error.vm";
 
 	private TemplateRenderer templateRenderer;
