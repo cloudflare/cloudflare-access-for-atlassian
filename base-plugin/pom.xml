@@ -102,6 +102,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.atlassian.annotations</groupId>
+			<artifactId>atlassian-annotations</artifactId>
+			<version>${atlassian.annotations.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 		    <groupId>javax.validation</groupId>
 		    <artifactId>validation-api</artifactId>
 		    <version>1.1.0.Final</version>
@@ -118,7 +124,12 @@
 		    <artifactId>bval-extras</artifactId>
 		    <version>${apache.bval.version}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.14</version>
+			<scope>provided</scope>
+		</dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
@@ -187,7 +198,7 @@
 		<active.objects.version>6.1.1</active.objects.version>
 		<crowd.version>6.0.3</crowd.version>
 		<atlassian.event.version>5.0.1</atlassian.event.version>
-
+		<atlassian.annotations.version>5.0.1</atlassian.annotations.version>
 		<atlassian.plugins.api.version>8.0.15</atlassian.plugins.api.version>
 		<atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
 		<atlassian.template.renderer.version>3.0.0</atlassian.template.renderer.version>

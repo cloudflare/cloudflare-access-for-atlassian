@@ -26,6 +26,12 @@
             <artifactId>jira-api</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
 		<dependency>
@@ -39,21 +45,28 @@
             <artifactId>jira-core</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
-            <!-- Excluded as would conflict with common
             <exclusions>
             	<exclusion>
-            		<groupId>org.bouncycastle</groupId>
-            		<artifactId>bcprov-jdk15on</artifactId>
+            		<groupId>jndi</groupId>
+            		<artifactId>jndi</artifactId>
             	</exclusion>
+                <exclusion>
+                    <groupId>jta</groupId>
+                    <artifactId>jta</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
             </exclusions>
-            -->
 		</dependency>
-		<dependency>
-			<groupId>com.atlassian.crowd</groupId>
-			<artifactId>crowd-api</artifactId>
-			<version>${crowd.version}</version>
-			<scope>provided</scope>			
-		</dependency>        
+        <dependency>
+            <groupId>com.atlassian.annotations</groupId>
+            <artifactId>atlassian-annotations</artifactId>
+            <version>${atlassian.annotations.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
@@ -102,10 +115,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-all</artifactId>
-		    <version>1.9.5</version>
-		    <scope>test</scope>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.15.2</version>
+            <scope>test</scope>
 		</dependency>
 		<dependency>
 		    <groupId>com.atlassian.jira</groupId>
@@ -142,7 +155,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
+                <artifactId>jira-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
@@ -159,7 +172,7 @@
                     </pluginArtifacts>
                     -->
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
+
                     <!-- See here for an explanation of default instructions: -->
                     <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
@@ -183,6 +196,9 @@
                         <!-- Ensure plugin is spring powered -->
                         <Spring-Context>*</Spring-Context>
                     </instructions>
+                    <banningExcludes>
+                        <exclude>org.apache.commons:commons-lang3</exclude>
+                    </banningExcludes>
                 </configuration>
             </plugin>
 
@@ -221,11 +237,10 @@
     </build>
 
     <properties>
-        <jira.version>7.7.1</jira.version>
-        <crowd.version>3.1.1</crowd.version>
-        <amps.version>6.3.15</amps.version>
-        <netty.version>4.0.44.Final</netty.version>
-        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
+        <jira.version>9.12.2</jira.version>
+        <atlassian.annotations.version>5.0.1</atlassian.annotations.version>
+        <amps.version>9.1.1</amps.version>
+        <plugin.testrunner.version>2.0.9</plugin.testrunner.version>
         <atlassian.spring.scanner.version>2.2.0</atlassian.spring.scanner.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>

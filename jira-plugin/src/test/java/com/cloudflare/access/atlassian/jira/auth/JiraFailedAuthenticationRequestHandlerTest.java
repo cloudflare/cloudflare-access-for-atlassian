@@ -1,7 +1,6 @@
 package com.cloudflare.access.atlassian.jira.auth;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -14,9 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JiraFailedAuthenticationRequestHandlerTest {
@@ -30,8 +29,6 @@ public class JiraFailedAuthenticationRequestHandlerTest {
 
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-
-		when(httpRequest.getRequestURI()).thenReturn("/secure/website");
 
 		handler.handle(httpRequest, httpResponse, new Exception("testing exception"));
 
@@ -78,7 +75,6 @@ public class JiraFailedAuthenticationRequestHandlerTest {
 		httpResponse = mock(HttpServletResponse.class);
 		Exception secondException = new Exception("another testing exception");
 
-		when(httpRequest.getRequestURI()).thenReturn(redirectUrlCaptor.getValue());
 		handler.handle(httpRequest, httpResponse, secondException);
 		verify(httpResponse, times(1)).sendRedirect(redirectUrlCaptor.capture());
 		assertTrue(redirectUrlCaptor.getValue().contains(AuthenticationErrorServlet.PATH));
