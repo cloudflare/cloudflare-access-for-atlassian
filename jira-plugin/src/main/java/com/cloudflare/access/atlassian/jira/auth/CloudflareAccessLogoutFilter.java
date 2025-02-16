@@ -13,11 +13,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.atlassian.annotations.security.UnrestrictedAccess;
 import com.atlassian.sal.api.component.ComponentLocator;
 import com.atlassian.seraph.service.rememberme.RememberMeService;
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
 
 @Named("CloudflareAccessLogoutFilter")
+@UnrestrictedAccess
 public class CloudflareAccessLogoutFilter implements Filter{
 
 	private CloudflareAccessService cloudflareAccess;

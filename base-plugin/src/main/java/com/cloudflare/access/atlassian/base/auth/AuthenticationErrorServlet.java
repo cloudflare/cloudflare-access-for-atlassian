@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.atlassian.annotations.security.UnrestrictedAccess;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
@@ -46,7 +47,8 @@ public class AuthenticationErrorServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	@UnrestrictedAccess
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		if(shouldRedirectToLogin(req)) {
 			redirectToLoginWithAtlassianFlowEnabled(req, resp);
 		}else {
