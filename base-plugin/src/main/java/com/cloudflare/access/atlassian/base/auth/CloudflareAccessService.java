@@ -84,6 +84,14 @@ public class CloudflareAccessService {
 			if(isAtlassianFlowEnabled(request)) {
 				log.debug("Atlassian flow is enabled, bypassing");
 				chain.doFilter(request, response);
+
+				//During the auth requests processing, ensure we keep the atlassian flow flag enabled
+				//if not the user would get into a loop as the session is destroyed when authenticating
+				//with atlassian credentials. We must check the response has not been fully sent to avoid
+				//errors.
+				if(!response.isCommitted()) {
+					SessionUtils.enableAtlassianFlowSession(request);
+				}
 				return;
 			}
 
