@@ -2,7 +2,6 @@ package com.cloudflare.access.atlassian.base.auth.impl;
 
 import java.util.Iterator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.atlassian.crowd.embedded.api.CrowdService;
@@ -20,13 +19,15 @@ import com.cloudflare.access.atlassian.base.config.UserMatchingAttribute;
 import com.cloudflare.access.atlassian.common.exception.CloudflareAccessUnauthorizedException;
 import com.google.common.collect.Iterators;
 
+import javax.inject.Inject;
+
 @Component
 public class DefaultAtlassianUserService implements AtlassianUserService{
 
 	private CrowdService crowdService;
 	private ConfigurationService configurationService;
 
-	@Autowired
+	@Inject
 	public DefaultAtlassianUserService(@ComponentImport CrowdService crowdService, ConfigurationService configurationService) {
 		this.crowdService = crowdService;
 		this.configurationService = configurationService;

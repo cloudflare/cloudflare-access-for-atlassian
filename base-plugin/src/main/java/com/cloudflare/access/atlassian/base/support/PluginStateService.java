@@ -6,13 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.event.PluginEventListener;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+
+import javax.inject.Inject;
 
 @Component
 public class PluginStateService implements InitializingBean, DisposableBean {
@@ -23,7 +24,7 @@ public class PluginStateService implements InitializingBean, DisposableBean {
 
 	private boolean ready;
 
-	@Autowired
+	@Inject
 	public PluginStateService(@ComponentImport EventPublisher eventPublisher) {
 		Objects.requireNonNull(eventPublisher);
 		this.eventPublisher = eventPublisher;
