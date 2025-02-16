@@ -1,0 +1,37 @@
+services:
+  postgresql:
+    image: postgres:16-alpine
+    volumes:
+      - $PWD/db:/var/lib/postgresql/data
+      - $PWD/init:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=test#setup
+      - POSTGRES_USER=atlassian
+      - POSTGRES_MULTIPLE_DATABASES=jira,confluence
+    profiles:
+      - jira
+      - confluence
+
+  jira:
+    image: atlassian/jira-software:10.3.2
+    ports:
+      - 8080:8080
+      - 8000:8000
+    volumes:
+      - $PWD/jira:/var/atlassian/application-data/jira
+    environment:
+      - JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true"
+    profiles:
+      - jira
+
+  confluence:
+    image: atlassian/confluence:9.0.2-ubuntu-jdk17
+    ports:
+      - 8080:8090
+      - 8081:8091
+    volumes:
+      - $PWD/confluence:/var/atlassian/application-data/confluence
+    environment:
+      - JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true"
+    profiles:
+      - confluence

@@ -23,3 +23,10 @@ localrepo/
 
 # Intellij
 .idea/
+
+
+# Docker
+docker/db
+docker/jira
+docker/confluence
+docker/bitbucket
