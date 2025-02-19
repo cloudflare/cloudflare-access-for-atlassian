@@ -26,9 +26,9 @@
 			<modules>
 				<module>common</module>
 				<module>base-plugin</module>
-				<!--module>jira-plugin</module>
+				<module>jira-plugin</module>
 				<module>confluence-plugin</module>
-				<module>bitbucket-plugin</module-->
+				<!--module>bitbucket-plugin</module-->
 			</modules>
 		</profile>
 		<profile>

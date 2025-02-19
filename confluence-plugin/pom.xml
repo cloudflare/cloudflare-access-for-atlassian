@@ -17,12 +17,6 @@
     <packaging>atlassian-plugin</packaging>
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.atlassian.confluence</groupId>
             <artifactId>confluence</artifactId>
             <version>${confluence.version}</version>
@@ -43,7 +37,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.0.0.RELEASE</version>
+            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -95,6 +89,21 @@
             <version>1.6.6</version>
             <scope>provided</scope>
         </dependency>
+        <!--
+            Guava is used by the common code, there is set to use the provided version.
+            For Confluence it needs to be packaged with the plugin
+        -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -102,8 +111,8 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.8.5</version>
+            <artifactId>mockito-core</artifactId>
+            <version>5.15.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -111,14 +120,13 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-confluence-plugin</artifactId>
+                <artifactId>confluence-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${confluence.version}</productVersion>
                     <productDataVersion>${confluence.data.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
                     <!-- See here for an explanation of default instructions: -->
                     <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
@@ -138,6 +146,12 @@
                         <!-- Ensure plugin is spring powered -->
                         <Spring-Context>*</Spring-Context>
                     </instructions>
+                    <banningExcludes>
+                        <!-- this is not packaged, but maven insists in saying so -->
+                        <exclude>org.apache.commons:commons-lang3</exclude>
+                        <!-- this is not available in confluence runtime -->
+                        <exclude>com.google.guava:guava</exclude>
+                    </banningExcludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -173,12 +187,13 @@
         <finalName>cloudflare-access-${project.artifactId}-${project.version}</finalName>
     </build>
     <properties>
-        <confluence.version>6.7.1</confluence.version>
-        <confluence.data.version>6.7.1</confluence.data.version>
-        <amps.version>6.3.15</amps.version>
+        <confluence.version>9.0.2</confluence.version>
+        <confluence.data.version>9.0.2</confluence.data.version>
+        <amps.version>9.1.1</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>2.2.0</atlassian.spring.scanner.version>
         <atlassian.templaterenderer.version>2.1.0</atlassian.templaterenderer.version>
+        <spring.version>4.2.5.RELEASE</spring.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
