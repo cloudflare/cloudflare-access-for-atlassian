@@ -68,6 +68,21 @@
 			    <artifactId>httpclient</artifactId>
 			    <version>4.5.13</version>
 			</dependency>
+
+			<!--
+			Defines the guava version to be used in modules
+			 -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>32.1.3-jre</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.google.code.findbugs</groupId>
+						<artifactId>jsr305</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	

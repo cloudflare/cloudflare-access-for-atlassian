@@ -26,12 +26,6 @@
             <artifactId>jira-api</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         
 		<dependency>
@@ -53,10 +47,6 @@
                 <exclusion>
                     <groupId>jta</groupId>
                     <artifactId>jta</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
 		</dependency>
