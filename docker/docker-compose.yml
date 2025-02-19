@@ -7,16 +7,16 @@ services:
     environment:
       - POSTGRES_PASSWORD=test#setup
       - POSTGRES_USER=atlassian
-      - POSTGRES_MULTIPLE_DATABASES=jira,confluence
+      - POSTGRES_MULTIPLE_DATABASES=jira,confluence,bitbucket
     profiles:
       - jira
       - confluence
+      - bitbucket
 
   jira:
     image: atlassian/jira-software:10.3.2
     ports:
       - 8080:8080
-      - 8000:8000
     volumes:
       - $PWD/jira:/var/atlassian/application-data/jira
     environment:
@@ -25,13 +25,25 @@ services:
       - jira
 
   confluence:
-    image: atlassian/confluence:9.0.2-ubuntu-jdk17
+    image: atlassian/confluence:9.0.2
     ports:
       - 8080:8090
-      - 8081:8091
     volumes:
       - $PWD/confluence:/var/atlassian/application-data/confluence
     environment:
       - JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true"
     profiles:
       - confluence
+
+  bitbucket:
+    image: atlassian/bitbucket:9.4.3
+    ports:
+      - 8080:7990
+    volumes:
+      - $PWD/bitbucket:/var/atlassian/application-data/bitbucket
+    environment:
+      - JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true"
+      # Disable embedded open search to make it more lightweight
+      - SEARCH_ENABLED=false
+    profiles:
+      - bitbucket

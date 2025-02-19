@@ -22,6 +22,8 @@ All quick-starts provided in this page expose services on port `8080` for simpli
 The project contains a `docker compose` configuration to quickstart services, use the respective application profile to
 start, e.g. `docker compose --profile=confluence up`.
 
+Supported profiles are: `jira`, `confluence`, `bitbucket`.
+
 This will take care of starting both the DB and the application, then follow the setup instructions using a test license 
 and database configuration as:
 - DB Type: Postgresql
@@ -32,16 +34,3 @@ and database configuration as:
 
 Depending on the host machine the setup process will take a while (> 3 minutes), if the setup wizard does not move after
 the DB setup step, try opening the root URL again as it should detect it got stuck and continue from where it stopped.
-
-## Bitbucket
-
-Bitbucket can be started as a docker container using:
-
-```bash
-
-docker run \
-  -e JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true" \
-  -v bitbucketVolume:/var/atlassian/application-data/bitbucket \
-  --name="bitbucket" \
-  -d -p 8080:7990 -p 8089:7999 atlassian/bitbucket:8.19-ubuntu-jdk17
-```
