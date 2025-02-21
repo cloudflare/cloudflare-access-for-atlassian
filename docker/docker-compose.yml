@@ -45,5 +45,11 @@ services:
       - JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true"
       # Disable embedded open search to make it more lightweight
       - SEARCH_ENABLED=false
+      # Adjust the below settings to match your testing environment if coming from a public URL
+      # if not, bitbucket will give XSRF errors.
+      #- SERVER_PROXY_NAME=yourpublicdomain.com
+      #- SERVER_PROXY_PORT=443
+      #- SERVER_SCHEME=https
+      #- SERVER_SECURE=true
     profiles:
       - bitbucket

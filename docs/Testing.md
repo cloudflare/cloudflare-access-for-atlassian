@@ -34,3 +34,9 @@ and database configuration as:
 
 Depending on the host machine the setup process will take a while (> 3 minutes), if the setup wizard does not move after
 the DB setup step, try opening the root URL again as it should detect it got stuck and continue from where it stopped.
+
+
+### Bitbucket public configuration
+
+For Bitbucket, the public URL needs to be configured in the `docker-compose.yml` file accordingly as if not operations
+like login will fail with XSRF errors. See the file for the configuration.
