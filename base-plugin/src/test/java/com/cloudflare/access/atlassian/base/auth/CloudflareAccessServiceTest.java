@@ -1,7 +1,10 @@
 package com.cloudflare.access.atlassian.base.auth;
 
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.ATLASSIAN_FLOW_FLAG;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -17,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.env.Environment;
@@ -261,6 +265,28 @@ public class CloudflareAccessServiceTest {
 		verifyNoInteractions(successHandler);
 		verifyNoInteractions(failureHandler);
 	}
+
+
+	@Test
+	public void atlassianFlowEnabledShouldBypassAuthProcess() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		HttpSession httpSession = mock(HttpSession.class);
+		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
+		when(httpSession.getAttribute(ATLASSIAN_FLOW_FLAG)).thenReturn(true);
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		ArgumentCaptor<HttpServletRequest> requestArgumentCaptor = ArgumentCaptor.forClass(HttpServletRequest.class);
+		verify(chain, times(1)).doFilter(requestArgumentCaptor.capture(), eq(httpResponse));
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(failureHandler);
+		assertEquals(AtlassianLoginFlowRequestWrapper.class, requestArgumentCaptor.getValue().getClass());
+	}
+
 
 	private Cookie newCookie(String name, String value, int maxAge) {
 		Cookie cookie = new Cookie(name, value);

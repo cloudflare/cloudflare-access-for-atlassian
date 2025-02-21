@@ -1,9 +1,6 @@
 package com.cloudflare.access.atlassian.base.auth;
 
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.clearSession;
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.isAtlassianFlowSession;
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.sessionAlreadyContainsAuthenticatedUser;
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.storeUserEmailInSession;
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.*;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
@@ -83,15 +80,7 @@ public class CloudflareAccessService {
 
 			if(isAtlassianFlowEnabled(request)) {
 				log.debug("Atlassian flow is enabled, bypassing");
-				chain.doFilter(request, response);
-
-				//During the auth requests processing, ensure we keep the atlassian flow flag enabled
-				//if not the user would get into a loop as the session is destroyed when authenticating
-				//with atlassian credentials. We must check the response has not been fully sent to avoid
-				//errors.
-				if(!response.isCommitted()) {
-					SessionUtils.enableAtlassianFlowSession(request);
-				}
+				chain.doFilter(new AtlassianLoginFlowRequestWrapper(request), response);
 				return;
 			}
 
@@ -148,6 +137,10 @@ public class CloudflareAccessService {
 
 		if(isAtlassianFlowEnabled(request)) {
 			log.debug("Atlassian flow is enabled, bypassing");
+			// If it is a logout from a session that was created during the Atlassian flow, remove the flag.
+			// This allows to return to the plugin flow until the user clicks the button to login with an atlassian
+			// account again.
+			removeAtlassianFlowFlagFromSession(request);
 			chain.doFilter(request, response);
 			return;
 		}
