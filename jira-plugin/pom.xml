@@ -132,12 +132,6 @@
         	<groupId>com.cloudflare.access.atlassian</groupId>
 			<artifactId>base-plugin</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-            		<groupId>org.bouncycastle</groupId>
-            		<artifactId>bcprov-jdk15on</artifactId>
-				</exclusion>
-			</exclusions>
         </dependency>
     </dependencies>
 
