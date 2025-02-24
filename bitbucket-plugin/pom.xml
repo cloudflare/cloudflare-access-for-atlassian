@@ -148,7 +148,7 @@
                     <banningExcludes>
                         <!-- this is not packaged, but maven insists in saying so -->
                         <exclude>org.apache.commons:commons-lang3</exclude>
-                        <!-- this is not available in confluence runtime -->
+                        <!-- this is not available in bitbucket runtime -->
                         <exclude>com.google.guava:guava</exclude>
                     </banningExcludes>
                 </configuration>

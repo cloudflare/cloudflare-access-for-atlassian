@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Init script to be run on the firstg time the Postgresql container
+# Init script to be run on the first time the Postgresql container
 # starts. It will setup the required databases in the environment variable
 # granting access to the same user as the one defined in the environment variable
 # for setting up the user.
