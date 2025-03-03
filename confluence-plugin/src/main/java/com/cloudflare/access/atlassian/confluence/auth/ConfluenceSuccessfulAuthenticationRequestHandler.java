@@ -16,7 +16,6 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.atlassian.confluence.security.login.LoginManager;
@@ -31,6 +30,8 @@ import com.atlassian.seraph.service.rememberme.RememberMeService;
 import com.cloudflare.access.atlassian.base.auth.SuccessfulAuthenticationRequestHandler;
 import com.cloudflare.access.atlassian.confluence.auth.exception.ConfluenceUserNotFoundException;
 
+import javax.inject.Inject;
+
 @Component
 public class ConfluenceSuccessfulAuthenticationRequestHandler implements SuccessfulAuthenticationRequestHandler{
 
@@ -38,7 +39,7 @@ public class ConfluenceSuccessfulAuthenticationRequestHandler implements Success
 
 	private UserAccessor userAcessor;
 
-	@Autowired
+	@Inject
 	public ConfluenceSuccessfulAuthenticationRequestHandler(@ComponentImport UserAccessor userAcessor) {
 		this.userAcessor = userAcessor;
 	}

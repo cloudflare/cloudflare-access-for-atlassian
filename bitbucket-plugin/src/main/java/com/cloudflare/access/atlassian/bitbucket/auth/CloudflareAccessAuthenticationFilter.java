@@ -13,9 +13,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.atlassian.annotations.security.UnrestrictedAccess;
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
 
 @Named("CloudflareAccessAuthenticationFilter")
+@UnrestrictedAccess
 public class CloudflareAccessAuthenticationFilter implements Filter{
 
 	//private static final Logger log = LoggerFactory.getLogger(CloudflareAccessAuthenticationFilter.class);
@@ -43,12 +45,7 @@ public class CloudflareAccessAuthenticationFilter implements Filter{
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		try {
-			cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
-		}catch (Throwable e) {
-			e.printStackTrace();
-			//chain.doFilter(httpRequest, httpResponse);
-		}
+		cloudflareAccess.processAuthRequest(httpRequest, httpResponse, chain);
 	}
 
 }

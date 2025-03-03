@@ -3,6 +3,7 @@ package com.cloudflare.access.atlassian.base.support;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -15,7 +16,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -34,7 +34,7 @@ public class PluginUpdateAvailabilityResource{
 	private PluginAccessor pluginAcessor;
 	private CloudflarePluginDetails pluginDetails;
 
-	@Autowired
+	@Inject
 	public PluginUpdateAvailabilityResource(RemoteVersionProvider remoteVersionProvider,
 								 @ComponentImport UserManager userManager,
 								 @ComponentImport PluginAccessor pluginAcessor,

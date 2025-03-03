@@ -7,79 +7,36 @@ To test the Cloudflare Access setup with this plugin you need:
 - a Cloudflare account with Access configuration
 - an Atlassian account for getting evaluation licenses for the applications
 - a running instance of the service you want to test
-  - the service needs to be exposed so Access can redirect properly to it, use a reverse proxy like `caddy` or `nginx`. 
+  - the service needs to be exposed so Access can redirect properly to it, on a public server use a reverse proxy like 
+`caddy` or `nginx`, on localhost `Cloudflare Tunnels` would be a good option. 
 
 In this page you find a quick-start to start a testing instance of supported Atlassian applications, for more details 
-and troubleshooting refer to Atlassian documentation.
+and troubleshooting refer to Atlassian documentation and the chosen public expose tool (e.g. `caddy` or  `Cloudflare Tunnels`).
 
 All applications supported need `upm.plugin.upload.enabled` to enable uploading the plugin through the Plugin Manager UI.
 
 All quick-starts provided in this page expose services on port `8080` for simplification. 
 
+## Docker
 
-## JIRA
+The project contains a `docker compose` configuration to quickstart services, use the respective application profile to
+start, e.g. `docker compose --profile=confluence up`.
 
-JIRA can be started as a docker container using:
+Supported profiles are: `jira`, `confluence`, `bitbucket`.
 
-```bash
-docker run \
-  -e JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true" \
-  -v jiraVolume:/var/atlassian/application-data/jira \
-  --name="jira" \
-  -d -p 8080:8080 atlassian/jira-software
-```
-
-
-## Confluence
-
-Confluence in the latest verssions also needs a database, which can be a docker container alongside the Confluence 
-container.
-
-As quick-start create a `docker-compose.yml` file with the contents below and run `docker compose up`:
-
-```yaml
-services:
-  postgresql:
-    image: postgres:16-alpine
-    environment:
-      - POSTGRES_PASSWORD=test#setup
-      - POSTGRES_USER=atlassian
-      - POSTGRES_DB=confluence
-
-  confluence:
-    image: atlassian/confluence:8.5.6-ubuntu-jdk17
-    ports:
-      - 8080:8090
-      - 8081:8091
-    volumes:
-      - confluence-data-8:/var/atlassian/application-data/confluence
-    environment:
-      - JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true"
-
-volumes:
-  confluence-data-8:
-```
-
-This will take care of starting both the DB and Confluence, then follow the setup instructions using a test license and 
-database configuration as:
+This will take care of starting both the DB and the application, then follow the setup instructions using a test license 
+and database configuration as:
 - DB Type: Postgresql
-- JDBC Url: `jdbc:postgresql://postgresql:5432/confluence`
+- Database name: `jira` OR `confluence` OR `bitbucket`
+- JDBC URL (if requested): `jdbc:postgresql://postgresql:5432/<jira OR confluence OR bitbucket>`
 - User: `atlassian`
 - Password: `test#setup`
 
 Depending on the host machine the setup process will take a while (> 3 minutes), if the setup wizard does not move after
-the DB setup step, try opening the URL for Confluence again as it should detect it got stuck and continue from 
-where it stopped.
+the DB setup step, try opening the root URL again as it should detect it got stuck and continue from where it stopped.
 
-## Bitbucket
 
-Bitbucket can be started as a docker container using:
+### Bitbucket public configuration
 
-```bash
-
-docker run \
-  -e JVM_SUPPORT_RECOMMENDED_ARGS="-Dupm.plugin.upload.enabled=true" \
-  -v bitbucketVolume:/var/atlassian/application-data/bitbucket \
-  --name="bitbucket" \
-  -d -p 8080:7990 -p 8089:7999 atlassian/bitbucket:8.19-ubuntu-jdk17
-```
+For Bitbucket, the public URL needs to be configured in the `docker-compose.yml` file accordingly as if not operations
+like login will fail with XSRF errors. See the file for the configuration.

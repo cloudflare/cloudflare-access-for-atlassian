@@ -1,9 +1,6 @@
 package com.cloudflare.access.atlassian.base.auth;
 
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.clearSession;
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.isAtlassianFlowSession;
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.sessionAlreadyContainsAuthenticatedUser;
-import static com.cloudflare.access.atlassian.base.utils.SessionUtils.storeUserEmailInSession;
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.*;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
@@ -11,6 +8,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -54,7 +51,7 @@ public class CloudflareAccessService {
 	private PluginStateService pluginStateService;
 	private final boolean filteringDisabled;
 
-	@Autowired
+	@Inject
 	public CloudflareAccessService(@ComponentImport PluginAccessor pluginAcessor,
 									CloudflarePluginDetails pluginDetails,
 									ConfigurationService configurationService,
@@ -83,7 +80,7 @@ public class CloudflareAccessService {
 
 			if(isAtlassianFlowEnabled(request)) {
 				log.debug("Atlassian flow is enabled, bypassing");
-				chain.doFilter(request, response);
+				chain.doFilter(new AtlassianLoginFlowRequestWrapper(request), response);
 				return;
 			}
 
@@ -101,7 +98,7 @@ public class CloudflareAccessService {
 			}
 
 			if(sessionAlreadyContainsAuthenticatedUser(request, token.getUserEmail())) {
-				log.debug("Session already contains user {} , skipping sucess handler: {}", token.getUserEmail(), request.getRequestURI());
+				log.debug("Session already contains user {} , skipping success handler: {}", token.getUserEmail(), request.getRequestURI());
 				chain.doFilter(request, response);
 				return;
 			}
@@ -140,6 +137,10 @@ public class CloudflareAccessService {
 
 		if(isAtlassianFlowEnabled(request)) {
 			log.debug("Atlassian flow is enabled, bypassing");
+			// If it is a logout from a session that was created during the Atlassian flow, remove the flag.
+			// This allows to return to the plugin flow until the user clicks the button to login with an atlassian
+			// account again.
+			removeAtlassianFlowFlagFromSession(request);
 			chain.doFilter(request, response);
 			return;
 		}

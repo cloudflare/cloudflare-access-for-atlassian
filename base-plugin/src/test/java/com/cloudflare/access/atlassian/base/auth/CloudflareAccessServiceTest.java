@@ -1,12 +1,11 @@
 package com.cloudflare.access.atlassian.base.auth;
 
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static com.cloudflare.access.atlassian.base.utils.SessionUtils.ATLASSIAN_FLOW_FLAG;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -21,8 +20,9 @@ import javax.servlet.http.HttpSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.env.Environment;
 
 import com.atlassian.crowd.embedded.api.User;
@@ -59,6 +59,7 @@ public class CloudflareAccessServiceTest {
 
 	@Before
 	public void setupDefaults() {
+		when(pluginDetails.getPluginKey()).thenReturn("some.plugin.key");
 		when(pluginAcessor.isPluginEnabled(anyString())).thenReturn(true);
 		when(pluginStateService.isReady()).thenReturn(true);
 
@@ -77,7 +78,6 @@ public class CloudflareAccessServiceTest {
 	public void testAuthenticationSuccess() throws IOException, ServletException {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 		HttpSession httpSession = mock(HttpSession.class);
-		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 
@@ -92,9 +92,9 @@ public class CloudflareAccessServiceTest {
 
 		verify(successHandler,times(1)).handle(httpRequest, httpResponse, chain, user);
 		verify(httpSession,times(1)).setAttribute("CF_USER_EMAIL", authContext.getTokenOwnerEmail());
-		verifyZeroInteractions(failureHandler);
-		verifyZeroInteractions(httpResponse);
-		verifyZeroInteractions(chain);
+		verifyNoInteractions(failureHandler);
+		verifyNoInteractions(httpResponse);
+		verifyNoInteractions(chain);
 	}
 
 	@Test
@@ -112,9 +112,9 @@ public class CloudflareAccessServiceTest {
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(failureHandler,times(1)).handle(httpRequest, httpResponse, userRetrievalExcpetion);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(httpResponse);
-		verifyZeroInteractions(chain);
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(httpResponse);
+		verifyNoInteractions(chain);
 	}
 
 	@Test
@@ -129,10 +129,10 @@ public class CloudflareAccessServiceTest {
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(userService);
-		verifyZeroInteractions(httpRequest);
-		verifyZeroInteractions(httpResponse);
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(userService);
+		verifyNoInteractions(httpRequest);
+		verifyNoInteractions(httpResponse);
 	}
 
 	@Test
@@ -147,9 +147,9 @@ public class CloudflareAccessServiceTest {
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain,times(1)).doFilter(httpRequest, httpResponse);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(userService);
-		verifyZeroInteractions(httpResponse);
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(userService);
+		verifyNoInteractions(httpResponse);
 	}
 
 	@Test
@@ -159,13 +159,7 @@ public class CloudflareAccessServiceTest {
 		FilterChain chain = mock(FilterChain.class);
 		HttpSession httpSession = mock(HttpSession.class);
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
-		when(httpRequest.getCookies()).thenReturn(new Cookie[] {
-				newCookie("seraph.whatever", "test", 999999),
-				newCookie("JSESSIONID", "test", 999999),
-		});
-		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(false)).thenReturn(httpSession);
-		when(httpRequest.getServerName()).thenReturn("example.com");
 
 		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processLogoutRequest(httpRequest, httpResponse, chain);
@@ -185,9 +179,7 @@ public class CloudflareAccessServiceTest {
 				newCookie("seraph.whatever", "test", 999999),
 				newCookie("JSESSIONID", "test", 999999),
 		});
-		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(false)).thenReturn(httpSession);
-		when(httpRequest.getServerName()).thenReturn("example.com");
 
 		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processLogoutRequest(httpRequest, httpResponse, chain);
@@ -200,7 +192,6 @@ public class CloudflareAccessServiceTest {
 	@Test
 	public void errorUrlShouldBeWhitelistedWhenTokenIsPresent() throws IOException, ServletException {
 		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 		when(httpRequest.getRequestURI()).thenReturn(AuthenticationErrorServlet.PATH);
 
 		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
@@ -210,10 +201,9 @@ public class CloudflareAccessServiceTest {
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(failureHandler);
-		verifyZeroInteractions(httpResponse);
-		verifyZeroInteractions(chain);
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(failureHandler);
+		verifyNoInteractions(httpResponse);
 	}
 
 	@Test
@@ -226,15 +216,14 @@ public class CloudflareAccessServiceTest {
 		when(httpSession.getAttribute("CF_USER_EMAIL")).thenReturn(authContext.getTokenOwnerEmail());
 
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
-		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
 
 		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(failureHandler);
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(failureHandler);
 	}
 
 	@Test
@@ -246,7 +235,6 @@ public class CloudflareAccessServiceTest {
 		when(configurationService.emailDomainRequiresAtlassianAuthentication(authContext.getTokenOwnerEmail())).thenReturn(true);
 
 		HttpSession httpSession = mock(HttpSession.class);
-		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 
@@ -254,8 +242,8 @@ public class CloudflareAccessServiceTest {
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(failureHandler);
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(failureHandler);
 	}
 
 	@Test
@@ -267,7 +255,6 @@ public class CloudflareAccessServiceTest {
 		when(configurationService.emailDomainRequiresAtlassianAuthentication(authContext.getTokenOwnerEmail())).thenReturn(true);
 
 		HttpSession httpSession = mock(HttpSession.class);
-		when(httpRequest.getSession()).thenReturn(httpSession);
 		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
 		when(httpRequest.getHeader(CloudflareToken.CF_ACCESS_JWT_HEADER)).thenReturn(authContext.getValidToken());
 
@@ -275,9 +262,31 @@ public class CloudflareAccessServiceTest {
 		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
 
 		verify(chain, times(1)).doFilter(httpRequest, httpResponse);
-		verifyZeroInteractions(successHandler);
-		verifyZeroInteractions(failureHandler);
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(failureHandler);
 	}
+
+
+	@Test
+	public void atlassianFlowEnabledShouldBypassAuthProcess() throws IOException, ServletException {
+		HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+		HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+		FilterChain chain = mock(FilterChain.class);
+
+		HttpSession httpSession = mock(HttpSession.class);
+		when(httpRequest.getSession(anyBoolean())).thenReturn(httpSession);
+		when(httpSession.getAttribute(ATLASSIAN_FLOW_FLAG)).thenReturn(true);
+
+		CloudflareAccessService cloudflareAccessService = newCloudflareAccessServiceInstance();
+		cloudflareAccessService.processAuthRequest(httpRequest, httpResponse, chain);
+
+		ArgumentCaptor<HttpServletRequest> requestArgumentCaptor = ArgumentCaptor.forClass(HttpServletRequest.class);
+		verify(chain, times(1)).doFilter(requestArgumentCaptor.capture(), eq(httpResponse));
+		verifyNoInteractions(successHandler);
+		verifyNoInteractions(failureHandler);
+		assertEquals(AtlassianLoginFlowRequestWrapper.class, requestArgumentCaptor.getValue().getClass());
+	}
+
 
 	private Cookie newCookie(String name, String value, int maxAge) {
 		Cookie cookie = new Cookie(name, value);

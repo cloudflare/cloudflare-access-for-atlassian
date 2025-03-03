@@ -14,9 +14,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.atlassian.annotations.security.UnrestrictedAccess;
 import com.cloudflare.access.atlassian.base.auth.CloudflareAccessService;
 
 @Named("CloudflareAccessAuthenticationFilter")
+@UnrestrictedAccess
 public class AuthenticationFilter implements Filter{
 
 	//private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);

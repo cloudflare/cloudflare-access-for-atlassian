@@ -51,17 +51,6 @@
             <groupId>com.atlassian.bitbucket.server</groupId>
             <artifactId>bitbucket-page-objects</artifactId>
             <scope>provided</scope>
-            <exclusions>
-                  <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                  </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -69,24 +58,12 @@
             <version>${junit.libversion}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons.lang3.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-              <groupId>com.atlassian.seraph</groupId>
-              <artifactId>atlassian-seraph</artifactId>
-              <version>${seraph.version}</version>
-              <scope>provided</scope>                  
-        </dependency>
 
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <version>${atlassian.spring.scanner.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         
         <dependency>
@@ -95,17 +72,22 @@
             <version>${atlassian.spring.version}</version>
             <scope>provided</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
             
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>${javax.inject.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!--
+            Guava is used by the common code, there is set to use the provided version.
+            For Bitbucket it needs to be packaged with the plugin
+        -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
@@ -125,16 +107,6 @@
             <groupId>com.cloudflare.access.atlassian</groupId>
             <artifactId>base-plugin</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                  <exclusion>
-                  <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcprov-jdk15on</artifactId>
-                  </exclusion>
-                   <exclusion>
-                   <groupId>org.slf4j</groupId>
-                   <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
@@ -173,6 +145,12 @@
                         <!-- Ensure plugin is Spring powered -->
                         <Spring-Context>*</Spring-Context>
                     </instructions>
+                    <banningExcludes>
+                        <!-- this is not packaged, but maven insists in saying so -->
+                        <exclude>org.apache.commons:commons-lang3</exclude>
+                        <!-- this is not available in bitbucket runtime -->
+                        <exclude>com.google.guava:guava</exclude>
+                    </banningExcludes>
                 </configuration>
             </plugin>
 
@@ -209,10 +187,10 @@
         <finalName>cloudflare-access-${project.artifactId}-${project.version}</finalName>
     </build>
     <properties>
-        <bitbucket.data.version>6.6.1</bitbucket.data.version>
-        <bitbucket.version>6.6.1</bitbucket.version>
+        <bitbucket.data.version>9.2.0</bitbucket.data.version>
+        <bitbucket.version>9.2.0</bitbucket.version>
         <seraph.version>4.0.0</seraph.version>
-        <amps.version>6.3.15</amps.version>
+        <amps.version>9.1.1</amps.version>
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <atlassian.spring.scanner.version>2.1.3</atlassian.spring.scanner.version>

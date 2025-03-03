@@ -41,7 +41,7 @@
   
   <servlet name="Authentication Error Servlet" i18n-name-key="authentication-error-servlet.name" key="authenticationErrorServlet" class="com.cloudflare.access.atlassian.base.auth.AuthenticationErrorServlet">
     <description key="authentication-error-servlet.description">Custom error page to display authentication errors</description>
-    <url-pattern>/cloudflareaccess/auth/error.vm</url-pattern>
+    <url-pattern>/cloudflareaccess/auth/error</url-pattern>
     <init-param>
     	<param-name>loginPath</param-name>
     	<param-value>/login.action</param-value>
@@ -68,5 +68,21 @@
     <description>Link to Cloudflare Access Configuration page.</description> 
     <label>Cloudflare Access</label> 
     <link linkId="cloudflareAccessConfigLink">/plugins/servlet/cloudflareaccess/config</link> 
-  </web-item> 
+  </web-item>
+
+  <velocity-allowlist key="velocity-allowlist" name="Plugin Velocity Allowlist">
+    <!-- Unfortunately this is duplicated in each plugin, should be in sync -->
+    <!-- docs: https://developer.atlassian.com/server/framework/atlassian-sdk/configuring-the-velocity-allowlist/ -->
+    <description>
+      Configures which Java methods can be used in Velocity templates
+    </description>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigSaveResult#getMsgCssClass()</method>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigSaveResult#getMsgTitle()</method>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigSaveResult#getMsg()</method>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigSaveResult#getViolations()</method>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigurationVariables#getTokenAudiences()</method>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigurationVariables#getAuthDomain()</method>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigurationVariables#getAllowedEmailDomain()</method>
+    <method>com.cloudflare.access.atlassian.base.config.ConfigurationVariables#getUserMatchingAttribute()</method>
+  </velocity-allowlist>
 </atlassian-plugin>
